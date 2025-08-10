@@ -306,7 +306,9 @@
             const heading = event.webkitCompassHeading || event.alpha;
             if (heading !== null && heading !== undefined) {
                 compassError.textContent = "";
+                // Calcul de la déviation par rapport au Sud (180°)
                 let deviation = heading - 180;
+                // Normalisation de l'angle entre -180 et +180
                 if (deviation <= -180) deviation += 360;
                 if (deviation > 180) deviation -= 360;
 
@@ -320,7 +322,7 @@
                     currentCompassDisplay.textContent = 'Plein Nord';
                 }
                 else {
-                    const direction = deviation < 0 ? 'Est' : 'Ouest';
+                    const direction = deviation > 0 ? 'Ouest' : 'Est';
                     currentCompassDisplay.textContent = `${Math.round(Math.abs(deviation))}° ${direction}`;
                 }
             } else {

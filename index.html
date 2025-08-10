@@ -139,6 +139,14 @@
                 </div>
             </div>
 
+            <!-- Section Don -->
+            <div class="text-center pt-4">
+                <a href="#" id="donate-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                    Soutenir ce projet (Faire un don)
+                </a>
+            </div>
+
             <!-- Copyright -->
             <div class="text-center text-xs text-gray-500 pt-4 border-t mt-6">
                 <p>- By FredZ - 2025</p>
@@ -162,6 +170,11 @@
         const startInclinometerButton = document.getElementById('start-inclinometer');
         const currentAngleDisplay = document.getElementById('current-angle');
         const inclinometerError = document.getElementById('inclinometer-error');
+        const donateLink = document.getElementById('donate-link');
+
+        // --- Configuration ---
+        // IMPORTANT : Le lien de don est maintenant configuré.
+        donateLink.href = 'https://paypal.me/iFredZ'; 
 
         // --- Constantes ---
         const defaultLatitude = 44.21446183336044;
@@ -235,7 +248,7 @@
             
             winterAngleDisplay.textContent = `${Math.round(winterAngleSouth / cosAzimuth)}°`;
             summerAngleDisplay.textContent = `${Math.round((summerAngleSouth + seasonalClippingAdjustment) / cosAzimuth)}°`;
-            springFallAngleDisplay.textContent = `${Math.round((springFallAngleSouth + seasonalClippingAdjustment) / cosAzimuth)}°`;
+            springFallAngleDisplay.textContent = `${Math.round(springFallAngleSouth / cosAzimuth)}°`;
         }
         
         // --- Inclinomètre Logic ---

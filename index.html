@@ -302,15 +302,21 @@
             }
 
             // Boussole (alpha)
-            if (event.alpha !== null) {
+            const heading = event.webkitCompassHeading || event.alpha;
+            if (heading !== null && heading !== undefined) {
                 compassError.textContent = "";
-                let deviation = event.alpha - 180;
+                // Calcul de la déviation par rapport au Sud (180°)
+                let deviation = heading - 180;
+                // Normalisation de l'angle entre -180 et +180
                 if (deviation <= -180) deviation += 360;
                 if (deviation > 180) deviation -= 360;
 
-                if (Math.abs(deviation) < 3) {
+                if (Math.abs(deviation) < 5) {
                     currentCompassDisplay.textContent = 'Plein Sud';
-                } else {
+                } else if (Math.abs(deviation) > 175) {
+                    currentCompassDisplay.textContent = 'Plein Nord';
+                }
+                else {
                     const direction = deviation < 0 ? 'Est' : 'Ouest';
                     currentCompassDisplay.textContent = `${Math.round(Math.abs(deviation))}° ${direction}`;
                 }
@@ -322,25 +328,31 @@
         function startSensors() {
             inclinometerError.textContent = "";
             compassError.textContent = "Activation...";
+            
+            const startListening = () => {
+                const eventName = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+                window.addEventListener(eventName, handleOrientation, true);
+                startSensorsButton.textContent = "Capteurs activés";
+                startSensorsButton.disabled = true;
+                startSensorsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            };
+
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(permissionState => {
                         if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                            startSensorsButton.textContent = "Capteurs activés";
-                            startSensorsButton.disabled = true;
-                            startSensorsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                            startListening();
                         } else {
                             inclinometerError.textContent = "Permission refusée.";
                             compassError.textContent = "";
                         }
                     })
-                    .catch(console.error);
+                    .catch(error => {
+                        inclinometerError.textContent = "Erreur capteur.";
+                        console.error(error);
+                    });
             } else if ('DeviceOrientationEvent' in window) {
-                window.addEventListener('deviceorientation', handleOrientation);
-                 startSensorsButton.textContent = "Capteurs activés";
-                 startSensorsButton.disabled = true;
-                 startSensorsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                startListening();
             } else {
                  inclinometerError.textContent = "Capteurs non supportés.";
                  compassError.textContent = "";

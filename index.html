@@ -306,8 +306,12 @@
             const heading = event.webkitCompassHeading || event.alpha;
             if (heading !== null && heading !== undefined) {
                 compassError.textContent = "";
+                
+                // Correction pour l'inversion potentielle des capteurs
+                const correctedHeading = 360 - heading;
+
                 // Calcul de la déviation par rapport au Sud (180°)
-                let deviation = heading - 180;
+                let deviation = correctedHeading - 180;
                 // Normalisation de l'angle entre -180 et +180
                 if (deviation <= -180) deviation += 360;
                 if (deviation > 180) deviation -= 360;

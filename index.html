@@ -57,64 +57,67 @@
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
 
-            <!-- En-tête -->
-            <div class="text-center">
+            <!-- En-tête et Localisation -->
+            <div class="text-center border-b pb-6">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Calculateur d'Inclinaison Solaire</h1>
-                <p id="location-subtitle" class="text-sm text-gray-500 mt-1">Localisation par défaut : La Grand-Combe (30110)</p>
-            </div>
-
-            <!-- Calculateur principal -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-                <label for="date-input" class="block text-md font-medium text-blue-800 mb-2">Choisissez une date :</label>
-                <input type="date" id="date-input" class="w-full max-w-xs mx-auto p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <p class="mt-4 text-lg text-blue-900">Angle d'inclinaison recommandé :</p>
-                <p id="result" class="text-5xl md:text-6xl font-bold text-blue-600 my-2">--°</p>
-            </div>
-
-            <!-- Section pour la localisation personnalisée -->
-            <div>
-                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Personnaliser la Localisation</h2>
-                <div class="bg-gray-50 p-4 rounded-lg border text-center">
-                    <label for="latitude-input" class="block text-sm font-medium text-gray-700">Latitude</label>
-                    <input type="number" id="latitude-input" step="any" placeholder="ex: 44.21" class="mt-1 block w-full max-w-xs mx-auto p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <div class="mt-4 max-w-xs mx-auto">
+                    <label for="latitude-input" class="block text-sm font-medium text-gray-700 mb-1">Localisation de l'installation</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="latitude-input" step="any" placeholder="ex: 44.21" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <button id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                     <p id="location-subtitle" class="text-sm text-gray-500 mt-2 h-4"></p>
+                    <p id="location-error" class="text-xs text-red-500 h-4 mt-1"></p>
                 </div>
             </div>
 
-            <!-- Section pour l'Orientation (Azimut) -->
-            <div>
-                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Ajuster l'Orientation (Azimut)</h2>
-                <div class="bg-gray-50 p-4 rounded-lg border">
-                    <label for="azimuth-slider" class="block text-sm font-medium text-gray-700">Déviation par rapport au Sud</label>
-                    <input type="range" id="azimuth-slider" min="-45" max="45" value="0" step="1" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer mt-2">
-                    <div class="flex justify-between text-xs text-gray-500 px-1 mt-2">
-                        <span>45° Est</span>
-                        <span id="azimuth-value" class="font-bold text-base text-gray-800">0° Plein Sud</span>
-                        <span>45° Ouest</span>
-                    </div>
+            <!-- Calcul & Mesure -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- Angle Cible -->
+                <div class="text-center">
+                    <label for="date-input" class="block text-md font-medium text-blue-800 mb-2">Date Cible</label>
+                    <input type="date" id="date-input" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <p class="mt-4 text-lg text-blue-900">Angle Recommandé</p>
+                    <p id="result" class="text-5xl md:text-6xl font-bold text-blue-600 my-1">--°</p>
+                </div>
+                <!-- Angle Mesuré -->
+                <div class="text-center md:border-l md:pl-6 border-gray-200">
+                     <p class="text-lg text-gray-700">Angle Actuel</p>
+                     <p class="text-5xl md:text-6xl font-bold text-gray-800 my-1"><span id="current-angle">--</span>°</p>
+                     <button id="start-sensors" class="mt-4 w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm">Activer les capteurs</button>
+                     <p id="inclinometer-error" class="text-xs text-red-500 h-4 mt-1"></p>
                 </div>
             </div>
 
-            <!-- Section pour l'optimisation de l'écrêtage -->
+
+            <!-- Réglages avancés -->
             <div>
-                 <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Stratégie de Production</h2>
-                 <div class="bg-gray-50 p-4 rounded-lg border">
-                    <div class="switch-field">
-                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
+                 <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Réglages Avancés</h2>
+                 <div class="space-y-4 bg-gray-50 p-4 rounded-lg border">
+                    <!-- Azimut & Boussole -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        <!-- Cible Azimut -->
+                        <div class="text-center">
+                             <label for="azimuth-slider" class="block text-sm font-medium text-gray-700">Déviation Cible / Sud</label>
+                             <input type="range" id="azimuth-slider" min="-45" max="45" value="0" step="1" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer mt-2">
+                             <div class="flex justify-between text-xs text-gray-500 px-1 mt-1">
+                                 <span>45° Est</span>
+                                 <span id="azimuth-value" class="font-bold text-base text-gray-800">0° Sud</span>
+                                 <span>45° Ouest</span>
+                             </div>
+                        </div>
+                        <!-- Mesure Boussole -->
+                        <div class="text-center md:border-l md:pl-6 border-gray-200">
+                            <p class="text-lg text-gray-700">Orientation Mesurée</p>
+                            <p class="text-2xl font-bold text-gray-800 my-1"><span id="current-compass">--</span></p>
+                            <p id="compass-error" class="text-xs text-red-500 h-4 mt-1">Activez les capteurs</p>
+                        </div>
                     </div>
-                    <p class="text-center text-xs text-gray-500 mt-2">Applique cette stratégie durant les mois à forte production (Avril à Septembre).</p>
                  </div>
-            </div>
-
-            <!-- Inclinomètre -->
-            <div>
-                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Mesurer l'inclinaison (Inclinomètre)</h2>
-                <div class="bg-gray-50 p-4 rounded-lg border text-center space-y-3">
-                    <p class="text-xs text-gray-500">Posez votre téléphone sur le bord du panneau pour mesurer son inclinaison actuelle.</p>
-                    <button id="start-inclinometer" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Activer la mesure</button>
-                    <p class="text-4xl font-bold text-blue-600 my-2"><span id="current-angle">--</span>°</p>
-                    <p id="inclinometer-error" class="text-xs text-red-500"></p>
-                </div>
             </div>
 
             <!-- Recommandations saisonnières -->
@@ -139,6 +142,19 @@
                 </div>
             </div>
 
+            <!-- Section Optimisation Écrêtage -->
+            <div class="bg-gray-50 p-4 rounded-lg border">
+                <div class="flex items-center justify-center">
+                    <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
+                    <button id="help-button" class="ml-2 p-1 rounded-full bg-gray-200 hover:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
             <!-- Section Don -->
             <div class="text-center pt-4">
                 <a href="#" id="donate-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
@@ -155,6 +171,29 @@
         </div>
     </div>
 
+    <!-- Modal d'aide -->
+    <div id="help-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Qu'est-ce que l'optimisation pour l'écrêtage ?</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500 text-left">
+                        Si vos panneaux solaires sont plus puissants que votre micro-onduleur (ex: panneau de 500W sur un onduleur de 400W), l'onduleur peut "écrêter" : il bride la production à son maximum, et vous perdez l'énergie excédentaire au milieu de la journée.
+                        <br><br>
+                        En cochant cette case, l'application vous recommandera un angle d'inclinaison **volontairement plus élevé** durant les mois à forte production (Avril à Septembre).
+                        <br><br>
+                        Cela permet de **réduire le pic de production à midi** (que vous perdez de toute façon) pour **améliorer la production le matin et le soir**. Le bilan total sur la journée est ainsi meilleur.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="close-modal" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Compris
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- Éléments du DOM ---
         const dateInput = document.getElementById('date-input');
@@ -167,18 +206,24 @@
         const winterAngleDisplay = document.getElementById('winter-angle');
         const springFallAngleDisplay = document.getElementById('spring-fall-angle');
         const summerAngleDisplay = document.getElementById('summer-angle');
-        const startInclinometerButton = document.getElementById('start-inclinometer');
+        const startSensorsButton = document.getElementById('start-sensors');
         const currentAngleDisplay = document.getElementById('current-angle');
         const inclinometerError = document.getElementById('inclinometer-error');
+        const currentCompassDisplay = document.getElementById('current-compass');
+        const compassError = document.getElementById('compass-error');
         const donateLink = document.getElementById('donate-link');
+        const getLocationButton = document.getElementById('get-location');
+        const locationError = document.getElementById('location-error');
+        const helpButton = document.getElementById('help-button');
+        const helpModal = document.getElementById('help-modal');
+        const closeModalButton = document.getElementById('close-modal');
 
         // --- Configuration ---
-        // IMPORTANT : Le lien de don est maintenant configuré.
         donateLink.href = 'https://paypal.me/iFredZ'; 
 
         // --- Constantes ---
         const defaultLatitude = 44.21446183336044;
-        const clippingAdjustment = 10; // Ajoute 10 degrés pour l'optimisation de l'écrêtage
+        const clippingAdjustment = 10; 
 
         // --- Fonctions utilitaires ---
         const toRadians = (angle) => angle * (Math.PI / 180);
@@ -194,13 +239,9 @@
             return -23.45 * Math.cos(toRadians((360 / 365) * (dayOfYear + 10)));
         };
 
-        /**
-         * Met à jour l'affichage de la valeur de l'azimut.
-         * @param {number} azimuth - L'angle d'azimut en degrés.
-         */
         function updateAzimuthDisplay(azimuth) {
             if (azimuth === 0) {
-                azimuthValueDisplay.textContent = '0° Plein Sud';
+                azimuthValueDisplay.textContent = '0° Sud';
                 azimuthValueDisplay.className = 'font-bold text-base text-gray-800';
             } else if (azimuth < 0) {
                 azimuthValueDisplay.textContent = `${Math.abs(azimuth)}° Est`;
@@ -211,9 +252,6 @@
             }
         }
 
-        /**
-         * Calcule et affiche toutes les valeurs (inclinaison du jour et saisonnières).
-         */
         function calculateAndDisplayAll() {
             const selectedDateStr = dateInput.value;
             if (!selectedDateStr) {
@@ -227,7 +265,7 @@
             }
 
             let currentLatitude = parseFloat(latitudeInput.value) || defaultLatitude;
-            locationSubtitle.textContent = latitudeInput.value.trim() ? `Localisation personnalisée : Lat ${currentLatitude.toFixed(2)}` : 'Localisation par défaut : La Grand-Combe (30110)';
+            locationSubtitle.textContent = latitudeInput.value.trim() ? `Localisation personnalisée : Lat ${currentLatitude.toFixed(2)}` : '';
 
             const panelAzimuth = parseInt(azimuthSlider.value);
             updateAzimuthDisplay(panelAzimuth);
@@ -251,36 +289,87 @@
             springFallAngleDisplay.textContent = `${Math.round(springFallAngleSouth / cosAzimuth)}°`;
         }
         
-        // --- Inclinomètre Logic ---
+        // --- Logique des capteurs ---
         function handleOrientation(event) {
-            if (event.beta === null) {
-                inclinometerError.textContent = "Votre appareil ne fournit pas les données d'inclinaison.";
-                return;
+            // Inclinomètre (beta)
+            if (event.beta !== null) {
+                let tilt = Math.round(event.beta);
+                if (tilt < 0) tilt = 0;
+                if (tilt > 90) tilt = 90;
+                currentAngleDisplay.textContent = tilt;
+            } else {
+                inclinometerError.textContent = "Inclinomètre non dispo.";
             }
-            let tilt = Math.round(event.beta);
-            if (tilt < 0) tilt = 0;
-            if (tilt > 90) tilt = 90;
-            currentAngleDisplay.textContent = tilt;
+
+            // Boussole (alpha)
+            if (event.alpha !== null) {
+                compassError.textContent = "";
+                let deviation = event.alpha - 180;
+                if (deviation <= -180) deviation += 360;
+                if (deviation > 180) deviation -= 360;
+
+                if (Math.abs(deviation) < 3) {
+                    currentCompassDisplay.textContent = 'Plein Sud';
+                } else {
+                    const direction = deviation < 0 ? 'Est' : 'Ouest';
+                    currentCompassDisplay.textContent = `${Math.round(Math.abs(deviation))}° ${direction}`;
+                }
+            } else {
+                compassError.textContent = "Boussole non dispo.";
+            }
         }
 
-        function startInclinometer() {
+        function startSensors() {
             inclinometerError.textContent = "";
+            compassError.textContent = "Activation...";
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(permissionState => {
                         if (permissionState === 'granted') {
                             window.addEventListener('deviceorientation', handleOrientation);
-                            startInclinometerButton.style.display = 'none';
+                            startSensorsButton.textContent = "Capteurs activés";
+                            startSensorsButton.disabled = true;
+                            startSensorsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
                         } else {
-                            inclinometerError.textContent = "Permission refusée. Impossible d'activer l'inclinomètre.";
+                            inclinometerError.textContent = "Permission refusée.";
+                            compassError.textContent = "";
                         }
                     })
                     .catch(console.error);
-            } else {
-                // Pour les navigateurs non-iOS 13+ (ex: Android)
+            } else if ('DeviceOrientationEvent' in window) {
                 window.addEventListener('deviceorientation', handleOrientation);
-                startInclinometerButton.style.display = 'none';
+                 startSensorsButton.textContent = "Capteurs activés";
+                 startSensorsButton.disabled = true;
+                 startSensorsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                 inclinometerError.textContent = "Capteurs non supportés.";
+                 compassError.textContent = "";
             }
+        }
+
+        // --- Logique de Géolocalisation ---
+        function getLocation() {
+            locationError.textContent = "Obtention de la position...";
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        latitudeInput.value = lat.toFixed(4);
+                        calculateAndDisplayAll();
+                        locationError.textContent = "";
+                    },
+                    () => {
+                        locationError.textContent = "Impossible d'obtenir la position.";
+                    }
+                );
+            } else {
+                locationError.textContent = "Géolocalisation non supportée.";
+            }
+        }
+
+        // --- Logique du Modal ---
+        function toggleModal() {
+            helpModal.classList.toggle('hidden');
         }
 
         // --- Écouteurs d'événements ---
@@ -288,7 +377,17 @@
         latitudeInput.addEventListener('input', calculateAndDisplayAll);
         azimuthSlider.addEventListener('input', calculateAndDisplayAll);
         clippingCheckbox.addEventListener('change', calculateAndDisplayAll);
-        startInclinometerButton.addEventListener('click', startInclinometer);
+        startSensorsButton.addEventListener('click', startSensors);
+        getLocationButton.addEventListener('click', getLocation);
+        helpButton.addEventListener('click', toggleModal);
+        closeModalButton.addEventListener('click', toggleModal);
+        // Fermer le modal si on clique en dehors
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                toggleModal();
+            }
+        });
+
 
         // --- Initialisation au chargement de la page ---
         window.addEventListener('load', () => {

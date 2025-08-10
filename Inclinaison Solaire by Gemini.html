@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur d'Inclinaison Solaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style pour les inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.5) sepia(0.6) saturate(2) hue-rotate(180deg);
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb; /* blue-600 */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .switch-field {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
+
+            <!-- En-tête -->
+            <div class="text-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Calculateur d'Inclinaison Solaire</h1>
+                <p id="location-subtitle" class="text-sm text-gray-500 mt-1">Localisation par défaut : La Grand-Combe (30110)</p>
+            </div>
+
+            <!-- Calculateur principal -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+                <label for="date-input" class="block text-md font-medium text-blue-800 mb-2">Choisissez une date :</label>
+                <input type="date" id="date-input" class="w-full max-w-xs mx-auto p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-4 text-lg text-blue-900">Angle d'inclinaison recommandé :</p>
+                <p id="result" class="text-5xl md:text-6xl font-bold text-blue-600 my-2">--°</p>
+            </div>
+
+            <!-- Section pour la localisation personnalisée -->
+            <div>
+                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Personnaliser la Localisation</h2>
+                <div class="bg-gray-50 p-4 rounded-lg border text-center">
+                    <label for="latitude-input" class="block text-sm font-medium text-gray-700">Latitude</label>
+                    <input type="number" id="latitude-input" step="any" placeholder="ex: 44.21" class="mt-1 block w-full max-w-xs mx-auto p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- Section pour l'Orientation (Azimut) -->
+            <div>
+                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Ajuster l'Orientation (Azimut)</h2>
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <label for="azimuth-slider" class="block text-sm font-medium text-gray-700">Déviation par rapport au Sud</label>
+                    <input type="range" id="azimuth-slider" min="-45" max="45" value="0" step="1" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer mt-2">
+                    <div class="flex justify-between text-xs text-gray-500 px-1 mt-2">
+                        <span>45° Est</span>
+                        <span id="azimuth-value" class="font-bold text-base text-gray-800">0° Plein Sud</span>
+                        <span>45° Ouest</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section pour l'optimisation de l'écrêtage -->
+            <div>
+                 <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Stratégie de Production</h2>
+                 <div class="bg-gray-50 p-4 rounded-lg border">
+                    <div class="switch-field">
+                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
+                    </div>
+                    <p class="text-center text-xs text-gray-500 mt-2">Applique cette stratégie durant les mois à forte production (Avril à Septembre).</p>
+                 </div>
+            </div>
+
+            <!-- Inclinomètre -->
+            <div>
+                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Mesurer l'inclinaison (Inclinomètre)</h2>
+                <div class="bg-gray-50 p-4 rounded-lg border text-center space-y-3">
+                    <p class="text-xs text-gray-500">Posez votre téléphone sur le bord du panneau pour mesurer son inclinaison actuelle.</p>
+                    <button id="start-inclinometer" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Activer la mesure</button>
+                    <p class="text-4xl font-bold text-blue-600 my-2"><span id="current-angle">--</span>°</p>
+                    <p id="inclinometer-error" class="text-xs text-red-500"></p>
+                </div>
+            </div>
+
+            <!-- Recommandations saisonnières -->
+            <div>
+                <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Réglages Saisonniers & Dates de Changement</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <p class="font-bold text-lg">Hiver</p>
+                        <p id="winter-angle" class="text-3xl font-bold text-sky-600">60°</p>
+                        <p class="text-xs text-gray-500">Changer le ~21 Déc.</p>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <p class="font-bold text-lg">Mi-saison</p>
+                        <p id="spring-fall-angle" class="text-3xl font-bold text-amber-600">44°</p>
+                        <p class="text-xs text-gray-500">~20 Mars & ~22 Sep.</p>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <p class="font-bold text-lg">Été</p>
+                        <p id="summer-angle" class="text-3xl font-bold text-red-600">29°</p>
+                        <p class="text-xs text-gray-500">Changer le ~21 Juin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-center text-xs text-gray-500 pt-4 border-t mt-6">
+                <p>- By FredZ - 2025</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Éléments du DOM ---
+        const dateInput = document.getElementById('date-input');
+        const resultDisplay = document.getElementById('result');
+        const latitudeInput = document.getElementById('latitude-input');
+        const locationSubtitle = document.getElementById('location-subtitle');
+        const azimuthSlider = document.getElementById('azimuth-slider');
+        const azimuthValueDisplay = document.getElementById('azimuth-value');
+        const clippingCheckbox = document.getElementById('clipping-checkbox');
+        const winterAngleDisplay = document.getElementById('winter-angle');
+        const springFallAngleDisplay = document.getElementById('spring-fall-angle');
+        const summerAngleDisplay = document.getElementById('summer-angle');
+        const startInclinometerButton = document.getElementById('start-inclinometer');
+        const currentAngleDisplay = document.getElementById('current-angle');
+        const inclinometerError = document.getElementById('inclinometer-error');
+
+        // --- Constantes ---
+        const defaultLatitude = 44.21446183336044;
+        const clippingAdjustment = 10; // Ajoute 10 degrés pour l'optimisation de l'écrêtage
+
+        // --- Fonctions utilitaires ---
+        const toRadians = (angle) => angle * (Math.PI / 180);
+
+        const getDayOfYear = (date) => {
+            const startOfYear = new Date(date.getFullYear(), 0, 0);
+            const diff = date - startOfYear;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        };
+
+        const calculateDeclination = (dayOfYear) => {
+            return -23.45 * Math.cos(toRadians((360 / 365) * (dayOfYear + 10)));
+        };
+
+        /**
+         * Met à jour l'affichage de la valeur de l'azimut.
+         * @param {number} azimuth - L'angle d'azimut en degrés.
+         */
+        function updateAzimuthDisplay(azimuth) {
+            if (azimuth === 0) {
+                azimuthValueDisplay.textContent = '0° Plein Sud';
+                azimuthValueDisplay.className = 'font-bold text-base text-gray-800';
+            } else if (azimuth < 0) {
+                azimuthValueDisplay.textContent = `${Math.abs(azimuth)}° Est`;
+                azimuthValueDisplay.className = 'font-bold text-base text-cyan-700';
+            } else {
+                azimuthValueDisplay.textContent = `${azimuth}° Ouest`;
+                azimuthValueDisplay.className = 'font-bold text-base text-orange-600';
+            }
+        }
+
+        /**
+         * Calcule et affiche toutes les valeurs (inclinaison du jour et saisonnières).
+         */
+        function calculateAndDisplayAll() {
+            const selectedDateStr = dateInput.value;
+            if (!selectedDateStr) {
+                resultDisplay.textContent = '--°';
+                return;
+            }
+            const selectedDate = new Date(selectedDateStr);
+            if (isNaN(selectedDate.getTime())) {
+                resultDisplay.textContent = '--°';
+                return;
+            }
+
+            let currentLatitude = parseFloat(latitudeInput.value) || defaultLatitude;
+            locationSubtitle.textContent = latitudeInput.value.trim() ? `Localisation personnalisée : Lat ${currentLatitude.toFixed(2)}` : 'Localisation par défaut : La Grand-Combe (30110)';
+
+            const panelAzimuth = parseInt(azimuthSlider.value);
+            updateAzimuthDisplay(panelAzimuth);
+            const cosAzimuth = Math.cos(toRadians(panelAzimuth));
+
+            const month = selectedDate.getMonth();
+            let dailyAdjustment = (clippingCheckbox.checked && month >= 3 && month <= 8) ? clippingAdjustment : 0;
+            
+            const dayOfYear = getDayOfYear(selectedDate);
+            const declination = calculateDeclination(dayOfYear);
+            let optimalTiltSouth = currentLatitude - declination + dailyAdjustment;
+            resultDisplay.textContent = `${Math.round(optimalTiltSouth / cosAzimuth)}°`;
+
+            const seasonalClippingAdjustment = clippingCheckbox.checked ? clippingAdjustment : 0;
+            const winterAngleSouth = currentLatitude + 15;
+            const summerAngleSouth = currentLatitude - 15;
+            const springFallAngleSouth = currentLatitude;
+            
+            winterAngleDisplay.textContent = `${Math.round(winterAngleSouth / cosAzimuth)}°`;
+            summerAngleDisplay.textContent = `${Math.round((summerAngleSouth + seasonalClippingAdjustment) / cosAzimuth)}°`;
+            springFallAngleDisplay.textContent = `${Math.round((springFallAngleSouth + seasonalClippingAdjustment) / cosAzimuth)}°`;
+        }
+        
+        // --- Inclinomètre Logic ---
+        function handleOrientation(event) {
+            if (event.beta === null) {
+                inclinometerError.textContent = "Votre appareil ne fournit pas les données d'inclinaison.";
+                return;
+            }
+            let tilt = Math.round(event.beta);
+            if (tilt < 0) tilt = 0;
+            if (tilt > 90) tilt = 90;
+            currentAngleDisplay.textContent = tilt;
+        }
+
+        function startInclinometer() {
+            inclinometerError.textContent = "";
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                            startInclinometerButton.style.display = 'none';
+                        } else {
+                            inclinometerError.textContent = "Permission refusée. Impossible d'activer l'inclinomètre.";
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Pour les navigateurs non-iOS 13+ (ex: Android)
+                window.addEventListener('deviceorientation', handleOrientation);
+                startInclinometerButton.style.display = 'none';
+            }
+        }
+
+        // --- Écouteurs d'événements ---
+        dateInput.addEventListener('change', calculateAndDisplayAll);
+        latitudeInput.addEventListener('input', calculateAndDisplayAll);
+        azimuthSlider.addEventListener('input', calculateAndDisplayAll);
+        clippingCheckbox.addEventListener('change', calculateAndDisplayAll);
+        startInclinometerButton.addEventListener('click', startInclinometer);
+
+        // --- Initialisation au chargement de la page ---
+        window.addEventListener('load', () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            
+            dateInput.value = `${year}-${month}-${day}`;
+            calculateAndDisplayAll();
+        });
+    </script>
+</body>
+</html>

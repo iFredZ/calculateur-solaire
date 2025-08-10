@@ -55,7 +55,14 @@
 <body class="bg-gray-50 text-gray-800">
 
     <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
+        <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6 relative">
+
+            <!-- Bouton d'aide principal -->
+            <button id="main-help-button" class="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
 
             <!-- En-tête et Localisation -->
             <div class="text-center border-b pb-6">
@@ -148,7 +155,7 @@
                 <div class="flex items-center justify-center">
                     <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                     <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
-                    <button id="help-button" class="ml-2 p-1 rounded-full bg-gray-200 hover:bg-gray-300">
+                    <button id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-200 hover:bg-gray-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -172,8 +179,8 @@
         </div>
     </div>
 
-    <!-- Modal d'aide -->
-    <div id="help-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <!-- Modal d'aide Écrêtage -->
+    <div id="clipping-help-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Qu'est-ce que l'optimisation pour l'écrêtage ?</h3>
@@ -187,8 +194,67 @@
                     </p>
                 </div>
                 <div class="items-center px-4 py-3">
-                    <button id="close-modal" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <button id="close-clipping-modal" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         Compris
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Guide d'utilisation -->
+     <div id="main-help-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-xl leading-6 font-medium text-gray-900 text-center">Guide d'utilisation</h3>
+                
+                <!-- Schéma visuel -->
+                <div class="mt-4 flex justify-around items-center text-center text-xs text-gray-600 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex flex-col items-center space-y-1">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">1</div>
+                        <p>Localisation</p>
+                    </div>
+                    <span class="text-gray-400">&rarr;</span>
+                    <div class="flex flex-col items-center space-y-1">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">2</div>
+                        <p>Date</p>
+                    </div>
+                    <span class="text-gray-400">&rarr;</span>
+                    <div class="flex flex-col items-center space-y-1">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">3</div>
+                        <p>Orientation</p>
+                    </div>
+                     <span class="text-gray-400">&rarr;</span>
+                    <div class="flex flex-col items-center space-y-1">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">✓</div>
+                        <p>Réglage</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 px-2 py-3 space-y-3">
+                    <p class="text-sm text-gray-600">
+                        <strong class="text-gray-800">1. Localisation :</strong> Saisissez votre latitude manuellement ou utilisez le bouton GPS <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg> pour une détection automatique.
+                    </p>
+                     <p class="text-sm text-gray-600">
+                        <strong class="text-gray-800">2. Date Cible :</strong> Choisissez le jour pour lequel vous souhaitez connaître l'inclinaison optimale.
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        <strong class="text-gray-800">3. Angle Recommandé :</strong> L'application calcule l'angle d'inclinaison idéal pour cette date et cette localisation.
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        <strong class="text-gray-800">4. Mesure & Réglage :</strong> Activez les capteurs.
+                        <ul class="list-disc list-inside ml-4 mt-1 text-xs">
+                            <li>Posez le grand côté de votre téléphone sur le panneau pour mesurer son <strong class="text-gray-700">Angle Actuel</strong>.</li>
+                            <li>Posez le téléphone à plat sur le panneau pour mesurer son <strong class="text-gray-700">Orientation Mesurée</strong>.</li>
+                        </ul>
+                    </p>
+                     <p class="text-sm text-gray-600">
+                        <strong class="text-gray-800">5. Affiner le calcul :</strong> Dans les "Réglages Avancés", ajustez la réglette "Déviation Cible" pour qu'elle corresponde à votre orientation mesurée. Cela garantit la meilleure précision pour l'angle recommandé.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="close-main-modal" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Fermer
                     </button>
                 </div>
             </div>
@@ -215,9 +281,13 @@
         const donateLink = document.getElementById('donate-link');
         const getLocationButton = document.getElementById('get-location');
         const locationError = document.getElementById('location-error');
-        const helpButton = document.getElementById('help-button');
-        const helpModal = document.getElementById('help-modal');
-        const closeModalButton = document.getElementById('close-modal');
+        const clippingHelpButton = document.getElementById('clipping-help-button');
+        const clippingHelpModal = document.getElementById('clipping-help-modal');
+        const closeClippingModalButton = document.getElementById('close-clipping-modal');
+        const mainHelpButton = document.getElementById('main-help-button');
+        const mainHelpModal = document.getElementById('main-help-modal');
+        const closeMainModalButton = document.getElementById('close-main-modal');
+
 
         // --- Configuration ---
         donateLink.href = 'https://paypal.me/iFredZ'; 
@@ -308,12 +378,9 @@
             if (heading !== null && heading !== undefined) {
                 compassError.textContent = "";
                 
-                // Correction pour l'inversion potentielle des capteurs
                 const correctedHeading = 360 - heading;
 
-                // Calcul de la déviation par rapport au Sud (180°)
                 let deviation = correctedHeading - 180;
-                // Normalisation de l'angle entre -180 et +180
                 if (deviation <= -180) deviation += 360;
                 if (deviation > 180) deviation -= 360;
 
@@ -389,9 +456,12 @@
             }
         }
 
-        // --- Logique du Modal ---
-        function toggleModal() {
-            helpModal.classList.toggle('hidden');
+        // --- Logique des Modals ---
+        function toggleClippingModal() {
+            clippingHelpModal.classList.toggle('hidden');
+        }
+         function toggleMainHelpModal() {
+            mainHelpModal.classList.toggle('hidden');
         }
 
         // --- Écouteurs d'événements ---
@@ -401,13 +471,13 @@
         clippingCheckbox.addEventListener('change', calculateAndDisplayAll);
         startSensorsButton.addEventListener('click', startSensors);
         getLocationButton.addEventListener('click', getLocation);
-        helpButton.addEventListener('click', toggleModal);
-        closeModalButton.addEventListener('click', toggleModal);
-        helpModal.addEventListener('click', (e) => {
-            if (e.target === helpModal) {
-                toggleModal();
-            }
-        });
+        clippingHelpButton.addEventListener('click', toggleClippingModal);
+        closeClippingModalButton.addEventListener('click', toggleClippingModal);
+        mainHelpButton.addEventListener('click', toggleMainHelpModal);
+        closeMainModalButton.addEventListener('click', toggleMainHelpModal);
+        
+        clippingHelpModal.addEventListener('click', (e) => { if (e.target === clippingHelpModal) { toggleClippingModal(); } });
+        mainHelpModal.addEventListener('click', (e) => { if (e.target === mainHelpModal) { toggleMainHelpModal(); } });
 
 
         // --- Initialisation au chargement de la page ---

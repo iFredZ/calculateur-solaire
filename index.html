@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Import Capacitor.js -->
+    <script src="https://unpkg.com/@capacitor/core@latest/dist/capacitor.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -262,6 +264,9 @@
     </div>
 
     <script>
+        // --- Capacitor plugins ---
+        const { Geolocation } = Capacitor.Plugins;
+
         // --- Éléments du DOM ---
         const dateInput = document.getElementById('date-input');
         const resultDisplay = document.getElementById('result');
@@ -349,7 +354,11 @@
             const dayOfYear = getDayOfYear(selectedDate);
             const declination = calculateDeclination(dayOfYear);
             let optimalTiltSouth = currentLatitude - declination + dailyAdjustment;
-            resultDisplay.textContent = `${Math.round(optimalTiltSouth / cosAzimuth)}°`;
+            
+            let correctedTilt = optimalTiltSouth / cosAzimuth;
+            if (correctedTilt > 90) correctedTilt = 90;
+            if (correctedTilt < 0) correctedTilt = 0; // Empêche les angles négatifs
+            resultDisplay.textContent = `${Math.round(correctedTilt)}°`;
 
             const seasonalClippingAdjustment = clippingCheckbox.checked ? clippingAdjustment : 0;
             const winterAngleSouth = currentLatitude + 15;
@@ -378,11 +387,12 @@
             if (heading !== null && heading !== undefined) {
                 compassError.textContent = "";
                 
-                const correctedHeading = 360 - heading;
-
-                let deviation = correctedHeading - 180;
+                let deviation = heading - 180;
                 if (deviation <= -180) deviation += 360;
                 if (deviation > 180) deviation -= 360;
+                
+                // Inversion pour corriger le bug Est/Ouest
+                deviation = -deviation;
 
                 if (Math.abs(deviation) < 10) {
                     currentCompassDisplay.textContent = 'Plein Sud';
@@ -437,22 +447,17 @@
         }
 
         // --- Logique de Géolocalisation ---
-        function getLocation() {
+        async function getLocation() {
             locationError.textContent = "Obtention de la position...";
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        latitudeInput.value = lat.toFixed(4);
-                        calculateAndDisplayAll();
-                        locationError.textContent = "";
-                    },
-                    () => {
-                        locationError.textContent = "Impossible d'obtenir la position.";
-                    }
-                );
-            } else {
-                locationError.textContent = "Géolocalisation non supportée.";
+            try {
+                const position = await Geolocation.getCurrentPosition();
+                const lat = position.coords.latitude;
+                latitudeInput.value = lat.toFixed(4);
+                calculateAndDisplayAll();
+                locationError.textContent = "";
+            } catch (e) {
+                locationError.textContent = "Impossible d'obtenir la position.";
+                console.error('Error getting location', e);
             }
         }
 

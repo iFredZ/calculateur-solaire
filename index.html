@@ -345,6 +345,7 @@
                 sensorsActive: false,
                 memorizedTilt: null,
                 memorizedAzimuthValue: null,
+                memorizedLongitude: null, // [NEW] To store longitude with other sensor values
                 lastRecommendedTilt: null,
                 activeModal: null,
                 lastFocusedElement: null
@@ -728,6 +729,7 @@
                     }
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
+                    state.memorizedLongitude = state.currentLongitude; // [MODIFIED] Save longitude
                     dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
                     dom.useMeasuredValuesButton.disabled = false;
                 },
@@ -738,6 +740,9 @@
                     }
                     dom.currentTiltInput.value = state.memorizedTilt;
                     dom.currentAzimuthInput.value = state.memorizedAzimuthValue;
+                    if (state.memorizedLongitude !== null) { // [MODIFIED] Restore longitude
+                        dom.longitudeInput.value = utils.formatNumber(state.memorizedLongitude, 6);
+                    }
                     dom.pvgisError.textContent = '';
                 },
                 handleModalKeydown: (e) => {

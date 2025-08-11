@@ -435,8 +435,8 @@
                     }
                 },
                 updateLocationFields: (lat, lon) => {
-                    dom.latitudeInput.value = utils.formatNumber(lat, 6);
-                    dom.longitudeInput.value = utils.formatNumber(lon, 6);
+                    dom.latitudeInput.value = lat; // Use raw number for input value
+                    dom.longitudeInput.value = lon; // Use raw number for input value
                     state.currentLongitude = lon;
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
@@ -731,7 +731,7 @@
                     }
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
-                    state.memorizedLongitude = state.currentLongitude; // [MODIFIED] Save longitude
+                    state.memorizedLongitude = state.currentLongitude;
                     dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
                     dom.useMeasuredValuesButton.disabled = false;
                 },
@@ -742,8 +742,8 @@
                     }
                     dom.currentTiltInput.value = state.memorizedTilt;
                     dom.currentAzimuthInput.value = state.memorizedAzimuthValue;
-                    if (state.memorizedLongitude !== null) { // [MODIFIED] Restore longitude
-                        dom.longitudeInput.value = utils.formatNumber(state.memorizedLongitude, 6);
+                    if (state.memorizedLongitude !== null) {
+                        dom.longitudeInput.value = state.memorizedLongitude;
                     }
                     dom.pvgisError.textContent = '';
                 },

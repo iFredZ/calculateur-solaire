@@ -14,7 +14,9 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* [NEW] Subtle grid background to evoke solar panels */
+        }
+        /* [NEW] Moved background to its own class for better application */
+        .app-background {
             background-color: #f9fafb; /* bg-gray-50 */
             background-image: 
                 linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px), 
@@ -69,7 +71,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="min-h-screen flex items-center justify-center p-4 app-background">
         <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6 relative">
             
             <!-- Page Principale -->

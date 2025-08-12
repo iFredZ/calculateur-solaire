@@ -433,13 +433,12 @@
                 julianDay: (date) => date.getTime() / 86400000 + 2440587.5,
                 getPosition: (date, lat, lon) => {
                     const d = solar.julianDay(date) - 2451545.0;
-                    const g = utils.toRadians(utils.normalizeAngle(357.529 + 0.98560028 * d));
+                    const g_deg = utils.normalizeAngle(357.529 + 0.98560028 * d);
                     const q_deg = utils.normalizeAngle(280.459 + 0.98564736 * d);
-                    const L_deg = utils.normalizeAngle(q_deg + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g));
-                    const L = utils.toRadians(L_deg);
+                    const L_deg = utils.normalizeAngle(q_deg + 1.915 * Math.sin(utils.toRadians(g_deg)) + 0.020 * Math.sin(utils.toRadians(2 * g_deg)));
                     const e = utils.toRadians(23.439 - 0.00000036 * d);
-                    const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
-                    const dec = Math.asin(Math.sin(e) * Math.sin(L));
+                    const ra = Math.atan2(Math.cos(e) * Math.sin(utils.toRadians(L_deg)), Math.cos(utils.toRadians(L_deg)));
+                    const dec = Math.asin(Math.sin(e) * Math.sin(utils.toRadians(L_deg)));
                     const GMST = utils.normalizeAngle(280.1600 + 360.9856235 * d);
                     const LST = utils.toRadians(utils.normalizeAngle(GMST + lon));
                     const HA = LST - ra;
@@ -499,7 +498,8 @@
                     if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
                     if (typeof e.alpha !== 'number') return null;
                     const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
-                    let heading = (e.alpha + screenAngle) % 360;
+                    let heading = 360 - e.alpha; // Correction for Android
+                    heading = (heading + screenAngle) % 360;
                     if (heading < 0) heading += 360;
                     return heading;
                 },

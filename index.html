@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optim'Angle Solaire (Modifié)</title>
+    <title>Optim'Angle Solaire (Final)</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +96,7 @@
                     <div class="mt-4 max-w-xs mx-auto">
                         <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1">Localisation</label>
                         <div class="flex items-center gap-2">
-                            <input type="number" id="latitude-input" step="any" placeholder="Cliquez ici ➔" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude">
+                            <input type="number" id="latitude-input" step="any" placeholder="Latitude requise" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude">
                             <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
                                 <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                             </button>
@@ -196,8 +196,6 @@
                     </div>
                 </div>
 
-                 <button type="button" id="use-measured-values" class="mt-4 w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors text-sm" disabled>Utiliser les valeurs mémorisées</button>
-
                 <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
                     <span id="calculate-text">Calculer le gain potentiel</span>
                     <div id="calculate-loader" class="loader hidden ml-3"></div>
@@ -269,10 +267,13 @@
                 <h3 id="main-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide</h3>
                 <div class="mt-4 px-2 py-3 space-y-3">
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">1. Localisation & Date :</strong> Renseignez votre latitude (ou utilisez le GPS) et la date cible.
+                        <strong class="text-gray-200">1. Localisation & Date :</strong> Renseignez votre latitude et la date cible.
                     </p>
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">2. Mesure :</strong> Activez les capteurs. Posez le téléphone sur le panneau pour lire l'angle et l'orientation. L'angle recommandé s'affiche alors en temps réel. Mémorisez si besoin pour la page d'estimation.
+                        <strong class="text-gray-200">2. Mesure :</strong> Activez les capteurs. L'angle recommandé s'affiche et s'ajuste en temps réel.
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        <strong class="text-gray-200">3. Estimation :</strong> Cliquez sur "Mémoriser" pour pré-remplir la page d'estimation avec vos mesures, puis allez-y pour calculer le gain.
                     </p>
                 </div>
                 <div class="items-center px-4 py-3">
@@ -286,7 +287,7 @@
             <div class="mt-3">
                 <h3 id="settings-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide Estimation</h3>
                 <div class="mt-4 px-2 py-3 space-y-3 text-sm text-gray-400 text-left">
-                    <p>Renseignez la puissance crête, longitude, inclinaison et orientation actuelles, puis lancez le calcul pour estimer votre gain de production.</p>
+                    <p>Les champs d'inclinaison et d'orientation sont pré-remplis si vous avez mémorisé des mesures. Ajustez-les si besoin, puis lancez le calcul.</p>
                 </div>
                 <div class="items-center px-4 py-3">
                     <button type="button" id="close-settings-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
@@ -336,7 +337,6 @@
                 memorizeSensorsButton: document.getElementById('memorize-sensors'),
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
                 
-                // --- ÉLÉMENTS MODIFIÉS / AJOUTÉS ---
                 resultContainer: document.getElementById('result-container'),
                 resultDisplay: document.getElementById('result'),
                 seasonalContainer: document.getElementById('seasonal-container'),
@@ -344,7 +344,6 @@
                 springFallAngleDisplay: document.getElementById('spring-fall-angle'),
                 summerAngleDisplay: document.getElementById('summer-angle'),
                 
-                // --- Elements de la page d'estimation et modals ---
                 donateLink: document.getElementById('donate-link'),
                 clippingHelpButton: document.getElementById('clipping-help-button'),
                 clippingHelpModal: document.getElementById('clipping-help-modal'),
@@ -370,7 +369,6 @@
                 settingsHelpButton: document.getElementById('settings-help-button'),
                 settingsHelpModal: document.getElementById('settings-help-modal'),
                 closeSettingsModalButton: document.getElementById('close-settings-modal'),
-                useMeasuredValuesButton: document.getElementById('use-measured-values'),
                 donateLink2: document.getElementById('donate-link-2'),
                 settingsModal: document.getElementById('settings-modal'),
                 closeSettingsModalMainButton: document.getElementById('close-settings-modal-main'),
@@ -396,13 +394,11 @@
                 showPage: (page) => {
                     dom.mainPage.classList.toggle('hidden', page !== 'main');
                     dom.settingsPage.classList.toggle('hidden', page !== 'settings');
-                    if (page === 'settings') {
-                        handlers.useMeasuredValues();
-                    }
                 },
                 updateLocationFields: (lat, lon) => {
                     dom.latitudeInput.value = lat;
                     state.currentLongitude = lon;
+                    dom.longitudeInput.value = lon; // Mettre à jour aussi le champ de la page d'estimation
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
                     calculations.calculateAndDisplayAll();
@@ -441,7 +437,7 @@
                     let rawAzimuth = null;
                     if (state.sensorsActive && state.panelAzimuthLive !== null) {
                         rawAzimuth = state.panelAzimuthLive;
-                    } else if (state.memorizedAzimuthValue !== null) {
+                    } else if (state.memorizedAzimuthValue !== null && !state.sensorsActive) {
                         rawAzimuth = state.memorizedAzimuthValue;
                     }
 
@@ -505,16 +501,14 @@
                 },
                 handleOrientation: (event) => {
                     const tilt = sensors.getTiltFromEvent(event);
-                    if (tilt == null) dom.inclinometerError.textContent = 'Inclinomètre non dispo.';
-                    else {
+                    if (tilt !== null) {
                         dom.currentAngleDisplay.textContent = tilt;
                         dom.inclinometerError.textContent = '';
                         dom.memorizeSensorsButton.disabled = false;
                     }
 
                     const heading = sensors.getHeadingFromEvent(event);
-                    if (heading == null) dom.inclinometerError.textContent = 'Boussole non dispo.';
-                    else {
+                    if (heading !== null) {
                         const panAz = utils.normalizeAngle(heading);
                         state.panelAzimuthLive = panAz;
                         dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(panAz);
@@ -543,7 +537,7 @@
                             startListening();
                         } else dom.inclinometerError.textContent = 'Capteurs non supportés.';
                     } catch (err) {
-                        dom.inclinometerError.textContent = 'Erreur demande permission capteurs.';
+                        dom.inclinometerError.textContent = 'Erreur demande permission.';
                         utils.log('DeviceOrientation permission error', err);
                     }
                 },
@@ -561,20 +555,13 @@
                         dom.memorizeSensorsButton.classList.add('hidden');
                         dom.memorizeSensorsButton.disabled = true;
                         
-                        // Si aucune valeur n'est mémorisée, on cache les résultats.
-                        // Sinon, on affiche le calcul basé sur la valeur mémorisée.
                         calculations.calculateAndDisplayAll(); 
                     }
                 }
             };
             
-            const geolocation = { /* ... inchangé ... */ };
-            const api = { /* ... inchangé ... */ };
-
-            // On garde les fonctions inchangées pour la concision
-            geolocation.get = async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation && Capacitor.Plugins.Geolocation.getCurrentPosition) { const pos = await Capacitor.Plugins.Geolocation.getCurrentPosition(); ui.updateLocationFields(pos.coords.latitude, pos.coords.longitude); } else if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( (p) => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), (err) => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; utils.log('Browser geolocation error', err); } ); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; utils.log('geolocation fallback error', err); } };
-            api.fetchPVGIS = async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; };
-            api.getProductionEstimate = async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => Number.isNaN(v))) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { let memorizedAzimuthDeviation = state.memorizedAzimuthValue - 180; if (memorizedAzimuthDeviation > 180) memorizedAzimuthDeviation -= 360; if (memorizedAzimuthDeviation < -180) memorizedAzimuthDeviation += 360; const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, memorizedAzimuthDeviation) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } };
+            const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation && Capacitor.Plugins.Geolocation.getCurrentPosition) { const pos = await Capacitor.Plugins.Geolocation.getCurrentPosition(); ui.updateLocationFields(pos.coords.latitude, pos.coords.longitude); } else if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( (p) => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), (err) => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; } ); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
+            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => Number.isNaN(v))) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { let memorizedAzimuthDeviation = state.memorizedAzimuthValue - 180; if (memorizedAzimuthDeviation > 180) memorizedAzimuthDeviation -= 360; if (memorizedAzimuthDeviation < -180) memorizedAzimuthDeviation += 360; const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, memorizedAzimuthDeviation) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
 
             const handlers = {
                 toggleSensors: () => {
@@ -590,25 +577,16 @@
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
                     state.memorizedLongitude = state.currentLongitude;
-                    dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
-                    dom.useMeasuredValuesButton.disabled = false;
-                    dom.gotoEstimationButton.classList.remove('hidden');
-                },
-                useMeasuredValues: () => {
-                    if (state.memorizedTilt === null || state.memorizedAzimuthValue === null) {
-                        dom.pvgisError.textContent = 'Aucune valeur mémorisée.';
-                        return;
-                    }
-                    dom.currentTiltInput.value = state.memorizedTilt;
-                    let deviation = state.memorizedAzimuthValue - 180;
+
+                    dom.currentTiltInput.value = tilt;
+                    dom.longitudeInput.value = state.currentLongitude;
+                    let deviation = az - 180;
                     if (deviation > 180) deviation -= 360;
                     if (deviation < -180) deviation += 360;
                     dom.currentAzimuthInput.value = Math.round(deviation);
 
-                    if (state.memorizedLongitude !== null) {
-                        dom.longitudeInput.value = state.memorizedLongitude;
-                    }
-                    dom.pvgisError.textContent = '';
+                    dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
+                    dom.gotoEstimationButton.classList.remove('hidden');
                 },
                 handleModalKeydown: (e) => {
                     if (e.key === 'Escape') modal.close();
@@ -629,7 +607,6 @@
                 dom.startSensorsButton.addEventListener('click', handlers.toggleSensors);
                 dom.getLocationButton.addEventListener('click', geolocation.get);
                 dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeValues);
-                dom.useMeasuredValuesButton.addEventListener('click', handlers.useMeasuredValues);
 
                 dom.settingsButton.addEventListener('click', (e) => modal.open(dom.settingsModal, e.currentTarget));
                 dom.gotoEstimationButton.addEventListener('click', () => ui.showPage('settings'));
@@ -650,7 +627,6 @@
                 const today = new Date();
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
-                // On s'assure que tout est caché au démarrage
                 calculations.calculateAndDisplayAll(); 
             }
 

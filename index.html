@@ -139,8 +139,9 @@
                                 <input type="number" id="manual-tilt-input" placeholder="ex: 35" class="bg-input w-full p-2 rounded-md text-center">
                             </div>
                             <div>
-                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Déviation / Sud (°)</label>
-                                <input type="number" id="manual-azimuth-input" placeholder="ex: -10" class="bg-input w-full p-2 rounded-md text-center">
+                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Orientation (Déviation / Sud)</label>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2 text-center">(Négatif = Est, Positif = Ouest)</p>
+                                <input type="number" id="manual-azimuth-input" placeholder="0 = Plein Sud" class="bg-input w-full p-2 rounded-md text-center">
                             </div>
                         </div>
                     </div>
@@ -420,7 +421,7 @@
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
                 formatNumber: (n, dec = 2) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
                 safeParseFloat: (v, fallback = NaN) => {
-                    if (v === null || v === undefined) return fallback;
+                    if (v === null || v === undefined || v === '') return fallback;
                     const s = String(v).replace(',', '.').trim();
                     const n = parseFloat(s);
                     return Number.isFinite(n) ? n : fallback;
@@ -460,6 +461,7 @@
                         dom.manualEntryButton.classList.remove('btn-secondary');
                         dom.activateSensorsButton.classList.add('btn-primary');
                         dom.activateSensorsButton.classList.remove('btn-danger');
+                        dom.activateSensorsButton.textContent = 'Activer les capteurs';
                         dom.gotoEstimationButton.classList.remove('hidden');
                     }
                     calculations.calculateAndDisplayAll();
@@ -549,7 +551,10 @@
                     calculations.calculateAndDisplayAll();
                 },
                 start: async () => {
-                    if (state.sensorsActive) return;
+                    if (state.sensorsActive) { // If already active, treat as a stop request
+                        sensors.stop();
+                        return;
+                    }
                     dom.sensorError.textContent = 'Activation...';
                     dom.memorizeSensorsButton.disabled = true;
                     try {
@@ -557,6 +562,7 @@
                             const permission = await DeviceOrientationEvent.requestPermission();
                             if (permission !== 'granted') {
                                 dom.sensorError.textContent = 'Permission capteurs refusée.';
+                                ui.setEntryMode(null); // Reset mode choice
                                 return;
                             }
                         }
@@ -575,6 +581,8 @@
                     state.sensorsActive = false;
                     state.panelAzimuthLive = null;
                     dom.activateSensorsButton.textContent = 'Activer les capteurs';
+                    dom.activateSensorsButton.classList.remove('btn-danger');
+                    dom.activateSensorsButton.classList.add('btn-primary');
                     dom.currentAngleDisplay.textContent = '--';
                     dom.currentCompassDisplay.textContent = '--';
                     dom.sensorError.textContent = '';
@@ -636,7 +644,9 @@
                 });
                 
                 // Choix du mode
-                dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
+                dom.activateSensorsButton.addEventListener('click', () => {
+                    state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors');
+                });
                 dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
 
                 // Actions
@@ -650,10 +660,8 @@
 
                 // Modals
                 const modals = [
-                    { btn: dom.settingsButton, modal: dom.settingsModal },
-                    { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
-                    { btn: dom.mainHelpButton, modal: dom.mainHelpModal },
-                    { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
+                    { btn: dom.settingsButton, modal: dom.settingsModal }, { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
+                    { btn: dom.mainHelpButton, modal: dom.mainHelpModal }, { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
                 ];
                 modals.forEach(item => item.btn.addEventListener('click', () => item.modal.classList.remove('hidden')));
                 
@@ -673,7 +681,7 @@
             
             // --- Fonctions inchangées (pour la lisibilité) ---
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
-            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => isNaN(v))) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
+            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
 
             window.addEventListener('load', init);
         })();

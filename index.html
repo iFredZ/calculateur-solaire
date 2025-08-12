@@ -71,7 +71,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Style pour le sélecteur de langue */
         .lang-btn {
             background-color: transparent;
             border: 1px solid var(--btn-secondary-bg);
@@ -570,31 +569,20 @@
                     if (!translations[lang]) return;
                     this.currentLang = lang;
                     document.documentElement.lang = lang;
-
                     document.querySelectorAll('[data-i18n]').forEach(el => {
                         const key = el.dataset.i18n;
-                        if (translations[lang][key]) {
-                            el.innerHTML = translations[lang][key];
-                        }
+                        if (translations[lang][key]) el.innerHTML = translations[lang][key];
                     });
-
                     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                         const key = el.dataset.i18nPlaceholder;
-                        if (translations[lang][key]) {
-                            el.placeholder = translations[lang][key];
-                        }
+                        if (translations[lang][key]) el.placeholder = translations[lang][key];
                     });
-
-                    document.querySelectorAll('.lang-btn').forEach(btn => {
-                        btn.classList.toggle('active', btn.dataset.lang === lang);
-                    });
-                    
+                    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
                     if(state.sensorsActive) {
                        dom.activateSensorsButton.textContent = translations[lang].stop_sensors;
                     } else {
                        dom.activateSensorsButton.textContent = translations[lang].activate_sensors;
                     }
-
                     calculations.calculateAndDisplayAll();
                 }
             };
@@ -668,6 +656,7 @@
                 toRadians: (deg) => deg * Math.PI / 180,
                 toDegrees: (rad) => rad * 180 / Math.PI,
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
+                getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
                 formatNumber: (n, dec = 2) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
                 safeParseFloat: (v, fallback = NaN) => {
                     if (v === null || v === undefined || v === '') return fallback;
@@ -717,10 +706,6 @@
                 }
             };
 
-            const solar = {
-                getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10)))
-            };
-
             const calculations = {
                 calculateAndDisplayAll: () => {
                     const dateValue = dom.dateInput.value;
@@ -751,7 +736,7 @@
                     if (isNaN(selectedDate.getTime())) return;
                     
                     const dayOfYear = utils.getDayOfYear(selectedDate);
-                    const declination = solar.getDeclination(dayOfYear);
+                    const declination = utils.getDeclination(dayOfYear);
                     const solarNoonAltitude = 90 - Math.abs(lat - declination);
                     let optimalTilt = 90 - solarNoonAltitude;
                     const clipping = dom.clippingCheckbox.checked && selectedDate.getMonth() >= 3 && selectedDate.getMonth() <= 8 ? CONFIG.clippingAdjustment : 0;
@@ -893,20 +878,17 @@
                     const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
                     
                     const strategies = [
-                        // Stratégie 1: Appel direct (idéal)
                         async () => {
                             const res = await fetch(pvgisUrl, { signal: AbortSignal.timeout(5000) });
                             if (!res.ok) throw new Error('Direct call failed');
                             return await res.json();
                         },
-                        // Stratégie 2: Proxy 1
                         async () => {
                             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
                             const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
                             if (!res.ok) throw new Error('Proxy 1 failed');
                             return await res.json();
                         },
-                        // Stratégie 3: Proxy 2 (avec parsing spécial)
                         async () => {
                              const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
                              const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
@@ -943,30 +925,40 @@
                     const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); 
                     const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); 
                     const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); 
-                    const recommendedTilt = state.lastRecommendedTilt; 
-
-                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { 
-                        dom.pvgisError.textContent = translations[i18n.currentLang].fill_all_fields_error || 'Veuillez remplir tous les champs valides.'; 
+                    
+                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v))) { 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].fill_all_fields_error;
                         dom.calculateText.classList.remove('hidden'); 
                         dom.calculateLoader.classList.add('hidden'); 
                         return; 
                     } 
-                    try { 
+                    
+                    try {
+                        const selectedDate = new Date(dom.dateInput.value);
+                        const dayOfYear = utils.getDayOfYear(selectedDate);
+                        const declination = utils.getDeclination(dayOfYear);
+                        let trueOptimalTilt = 90 - (90 - Math.abs(lat - declination));
+                        const clipping = dom.clippingCheckbox.checked && selectedDate.getMonth() >= 3 && selectedDate.getMonth() <= 8 ? CONFIG.clippingAdjustment : 0;
+                        const finalOptimalTilt = Math.round(trueOptimalTilt + clipping);
+
                         const [currentProd, optimalProd] = await Promise.all([ 
                             api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
-                            api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) 
-                        ]); 
+                            api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
+                        ]);
+
                         let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
                         let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
                         let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
                         let optMonthly = Number(optimalProd.outputs.fixed.E_m) || 0; 
+
                         if (optDaily < curDaily) { 
                             optDaily = curDaily; 
                             optMonthly = curMonthly; 
-                            dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal || 'Vos réglages actuels sont déjà optimaux.'; 
+                            dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal; 
                         } else { 
                             dom.pvgisError.textContent = ''; 
                         } 
+
                         dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
                         dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
                         const gainDaily = optDaily - curDaily; 

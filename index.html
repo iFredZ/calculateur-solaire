@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optim'Angle Solaire</title>
-    <!-- [MODIFIED] Pinned versions for stability -->
+    <!-- Pinned versions for stability -->
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- [MODIFIED] Pinned versions for stability -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Pinned versions for stability -->
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* [NEW] Moved background to its own class for better application */
         .app-background {
             background-color: #f9fafb; /* bg-gray-50 */
             background-image: 
@@ -77,16 +76,17 @@
             <!-- Page Principale -->
             <div id="main-page">
                 <!-- Boutons d'aide et de settings -->
-                <div class="absolute top-4 right-4 flex gap-2">
-                    <button type="button" id="settings-button" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors" aria-label="Ouvrir la page d'estimation">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734-2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                         </svg>
-                    </button>
+                <div class="absolute top-4 right-4 flex flex-col gap-2">
                     <button type="button" id="main-help-button" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors" aria-label="Ouvrir le guide d'utilisation">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                          </svg>
+                    </button>
+                    <button type="button" id="settings-button" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors" aria-label="Ouvrir les réglages">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                     </button>
                 </div>
 
@@ -127,9 +127,8 @@
                     </div>
                 </div>
 
-
-                <!-- Réglages avancés -->
-                <div>
+                <!-- [FIXED] Re-added the missing advanced settings section -->
+                <div class="mt-6">
                      <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Réglages Avancés</h2>
                      <div class="bg-gray-50 p-4 rounded-lg border">
                          <!-- Azimut & Boussole -->
@@ -155,8 +154,16 @@
                        </div>
                 </div>
 
+                <!-- Button to go to estimation page -->
+                <button type="button" id="goto-estimation-button" class="hidden mt-6 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all text-lg flex items-center justify-center">
+                    Calculer le Gain Potentiel
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </button>
+
                 <!-- Recommandations saisonnières -->
-                <div>
+                <div class="mt-6">
                     <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Réglages Saisonniers</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                         <div class="bg-gray-100 rounded-lg p-4">
@@ -174,19 +181,6 @@
                             <p id="summer-angle" class="text-3xl font-bold text-red-600">29°</p>
                             <p class="text-xs text-gray-500">~21 Juin</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Section Optimisation Écrêtage -->
-                <div class="bg-gray-50 p-4 rounded-lg border">
-                    <div class="flex items-center justify-center">
-                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
-                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-200 hover:bg-gray-300" aria-label="Aide sur l'optimisation pour l'écrêtage">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
 
@@ -272,6 +266,29 @@
         </div>
     </div>
 
+    <!-- [NEW] Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 id="settings-modal-title" class="text-lg leading-6 font-medium text-gray-900 text-center">Réglages</h3>
+                <div class="mt-4 p-4">
+                     <div class="flex items-center justify-center">
+                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Optimiser pour éviter l'écrêtage</label>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-200 hover:bg-gray-300" aria-label="Aide sur l'optimisation pour l'écrêtage">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button type="button" id="close-settings-modal-main" class="px-4 py-2 bg-blue-500 text-white rounded-md w-full">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal d'aide Écrêtage -->
     <div id="clipping-help-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -347,7 +364,7 @@
                 sensorsActive: false,
                 memorizedTilt: null,
                 memorizedAzimuthValue: null,
-                memorizedLongitude: null, // [NEW] To store longitude with other sensor values
+                memorizedLongitude: null,
                 lastRecommendedTilt: null,
                 activeModal: null,
                 lastFocusedElement: null
@@ -401,7 +418,10 @@
                 closeSettingsModalButton: document.getElementById('close-settings-modal'),
                 useMeasuredValuesButton: document.getElementById('use-measured-values'),
                 memorizeSensorsButton: document.getElementById('memorize-sensors'),
-                donateLink2: document.getElementById('donate-link-2')
+                donateLink2: document.getElementById('donate-link-2'),
+                gotoEstimationButton: document.getElementById('goto-estimation-button'),
+                settingsModal: document.getElementById('settings-modal'),
+                closeSettingsModalMainButton: document.getElementById('close-settings-modal-main')
             };
 
             // --- UTILITY HELPERS ---
@@ -505,8 +525,11 @@
                     const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
                     let tilt = Math.abs(screenAngle) === 90 ? e.gamma : e.beta;
                     if (tilt == null) return null;
+                    
+                    tilt = Math.abs(tilt); 
                     tilt = Math.round(tilt);
-                    return Math.max(0, Math.min(90, tilt));
+                    
+                    return Math.min(90, tilt); 
                 },
                 getHeadingFromEvent: (e) => {
                     if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
@@ -734,6 +757,7 @@
                     state.memorizedLongitude = state.currentLongitude;
                     dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
                     dom.useMeasuredValuesButton.disabled = false;
+                    dom.gotoEstimationButton.classList.remove('hidden'); // Show button
                 },
                 useMeasuredValues: () => {
                     if (state.memorizedTilt === null || state.memorizedAzimuthValue === null) {
@@ -771,7 +795,8 @@
                 dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeValues);
                 dom.useMeasuredValuesButton.addEventListener('click', handlers.useMeasuredValues);
 
-                dom.settingsButton.addEventListener('click', () => ui.showPage('settings'));
+                dom.settingsButton.addEventListener('click', (e) => modal.open(dom.settingsModal, e.currentTarget));
+                dom.gotoEstimationButton.addEventListener('click', () => ui.showPage('settings'));
                 dom.backButton.addEventListener('click', () => ui.showPage('main'));
                 dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
 
@@ -783,6 +808,7 @@
                 dom.closeClippingModalButton.addEventListener('click', modal.close);
                 dom.closeMainModalButton.addEventListener('click', modal.close);
                 dom.closeSettingsModalButton.addEventListener('click', modal.close);
+                dom.closeSettingsModalMainButton.addEventListener('click', modal.close);
 
                 document.addEventListener('keydown', handlers.handleModalKeydown);
 

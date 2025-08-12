@@ -919,21 +919,43 @@
 
             const api = {
                 fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
-                    const proxyUrl = `/.netlify/functions/pvgis?lat=${lat}&lon=${lon}&peakpower=${peakpower}&angle=${angle}&aspect=${aspect}`;
-                    try {
-                        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) }); 
-                        if (!res.ok) {
-                            throw new Error(`PVGIS proxy failed with status ${res.status}`);
+                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
+                    
+                    const strategies = [
+                        async () => {
+                             const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
+                             const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+                             if (!res.ok) throw new Error('Proxy allorigins.win failed');
+                             const data = await res.json();
+                             return JSON.parse(data.contents);
+                        },
+                        async () => {
+                            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
+                            const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+                            if (!res.ok) throw new Error('Proxy corsproxy.io failed');
+                            return await res.json();
+                        },
+                        async () => {
+                            const res = await fetch(pvgisUrl, { signal: AbortSignal.timeout(5000) });
+                            if (!res.ok) throw new Error('Direct call failed');
+                            return await res.json();
                         }
-                        const json = await res.json();
-                        if (!json?.outputs?.totals?.fixed) {
-                            throw new Error('Invalid data structure from PVGIS proxy');
+                    ];
+
+                    for (let i = 0; i < strategies.length; i++) {
+                        try {
+                            utils.log(`Attempting PVGIS fetch with strategy #${i + 1}`);
+                            const json = await strategies[i]();
+                            if (json?.outputs?.totals?.fixed) {
+                                utils.log(`Strategy #${i + 1} succeeded.`);
+                                return json;
+                            }
+                        } catch (error) {
+                            utils.log(`Strategy #${i + 1} failed:`, error.message);
                         }
-                        return json;
-                    } catch (error) {
-                         utils.log('PVGIS proxy fetch error:', error);
-                         throw error;
                     }
+
+                    throw new Error('All PVGIS fetch strategies failed.');
                 },
                 getProductionEstimate: async () => { 
                     dom.pvgisError.textContent = ''; 

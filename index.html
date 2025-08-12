@@ -936,7 +936,85 @@
             }
             
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
-            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
+            const api = {
+                fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
+                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
+                    
+                    const proxies = [
+                        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+                    ];
+
+                    for (const proxy of proxies) {
+                        const proxyUrl = proxy(pvgisUrl);
+                        try {
+                            const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) }); // 5 second timeout
+                            if (!res.ok) {
+                                utils.log(`Proxy failed with status ${res.status}: ${proxyUrl}`);
+                                continue; // Try next proxy
+                            }
+                            const json = await res.json();
+                            if (json?.outputs?.totals?.fixed) {
+                                utils.log(`Data fetched with proxy: ${proxyUrl}`);
+                                return json;
+                            }
+                        } catch (error) {
+                            utils.log(`Error with proxy: ${proxyUrl}`, error);
+                        }
+                    }
+
+                    // If loop finishes without returning, all proxies failed.
+                    throw new Error('All PVGIS proxies failed.');
+                },
+                getProductionEstimate: async () => { 
+                    dom.pvgisError.textContent = ''; 
+                    dom.calculateText.classList.add('hidden'); 
+                    dom.calculateLoader.classList.remove('hidden'); 
+                    dom.productionResults.classList.add('hidden'); 
+                    const lat = utils.safeParseFloat(dom.latitudeInput.value); 
+                    const lon = utils.safeParseFloat(dom.longitudeInput.value); 
+                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); 
+                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); 
+                    const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); 
+                    const recommendedTilt = state.lastRecommendedTilt; 
+                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { 
+                        dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; 
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden'); 
+                        return; 
+                    } 
+                    try { 
+                        const [currentProd, optimalProd] = await Promise.all([ 
+                            api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
+                            api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) 
+                        ]); 
+                        let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
+                        let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
+                        let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
+                        let optMonthly = Number(optimalProd.outputs.fixed.E_m) || 0; 
+                        if (optDaily < curDaily) { 
+                            optDaily = curDaily; 
+                            optMonthly = curMonthly; 
+                            dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; 
+                        } else { 
+                            dom.pvgisError.textContent = ''; 
+                        } 
+                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
+                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
+                        const gainDaily = optDaily - curDaily; 
+                        dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
+                        const gainMonthly = optMonthly - curMonthly; 
+                        dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
+                        dom.productionResults.classList.remove('hidden'); 
+                    } catch (err) { 
+                        dom.pvgisError.textContent = 'Erreur communication PVGIS.'; 
+                        utils.log('PVGIS error', err); 
+                    } finally { 
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden'); 
+                    } 
+                }
+            };
 
             window.addEventListener('load', init);
         })();

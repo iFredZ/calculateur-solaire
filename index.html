@@ -139,9 +139,9 @@
                                 <input type="number" id="manual-tilt-input" placeholder="ex: 35" class="bg-input w-full p-2 rounded-md text-center">
                             </div>
                             <div>
-                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Orientation (Déviation / Sud)</label>
-                                <p class="text-xs text-gray-500 -mt-1 mb-2 text-center">(Négatif = Est, Positif = Ouest)</p>
-                                <input type="number" id="manual-azimuth-input" placeholder="0 = Plein Sud" class="bg-input w-full p-2 rounded-md text-center">
+                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Orientation (°)</label>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2 text-center">EST (-) | SUD (0) | OUEST (+)</p>
+                                <input type="number" id="manual-azimuth-input" placeholder="0" class="bg-input w-full p-2 rounded-md text-center">
                             </div>
                         </div>
                     </div>
@@ -250,70 +250,145 @@
 
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
         <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
-            <div class="mt-3">
-                <h3 id="settings-modal-title" class="text-lg leading-6 font-medium text-center">Réglages</h3>
-                <div class="mt-4 p-4">
-                     <div class="flex items-center justify-center">
-                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
-                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium">Optimiser pour éviter l'écrêtage</label>
-                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="items-center px-4 py-3">
-                    <button type="button" id="close-settings-modal-main" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+            <div class="flex justify-between items-center">
+                <h3 id="settings-modal-title" class="text-lg leading-6 font-bold text-teal-300">Réglages</h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 p-4">
+                 <div class="flex items-center justify-center">
+                    <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
+                    <label for="clipping-checkbox" class="ml-2 block text-sm font-medium">Optimiser pour éviter l'écrêtage</label>
+                    <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    
     <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
         <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
-            <div class="mt-3 text-center">
-                <h3 id="clipping-modal-title" class="text-lg leading-6 font-medium">Qu'est-ce que l'écrêtage ?</h3>
-                <div class="mt-2 px-7 py-3">
-                    <p class="text-sm text-gray-400 text-left">Si votre onduleur bride au pic, augmenter l'inclinaison en période de fort ensoleillement réduit le pic et améliore la production matinale/soir.</p>
+            <div class="flex justify-between items-center">
+                <h3 id="clipping-modal-title" class="text-lg leading-6 font-bold text-teal-300">Optimisation pour l'Écrêtage</h3>
+                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-4">
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                       <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Le Problème</h4>
+                        <p class="text-sm text-gray-400 mt-1">En été, votre production solaire peut dépasser la puissance maximale de votre onduleur. Cette énergie excédentaire est perdue : c'est l'écrêtage (ou "clipping").</p>
+                    </div>
                 </div>
-                <div class="items-center px-4 py-3">
-                    <button type="button" id="close-clipping-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Compris</button>
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                       <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">La Solution</h4>
+                        <p class="text-sm text-gray-400 mt-1">Cocher cette case augmente volontairement l'angle de vos panneaux. Cela réduit le pic de production à midi (évitant la saturation) et augmente la production le matin et le soir, pour un gain global sur la journée.</p>
+                    </div>
                 </div>
+            </div>
+            <div class="items-center px-4 pt-3">
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full">Compris</button>
             </div>
         </div>
     </div>
+    
      <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
         <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
-            <div class="mt-3">
-                <h3 id="main-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide</h3>
-                <div class="mt-4 px-2 py-3 space-y-3">
-                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">1. Choisissez un mode :</strong> Activez les capteurs pour une mesure live, ou entrez manuellement les valeurs pour une simulation.
-                    </p>
-                    <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">2. Observez le résultat :</strong> L'angle recommandé s'affiche et s'ajuste en temps réel en fonction de vos actions.
-                    </p>
-                    <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">3. Estimez le gain :</strong> Cliquez sur "Calculer le Gain Potentiel". Vos données (manuelles ou mémorisées) seront utilisées pour pré-remplir la page suivante.
-                    </p>
+            <div class="flex justify-between items-center">
+                <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-teal-300">Guide d'Utilisation</h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Étape 1 : Localisation & Date</h4>
+                        <p class="text-sm text-gray-400 mt-1">Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.</p>
+                    </div>
                 </div>
-                <div class="items-center px-4 py-3">
-                    <button type="button" id="close-main-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Étape 2 : Choix du Mode</h4>
+                        <p class="text-sm text-gray-400 mt-1"><strong class="text-gray-200">Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.</p>
+                        <p class="text-sm text-gray-400"><strong class="text-gray-200">Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation de votre installation.</p>
+                    </div>
                 </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                         <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Étape 3 : Lecture du Résultat</h4>
+                        <p class="text-sm text-gray-400 mt-1">L'angle recommandé s'affiche et s'ajuste en temps réel. Les réglages saisonniers apparaissent également pour information.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Étape 4 : Estimation du Gain</h4>
+                        <p class="text-sm text-gray-400 mt-1">Cliquez sur "Calculer le Gain Potentiel". Vos données seront automatiquement reportées sur la page suivante pour une simulation précise.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center px-4 pt-3">
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full">Compris</button>
             </div>
         </div>
     </div>
+    
     <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
         <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
-            <div class="mt-3">
-                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide Estimation</h3>
-                <div class="mt-4 px-2 py-3 space-y-3 text-sm text-gray-400 text-left">
-                    <p>Les champs d'inclinaison et d'orientation sont pré-remplis. Ajustez-les si besoin, puis lancez le calcul.</p>
+            <div class="flex justify-between items-center">
+                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300">Guide de l'Estimation</h3>
+                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Vérifiez vos Données</h4>
+                        <p class="text-sm text-gray-400 mt-1">Les champs sont pré-remplis à partir de la page précédente. Vous pouvez les modifier pour simuler d'autres configurations.</p>
+                    </div>
                 </div>
-                <div class="items-center px-4 py-3">
-                    <button type="button" id="close-settings-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Lancez le Calcul</h4>
+                        <p class="text-sm text-gray-400 mt-1">Cliquez sur "Calculer" pour comparer la production annuelle estimée de votre réglage actuel avec celle du réglage optimal recommandé.</p>
+                    </div>
                 </div>
+            </div>
+            <div class="items-center px-4 pt-3">
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full">Compris</button>
             </div>
         </div>
     </div>
+
 
     <script>
         (function() {
@@ -342,46 +417,31 @@
             };
 
             const dom = {
-                // Pages
                 mainPage: document.getElementById('main-page'),
                 settingsPage: document.getElementById('settings-page'),
-                
-                // Entrées principales
                 latitudeInput: document.getElementById('latitude-input'),
                 dateInput: document.getElementById('date-input'),
                 getLocationButton: document.getElementById('get-location'),
                 locationSubtitle: document.getElementById('location-subtitle'),
                 locationError: document.getElementById('location-error'),
-
-                // Choix du mode
                 activateSensorsButton: document.getElementById('activate-sensors-button'),
                 manualEntryButton: document.getElementById('manual-entry-button'),
-
-                // Mode capteurs
                 sensorsDisplay: document.getElementById('sensors-display'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
                 memorizeSensorsButton: document.getElementById('memorize-sensors'),
                 sensorError: document.getElementById('sensor-error'),
-
-                // Mode manuel
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
                 manualTiltInput: document.getElementById('manual-tilt-input'),
                 manualAzimuthInput: document.getElementById('manual-azimuth-input'),
-                
-                // Affichage des résultats
                 resultContainer: document.getElementById('result-container'),
                 resultDisplay: document.getElementById('result'),
                 seasonalContainer: document.getElementById('seasonal-container'),
                 winterAngleDisplay: document.getElementById('winter-angle'),
                 springFallAngleDisplay: document.getElementById('spring-fall-angle'),
                 summerAngleDisplay: document.getElementById('summer-angle'),
-                
-                // Boutons de navigation et autres
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
                 clippingCheckbox: document.getElementById('clipping-checkbox'),
-                
-                // Page d'estimation
                 backButton: document.getElementById('back-button'),
                 peakPowerInput: document.getElementById('peak-power'),
                 longitudeInput: document.getElementById('longitude-input'),
@@ -396,8 +456,6 @@
                 pvgisError: document.getElementById('pvgis-error'),
                 calculateText: document.getElementById('calculate-text'),
                 calculateLoader: document.getElementById('calculate-loader'),
-
-                // Modals et liens
                 settingsButton: document.getElementById('settings-button'),
                 donateLink: document.getElementById('donate-link'),
                 donateLink2: document.getElementById('donate-link-2'),
@@ -408,10 +466,6 @@
                 clippingHelpModal: document.getElementById('clipping-help-modal'),
                 mainHelpModal: document.getElementById('main-help-modal'),
                 settingsHelpModal: document.getElementById('settings-help-modal'),
-                closeSettingsModalMainButton: document.getElementById('close-settings-modal-main'),
-                closeClippingModalButton: document.getElementById('close-clipping-modal'),
-                closeMainModalButton: document.getElementById('close-main-modal'),
-                closeSettingsModalButton: document.getElementById('close-settings-modal'),
             };
 
             const utils = {
@@ -551,7 +605,7 @@
                     calculations.calculateAndDisplayAll();
                 },
                 start: async () => {
-                    if (state.sensorsActive) { // If already active, treat as a stop request
+                    if (state.sensorsActive) { 
                         sensors.stop();
                         return;
                     }
@@ -562,7 +616,7 @@
                             const permission = await DeviceOrientationEvent.requestPermission();
                             if (permission !== 'granted') {
                                 dom.sensorError.textContent = 'Permission capteurs refusée.';
-                                ui.setEntryMode(null); // Reset mode choice
+                                ui.setEntryMode(null);
                                 return;
                             }
                         }
@@ -596,7 +650,7 @@
                     if (state.entryMode === 'manual') {
                         dom.currentTiltInput.value = dom.manualTiltInput.value;
                         dom.currentAzimuthInput.value = dom.manualAzimuthInput.value;
-                    } else { // sensors mode
+                    } else { 
                         dom.currentTiltInput.value = state.memorizedTilt || '';
                         if (state.memorizedAzimuthValue !== null) {
                              let deviation = state.memorizedAzimuthValue - 180;
@@ -665,7 +719,7 @@
                 ];
                 modals.forEach(item => item.btn.addEventListener('click', () => item.modal.classList.remove('hidden')));
                 
-                const closeButtons = document.querySelectorAll('[id^="close-"]');
+                const closeButtons = document.querySelectorAll('.close-modal-btn');
                 closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden')));
                 
                 document.addEventListener('keydown', handlers.handleModalKeydown);
@@ -679,7 +733,6 @@
                 utils.log('Application initialisée.');
             }
             
-            // --- Fonctions inchangées (pour la lisibilité) ---
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
             const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
 

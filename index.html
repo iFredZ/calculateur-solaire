@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optim'Angle Solaire</title>
-    <!-- Pinned versions for stability -->
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <!-- Pinned versions for stability -->
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <style>
         :root {
@@ -343,7 +341,7 @@
                 summerAngleDisplay: document.getElementById('summer-angle'),
                 startSensorsButton: document.getElementById('start-sensors'),
                 currentAngleDisplay: document.getElementById('current-angle'),
-                inclinometerError: document.getElementById('sensor-error'), // Changed ID
+                inclinometerError: document.getElementById('sensor-error'),
                 currentCompassDisplay: document.getElementById('current-compass'),
                 donateLink: document.getElementById('donate-link'),
                 getLocationButton: document.getElementById('get-location'),
@@ -492,11 +490,9 @@
 
             const sensors = {
                 getTiltFromEvent: (e) => {
-                    const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
-                    let tilt = Math.abs(screenAngle) === 90 ? e.gamma : e.beta;
+                    let tilt = e.beta;
                     if (tilt == null) return null;
-                    if (dom.flipPhoneCheckbox.checked) tilt = -tilt;
-                    return utils.clamp(Math.round(tilt), 0, 90);
+                    return utils.clamp(Math.round(Math.abs(tilt)), 0, 90);
                 },
                 getHeadingFromEvent: (e) => {
                     if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
@@ -518,7 +514,7 @@
                     const heading = sensors.getHeadingFromEvent(event);
                     if (heading == null) dom.inclinometerError.textContent = 'Boussole non dispo.';
                     else {
-                        const panAz = utils.normalizeAngle(heading + (dom.leftCornerCheckbox.checked ? 90 : -90));
+                        const panAz = utils.normalizeAngle(heading);
                         state.panelAzimuthLive = panAz;
                         dom.currentCompassDisplay.textContent = `${Math.round(panAz)}°`;
                     }

@@ -96,7 +96,7 @@
                     <div class="mt-4 max-w-xs mx-auto">
                         <label for="latitude-input" class="block text-sm font-medium text-gray-700 mb-1">Localisation</label>
                         <div class="flex items-center gap-2">
-                            <input type="number" id="latitude-input" step="any" placeholder="ex: 44,21" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" aria-label="Latitude">
+                            <input type="number" id="latitude-input" step="any" placeholder="Cliquez sur 📍" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" aria-label="Latitude">
                             <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors" aria-label="Obtenir la géolocalisation">
                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
                                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
@@ -147,17 +147,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                         <div class="bg-gray-100 rounded-lg p-4">
                             <p class="font-bold text-lg">Hiver</p>
-                            <p id="winter-angle" class="text-3xl font-bold text-sky-600">60°</p>
+                            <p id="winter-angle" class="text-3xl font-bold text-sky-600">--°</p>
                             <p class="text-xs text-gray-500">~21 Déc.</p>
                         </div>
                         <div class="bg-gray-100 rounded-lg p-4">
                             <p class="font-bold text-lg">Mi-saison</p>
-                            <p id="spring-fall-angle" class="text-3xl font-bold text-amber-600">44°</p>
+                            <p id="spring-fall-angle" class="text-3xl font-bold text-amber-600">--°</p>
                             <p class="text-xs text-gray-500">~20 Mars & ~22 Sep.</p>
                         </div>
                         <div class="bg-gray-100 rounded-lg p-4">
                             <p class="font-bold text-lg">Été</p>
-                            <p id="summer-angle" class="text-3xl font-bold text-red-600">29°</p>
+                            <p id="summer-angle" class="text-3xl font-bold text-red-600">--°</p>
                             <p class="text-xs text-gray-500">~21 Juin</p>
                         </div>
                     </div>
@@ -468,20 +468,31 @@
                 getDeclination: (dayOfYear) => -23.45 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
                 calculateAndDisplayAll: () => {
                     const dateValue = dom.dateInput.value;
-                    if (!dateValue) {
+                    const latValueStr = dom.latitudeInput.value;
+
+                    if (!dateValue || !latValueStr) {
                         dom.resultDisplay.textContent = '--°';
+                        dom.winterAngleDisplay.textContent = '--°';
+                        dom.springFallAngleDisplay.textContent = '--°';
+                        dom.summerAngleDisplay.textContent = '--°';
                         return;
                     }
+
                     const selectedDate = new Date(dateValue);
                     if (Number.isNaN(selectedDate.getTime())) {
                         dom.resultDisplay.textContent = '--°';
                         return;
                     }
 
-                    const lat = utils.safeParseFloat(dom.latitudeInput.value, CONFIG.defaultLatitude);
+                    const lat = utils.safeParseFloat(latValueStr, NaN);
+                     if (isNaN(lat)) {
+                        dom.resultDisplay.textContent = '--°';
+                        return;
+                    }
+                    
                     const panelAzimuth = state.memorizedAzimuthValue !== null ? state.memorizedAzimuthValue : 0;
                     
-                    if(dom.azimuthSlider) { // Check if slider exists before using it
+                    if(dom.azimuthSlider) {
                         ui.updateAzimuthDisplay(panelAzimuth);
                     }
 

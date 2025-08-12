@@ -1,351 +1,753 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Optim’Angle Solaire</title>
-  <style>
-    :root{
-      --bg:#0b1220;--card:#121a2b;--muted:#7b8aa5;--fg:#e9f0ff;--accent:#41d1b7;--warn:#ffcc00;--bad:#ff6b6b;
-    }
-    html,body{height:100%;}
-    body{margin:0;background:linear-gradient(180deg,#0b1220,#0a0f1a 80%);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";}
-    .wrap{max-width:1000px;margin:0 auto;padding:16px 16px 120px;}
-    header{display:flex;gap:12px;align-items:center;}
-    h1{font-size:clamp(22px,3vw,32px);margin:8px 0 0}
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 30px rgba(0,0,0,.35);border-radius:18px;padding:16px;margin-top:16px}
-    .row{display:flex;flex-wrap:wrap;gap:12px}
-    .col{flex:1 1 260px}
-    .btn{appearance:none;border:0;background:var(--accent);color:#00110e;font-weight:700;padding:14px 16px;border-radius:14px;cursor:pointer;transition:transform .05s ease,opacity .2s;}
-    .btn:active{transform:translateY(1px)}
-    .btn.secondary{background:#2a3957;color:var(--fg)}
-    .btn.ghost{background:transparent;border:1px dashed #3a4a6a;color:var(--fg)}
-    .btn.full{width:100%}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    .kv{background:#0e1423;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}
-    .kv h3{margin:0 0 6px;font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
-    .kv .val{font-feature-settings:"tnum" 1; font-variant-numeric:tabular-nums; font-size:22px}
-    .hint{color:var(--muted);font-size:13px}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#0e1423;border:1px solid rgba(255,255,255,.08)}
-    .ok{color:#00e18a}
-    .warn{color:var(--warn)}
-    .bad{color:var(--bad)}
-    .footer{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(11,18,32,.0),rgba(11,18,32,.9) 35%,rgba(11,18,32,1));padding:14px}
-    .footer .bar{max-width:1000px;margin:0 auto;display:flex;gap:10px}
-    label.switch{display:inline-flex;align-items:center;gap:8px}
-    input[type=checkbox]{width:18px;height:18px}
-    code{background:#0e1423;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:2px 6px}
-    details{opacity:.95}
-    .small{font-size:12px;color:var(--muted)}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optim'Angle Solaire</title>
+    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --card: #121a2b;
+            --muted: #7b8aa5;
+            --fg: #e9f0ff;
+            --accent: #41d1b7;
+            --warn: #ffcc00;
+            --bad: #ff6b6b;
+            --btn-secondary-bg: #2a3957;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+        }
+        .card {
+            background-color: var(--card);
+            border: 1px solid rgba(255, 255, 255, .06);
+            box-shadow: 0 8px 30px rgba(0,0,0,.35);
+        }
+        .btn-primary {
+            background-color: var(--accent);
+            color: #00110e;
+        }
+        .btn-primary:hover {
+            background-color: #52d9c3;
+        }
+        .btn-secondary {
+            background-color: var(--btn-secondary-bg);
+            color: var(--fg);
+        }
+        .btn-secondary:hover {
+            background-color: #3a4a6a;
+        }
+        .btn-danger {
+             background-color: var(--bad);
+             color: #fff;
+        }
+        .btn-danger:hover {
+            background-color: #ff8a8a;
+        }
+        input, .bg-input {
+            background-color: #0e1423;
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--fg);
+        }
+        input::placeholder {
+            color: var(--muted);
+        }
+        .loader {
+            border: 4px solid #2a3957;
+            border-radius: 50%;
+            border-top: 4px solid var(--accent);
+            width: 24px;
+            height: 24px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="6" stroke="#41d1b7" stroke-width="2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3M4.2 4.2l2.2 2.2M17.6 17.6l2.2 2.2M19.8 4.2l-2.2 2.2M6.4 17.6l-2.2 2.2" stroke="#41d1b7" stroke-width="2" stroke-linecap="round"/></svg>
-      <div>
-        <h1>Optim’Angle Solaire</h1>
-        <div class="hint">Posez le smartphone <strong>face contre le panneau</strong>, sur un coin, bien perpendiculaire au bord. Puis activez les capteurs et enregistrez.</div>
-      </div>
-    </header>
+<body class="antialiased">
 
-    <div class="card">
-      <div class="row">
-        <div class="col">
-          <button id="btnGeo" class="btn full">📍 Autoriser la géolocalisation</button>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div id="app-container" class="w-full max-w-lg card rounded-2xl p-6 md:p-8 space-y-6 relative">
+            
+            <!-- Page Principale -->
+            <div id="main-page">
+                <div class="absolute top-4 right-4 flex flex-col gap-2">
+                    <button type="button" id="main-help-button" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Ouvrir le guide d'utilisation">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                    <button type="button" id="settings-button" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Ouvrir les réglages">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="text-center border-b border-gray-700 pb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold mt-8">Optim'Angle Solaire</h1>
+                    <div class="mt-4 max-w-xs mx-auto">
+                        <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1">Localisation</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="latitude-input" step="any" placeholder="Cliquez ici ➔" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude">
+                            <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
+                                <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                         <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
+                        <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
+                    </div>
+                </div>
+
+                <div class="card bg-gray-900/50 p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="text-center">
+                        <label for="date-input" class="block text-md font-medium text-teal-300 mb-2">Date Cible</label>
+                        <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
+                        <p class="mt-4 text-lg text-teal-300">Angle Recommandé</p>
+                        <p id="result" class="text-5xl md:text-6xl font-bold text-teal-400 my-1" aria-live="polite">--°</p>
+                    </div>
+                    <div class="text-center md:border-l md:pl-6 border-gray-700 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-lg text-gray-400">Angle Actuel</p>
+                                <p class="text-4xl font-bold my-1"><span id="current-angle">--</span>°</p>
+                            </div>
+                             <div>
+                                <p class="text-lg text-gray-400">Orientation</p>
+                                <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
+                            </div>
+                        </div>
+                         <button type="button" id="start-sensors" class="w-full btn-primary font-bold py-2 px-4 rounded-lg transition-colors text-sm">Activer les capteurs</button>
+                         <button type="button" id="memorize-sensors" class="hidden mt-2 w-full btn-secondary font-bold py-3 px-4 rounded-lg transition-colors text-base" disabled>Mémoriser les mesures</button>
+                         <p id="inclinometer-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
+                    </div>
+                </div>
+
+                <button type="button" id="goto-estimation-button" class="hidden mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-all text-lg flex items-center justify-center">
+                    Calculer le Gain Potentiel
+                    <svg class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                </button>
+
+                <div class="mt-6">
+                    <h2 class="text-xl font-bold text-center mb-4">Réglages Saisonniers</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div class="bg-gray-900/50 rounded-lg p-4">
+                            <p class="font-bold text-lg">Hiver</p>
+                            <p id="winter-angle" class="text-3xl font-bold text-sky-400">--°</p>
+                            <p class="text-xs text-gray-500">~21 Déc.</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4">
+                            <p class="font-bold text-lg">Mi-saison</p>
+                            <p id="spring-fall-angle" class="text-3xl font-bold text-amber-400">--°</p>
+                            <p class="text-xs text-gray-500">~20 Mars & ~22 Sep.</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4">
+                            <p class="font-bold text-lg">Été</p>
+                            <p id="summer-angle" class="text-3xl font-bold text-red-400">--°</p>
+                            <p class="text-xs text-gray-500">~21 Juin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4 border-t border-gray-700 mt-6">
+                    <a href="#" id="donate-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">Soutenir ce projet</a>
+                </div>
+
+                <div class="text-center text-xs text-gray-500 pt-4 mt-6">
+                    <p>- By FredZ - 2025</p>
+                </div>
+            </div>
+
+            <!-- Page Estimation -->
+            <div id="settings-page" class="hidden">
+                 <button type="button" id="back-button" class="absolute top-4 left-4 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Retour à la page principale">
+                     <svg class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                 </button>
+                 <button type="button" id="settings-help-button" class="absolute top-4 right-4 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Ouvrir le guide de la page d'estimation">
+                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 </button>
+                <h2 class="text-2xl md:text-3xl font-bold text-center">Estimation de Production</h2>
+                
+                <div class="space-y-4 mt-6">
+                    <div>
+                        <label for="peak-power" class="block text-sm font-medium text-gray-400">Puissance crête (kWc)</label>
+                        <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="longitude-input" class="block text-sm font-medium text-gray-400">Longitude</label>
+                        <input type="number" id="longitude-input" value="4.028" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="current-tilt-input" class="block text-sm font-medium text-gray-400">Inclinaison actuelle (°)</label>
+                        <input type="number" id="current-tilt-input" placeholder="ex: 45" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400">Orientation actuelle (Déviation / Sud)</label>
+                        <input type="number" id="current-azimuth-input" placeholder="ex: -10 (10° Est)" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                </div>
+
+                 <button type="button" id="use-measured-values" class="mt-4 w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors text-sm" disabled>Utiliser les valeurs mémorisées</button>
+
+                <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <span id="calculate-text">Calculer le gain potentiel</span>
+                    <div id="calculate-loader" class="loader hidden ml-3"></div>
+                </button>
+
+                <div id="production-results" class="mt-6 space-y-4 hidden">
+                    <div class="bg-gray-900/50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-400">Production estimée (réglage actuel)</p>
+                        <p id="current-production" class="text-2xl font-bold">-- kWh</p>
+                    </div>
+                    <div class="bg-green-900/30 p-4 rounded-lg text-center">
+                        <p class="text-sm text-green-300">Production estimée (réglage optimal)</p>
+                        <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
+                    </div>
+                    <div class="bg-blue-900/30 p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300">Gain potentiel journalier</p>
+                        <p id="potential-gain" class="text-3xl font-bold text-blue-300">~ -- Wh</p>
+                    </div>
+                     <div class="bg-blue-900/30 p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300">Gain potentiel mensuel</p>
+                        <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
+                    </div>
+                </div>
+                 <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
+                
+                 <div class="text-center pt-4 border-t border-gray-700 mt-6">
+                    <a href="#" id="donate-link-2" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">Soutenir ce projet</a>
+                </div>
+            </div>
+
         </div>
-        <div class="col">
-          <button id="btnSensors" class="btn full">🧭 Activer les capteurs</button>
-        </div>
-        <div class="col">
-          <button id="btnSnap" class="btn secondary full" disabled>📸 Enregistrer la mesure</button>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <label class="switch">
-          <input type="checkbox" id="flipPhone" />
-          <span>Mon téléphone est posé <strong>écran vers le bas</strong> (recommandé)</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="leftCorner" />
-          <span>Je suis sur le <strong>coin gauche</strong> (par défaut : coin droit)</span>
-        </label>
-      </div>
-      <div class="small" style="margin-top:8px">Si les capteurs ne s’activent pas : assurez‑vous d’être en <strong>HTTPS</strong> (ou application Android), puis cliquez sur « Activer les capteurs » et acceptez les permissions.
-      </div>
     </div>
 
-    <div class="card">
-      <div class="grid">
-        <div class="kv"><h3>Position</h3><div class="val" id="latlon">—</div><div class="hint" id="tz">Fuseau : —</div></div>
-        <div class="kv"><h3>Horodatage</h3><div class="val" id="ts">—</div><div class="hint">UTC / local</div></div>
-        <div class="kv"><h3>Azimut solaire</h3><div class="val" id="sunAz">—</div><div class="hint">0° = Nord, 90° = Est</div></div>
-        <div class="kv"><h3>Hauteur solaire</h3><div class="val" id="sunEl">—</div><div class="hint">Élévation au-dessus de l’horizon</div></div>
-      </div>
-      <div class="grid" style="margin-top:12px">
-        <div class="kv"><h3>Azimut panneau (mesuré)</h3><div class="val" id="panAz">—</div><div class="hint">Estimé via boussole</div></div>
-        <div class="kv"><h3>Inclinaison panneau (mesurée)</h3><div class="val" id="panTilt">—</div><div class="hint">0° = à plat, 90° = vertical</div></div>
-        <div class="kv"><h3>Inclinaison <span class="pill">recommandée</span></h3><div class="val" id="tiltOpt">—</div><div class="hint" id="recNote">Principe : optimisation instantanée</div></div>
-        <div class="kv"><h3>Incidence min. atteignable</h3><div class="val" id="incidence">—</div><div class="hint">Angle rayon ↔ normal du panneau</div></div>
-      </div>
-      <div id="quality" class="hint" style="margin-top:10px"></div>
-    </div>
-
-    <div class="card">
-      <details>
-        <summary>⚙️ Options & Outils (avancé)</summary>
-        <div class="row" style="margin-top:10px">
-          <button id="btnZero" class="btn ghost">Zéro capteurs (calibration douce)</button>
-          <button id="btnSim" class="btn ghost">Simuler une mesure</button>
-          <button id="btnPVGIS" class="btn ghost">Comparer avec PVGIS (beta)</button>
+    <!-- [NEW] Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
+            <div class="mt-3">
+                <h3 id="settings-modal-title" class="text-lg leading-6 font-medium text-center">Réglages</h3>
+                <div class="mt-4 p-4">
+                     <div class="flex items-center justify-center">
+                        <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
+                        <label for="clipping-checkbox" class="ml-2 block text-sm font-medium">Optimiser pour éviter l'écrêtage</label>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button type="button" id="close-settings-modal-main" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+                </div>
+            </div>
         </div>
-        <p class="small">La valeur <em>recommandée</em> est calculée pour minimiser l’angle d’incidence <code>θ</code> entre le rayon solaire et la normale du panneau <strong>en ne modifiant que l’inclinaison</strong> (azimut fixe tel que mesuré). Formule : si le zénith solaire vaut <code>ζ = 90° − élévation</code> et <code>Δ = azimut_solaire − azimut_panneau</code>, alors <code>tan(tilt_opt) = tan(ζ) · cos(Δ)</code>, bornée à [0°, 90°]. L’incidence minimale obtenue est <code>θ_min = arccos(cos ζ · cos τ + sin ζ · sin τ · cos Δ)</code> avec <code>τ = tilt_opt</code>. Si <code>cos Δ &lt; 0</code> (soleil derrière le panneau), l’application signale une orientation défavorable.</p>
-      </details>
     </div>
 
-    <div class="footer">
-      <div class="bar">
-        <div class="pill">État capteurs : <span id="state" class="warn">inactifs</span></div>
-        <div class="pill">Précision boussole : <span id="acc">—</span></div>
-        <div class="pill">HTTPS : <span id="https">—</span></div>
-      </div>
+    <!-- Modal d'aide Écrêtage -->
+    <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
+        <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
+            <div class="mt-3 text-center">
+                <h3 id="clipping-modal-title" class="text-lg leading-6 font-medium">Qu'est-ce que l'écrêtage ?</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-400 text-left">Si votre onduleur bride au pic, augmenter l'inclinaison en période de fort ensoleillement réduit le pic et améliore la production matinale/soir.</p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button type="button" id="close-clipping-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Compris</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // ======= Utilitaires UI =======
-    const $ = (id)=>document.getElementById(id);
-    const fmtDeg = (x)=> Number.isFinite(x)? `${x.toFixed(1)}°` : '—';
-    const clamp = (x,a,b)=> Math.min(Math.max(x,a),b);
-    const norm360 = (a)=> (a%360+360)%360;
-    const deg2rad = (d)=> d*Math.PI/180;
-    const rad2deg = (r)=> r*180/Math.PI;
+    <!-- Modal Guide d'utilisation -->
+     <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
+        <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
+            <div class="mt-3">
+                <h3 id="main-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide</h3>
+                <div class="mt-4 px-2 py-3 space-y-3">
+                    <p class="text-sm text-gray-400">
+                        <strong class="text-gray-200">1. Localisation & Date :</strong> Renseignez votre latitude (ou utilisez le GPS) et la date cible.
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        <strong class="text-gray-200">2. Mesure :</strong> Activez les capteurs. Posez le téléphone sur le panneau pour lire l'angle et l'orientation, puis mémorisez les valeurs. Vous pouvez ensuite arrêter les capteurs.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button type="button" id="close-main-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     <!-- Modal Guide d'utilisation Estimation -->
+    <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
+        <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
+            <div class="mt-3">
+                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide Estimation</h3>
+                <div class="mt-4 px-2 py-3 space-y-3 text-sm text-gray-400 text-left">
+                    <p>Renseignez la puissance crête, longitude, inclinaison et orientation actuelles, puis lancez le calcul pour estimer votre gain de production.</p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button type="button" id="close-settings-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // ======= État global =======
-    const st = {
-      lat:null, lon:null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      sunAz:null, sunEl:null,
-      panAz:null, panTilt:null,
-      // compensations
-      zero:{alpha:0,beta:0,gamma:0},
-      headingAcc:null,
-      sensorsOn:false,
-    };
 
-    // ======= Géolocalisation =======
-    function askGeo(){
-      if(!('geolocation' in navigator)){ alert('Géolocalisation non disponible'); return; }
-      navigator.geolocation.getCurrentPosition(pos=>{
-        st.lat = pos.coords.latitude; st.lon = pos.coords.longitude;
-        $('latlon').textContent = `${st.lat.toFixed(5)}, ${st.lon.toFixed(5)}`;
-        $('tz').textContent = `Fuseau : ${st.tz}`;
-        updateSun();
-      }, err=>{
-        alert('Impossible d\'obtenir la position : '+err.message);
-      }, {enableHighAccuracy:true,timeout:8000,maximumAge:0});
-    }
+    <script>
+        (function() {
+            'use strict';
 
-    // ======= Soleil (algorithme NOAA simplifié) =======
-    function julianDay(date){
-      const t = date.getTime()/86400000 + 2440587.5; return t;
-    }
-    function sunPos(date, lat, lon){
-      // Renvoie {az, el} en degrés (azimut depuis le Nord, sens horaire)
-      // Source: algorithme simplifié NOAA, précision ~0.5°
-      const d = julianDay(date) - 2451545.0;
-      const g = deg2rad(norm360(357.529 + 0.98560028*d));
-      const q = deg2rad(norm360(280.459 + 0.98564736*d));
-      const L = q + deg2rad(1.915)*Math.sin(g) + deg2rad(0.020)*Math.sin(2*g);
-      const e = deg2rad(23.439 - 0.00000036*d);
-      const ra = Math.atan2(Math.cos(e)*Math.sin(L), Math.cos(L));
-      const dec = Math.asin(Math.sin(e)*Math.sin(L));
-      const GMST = norm360(280.1600 + 360.9856235*d);
-      const LST = deg2rad(norm360(GMST + lon));
-      const HA = LST - ra; // angle horaire
-      const latR = deg2rad(lat);
-      const el = Math.asin(Math.sin(latR)*Math.sin(dec) + Math.cos(latR)*Math.cos(dec)*Math.cos(HA));
-      const az = Math.atan2(-Math.sin(HA), Math.tan(dec)*Math.cos(latR) - Math.sin(latR)*Math.cos(HA));
-      // azimut depuis le Nord (0), sens horaire
-      let azDeg = norm360(rad2deg(az));
-      let elDeg = rad2deg(el);
-      return {az:azDeg, el:elDeg};
-    }
+            const DEBUG = false;
+            const CONFIG = {
+                donateLink: 'https://paypal.me/iFredZ',
+                defaultLatitude: 44.21446183336044,
+                defaultLongitude: 4.028,
+                clippingAdjustment: 10,
+                sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
+            };
 
-    function updateSun(){
-      if(st.lat==null||st.lon==null){ return; }
-      const now = new Date();
-      const s = sunPos(now, st.lat, st.lon);
-      st.sunAz = s.az; st.sunEl = s.el;
-      $('ts').textContent = now.toLocaleString();
-      $('sunAz').textContent = fmtDeg(s.az);
-      $('sunEl').textContent = fmtDeg(s.el);
-      computeRecommendation();
-    }
+            const state = {
+                currentLongitude: CONFIG.defaultLongitude,
+                sensorsActive: false,
+                memorizedTilt: null,
+                memorizedAzimuthValue: null,
+                memorizedLongitude: null,
+                lastRecommendedTilt: null,
+                activeModal: null,
+                lastFocusedElement: null,
+                panelAzimuthLive: null
+            };
 
-    // ======= Capteurs (boussole + orientation) =======
-    const httpsOk = location.protocol === 'https:' || location.protocol === 'file:'; // Capacitor/Android = file:
-    $('https').textContent = httpsOk ? 'OK' : 'non sécurisé';
+            const dom = {
+                mainPage: document.getElementById('main-page'),
+                settingsPage: document.getElementById('settings-page'),
+                dateInput: document.getElementById('date-input'),
+                resultDisplay: document.getElementById('result'),
+                latitudeInput: document.getElementById('latitude-input'),
+                locationSubtitle: document.getElementById('location-subtitle'),
+                locationError: document.getElementById('location-error'),
+                clippingCheckbox: document.getElementById('clipping-checkbox'),
+                winterAngleDisplay: document.getElementById('winter-angle'),
+                springFallAngleDisplay: document.getElementById('spring-fall-angle'),
+                summerAngleDisplay: document.getElementById('summer-angle'),
+                startSensorsButton: document.getElementById('start-sensors'),
+                currentAngleDisplay: document.getElementById('current-angle'),
+                inclinometerError: document.getElementById('inclinometer-error'),
+                currentCompassDisplay: document.getElementById('current-compass'),
+                compassError: document.getElementById('compass-error'),
+                donateLink: document.getElementById('donate-link'),
+                getLocationButton: document.getElementById('get-location'),
+                clippingHelpButton: document.getElementById('clipping-help-button'),
+                clippingHelpModal: document.getElementById('clipping-help-modal'),
+                closeClippingModalButton: document.getElementById('close-clipping-modal'),
+                mainHelpButton: document.getElementById('main-help-button'),
+                mainHelpModal: document.getElementById('main-help-modal'),
+                closeMainModalButton: document.getElementById('close-main-modal'),
+                settingsButton: document.getElementById('settings-button'),
+                backButton: document.getElementById('back-button'),
+                peakPowerInput: document.getElementById('peak-power'),
+                longitudeInput: document.getElementById('longitude-input'),
+                currentTiltInput: document.getElementById('current-tilt-input'),
+                currentAzimuthInput: document.getElementById('current-azimuth-input'),
+                calculateProductionButton: document.getElementById('calculate-production'),
+                productionResults: document.getElementById('production-results'),
+                currentProductionDisplay: document.getElementById('current-production'),
+                optimalProductionDisplay: document.getElementById('optimal-production'),
+                potentialGainDisplay: document.getElementById('potential-gain'),
+                potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
+                pvgisError: document.getElementById('pvgis-error'),
+                calculateText: document.getElementById('calculate-text'),
+                calculateLoader: document.getElementById('calculate-loader'),
+                settingsHelpButton: document.getElementById('settings-help-button'),
+                settingsHelpModal: document.getElementById('settings-help-modal'),
+                closeSettingsModalButton: document.getElementById('close-settings-modal'),
+                useMeasuredValuesButton: document.getElementById('use-measured-values'),
+                memorizeSensorsButton: document.getElementById('memorize-sensors'),
+                donateLink2: document.getElementById('donate-link-2'),
+                gotoEstimationButton: document.getElementById('goto-estimation-button'),
+                settingsModal: document.getElementById('settings-modal'),
+                closeSettingsModalMainButton: document.getElementById('close-settings-modal-main'),
+                flipPhoneCheckbox: document.getElementById('flipPhone'),
+                leftCornerCheckbox: document.getElementById('leftCorner')
+            };
 
-    async function requestIOSPermission(){
-      try{
-        // iOS 13+
-        if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
-          const p = await DeviceOrientationEvent.requestPermission();
-          if(p !== 'granted') throw new Error('Permission orientation refusée');
-        }
-        if(typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
-          const p2 = await DeviceMotionEvent.requestPermission();
-          if(p2 !== 'granted') throw new Error('Permission motion refusée');
-        }
-      }catch(e){ console.warn(e); }
-    }
+            const utils = {
+                log: (...args) => { if (DEBUG) console.log('[OptimAngle]', ...args); },
+                toRadians: (deg) => deg * Math.PI / 180,
+                toDegrees: (rad) => rad * 180 / Math.PI,
+                getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
+                formatNumber: (n, dec = 2) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
+                safeParseFloat: (v, fallback = NaN) => {
+                    if (v === null || v === undefined) return fallback;
+                    const s = String(v).replace(',', '.').trim();
+                    const n = parseFloat(s);
+                    return Number.isFinite(n) ? n : fallback;
+                },
+                clamp: (x, min, max) => Math.min(Math.max(x, min), max),
+                normalizeAngle: (a) => (a % 360 + 360) % 360
+            };
 
-    let orientationHandler=null, compassHandler=null, compassHeading=null;
+            const ui = {
+                showPage: (page) => {
+                    dom.mainPage.classList.toggle('hidden', page !== 'main');
+                    dom.settingsPage.classList.toggle('hidden', page !== 'settings');
+                    if (page === 'settings') {
+                        handlers.useMeasuredValues();
+                    }
+                },
+                updateLocationFields: (lat, lon) => {
+                    dom.latitudeInput.value = lat;
+                    state.currentLongitude = lon;
+                    dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
+                    dom.locationError.textContent = '';
+                    calculations.calculateAndDisplayAll();
+                }
+            };
 
-    function startSensors(){
-      if(!httpsOk){ alert('Les capteurs nécessitent HTTPS ou une app Android.'); return; }
-      requestIOSPermission();
-      // Device orientation (beta, gamma, absolute)
-      orientationHandler = (ev)=>{
-        const {alpha, beta, gamma} = ev; // degrés
-        // beta: rotation autour de l'axe X (-180 à 180) | gamma: autour de Y (-90 à 90)
-        let b = (beta??0) - st.zero.beta;
-        let g = (gamma??0) - st.zero.gamma;
-        const faceDown = $('flipPhone').checked; // si écran vers le bas, on inverse l'axe Z
-        if(faceDown){ b = -b; g = -g; }
-        // Inclinaison panneau = angle à partir de l'horizontale
-        // Approximation robuste: tilt = acos(|z|) où z ≈ cos(beta) * cos(gamma)
-        const z = Math.cos(deg2rad(b)) * Math.cos(deg2rad(g));
-        const tilt = clamp(rad2deg(Math.acos(Math.min(1,Math.max(-1, Math.abs(z) )))), 0, 90);
-        st.panTilt = tilt;
-        $('panTilt').textContent = fmtDeg(tilt);
-        computeRecommendation();
-      };
-      window.addEventListener('deviceorientation', orientationHandler, {once:false, passive:true});
+            const modal = {
+                open: (el, trigger) => {
+                    state.lastFocusedElement = trigger || document.activeElement;
+                    state.activeModal = el;
+                    el.classList.remove('hidden');
+                    const first = el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (first) first.focus();
+                },
+                close: () => {
+                    if (!state.activeModal) return;
+                    state.activeModal.classList.add('hidden');
+                    state.activeModal = null;
+                    if (state.lastFocusedElement) state.lastFocusedElement.focus();
+                    state.lastFocusedElement = null;
+                }
+            };
 
-      compassHandler = (ev)=>{
-        // Chrome Android: ev.alpha (0-360) relatif Nord; iOS: webkitCompassHeading (0 = Nord)
-        let heading = null;
-        if(typeof ev.webkitCompassHeading === 'number' && !isNaN(ev.webkitCompassHeading)){
-          // iOS fournit déjà l'azimut vrai en degrés depuis le Nord
-          heading = ev.webkitCompassHeading;
-          st.headingAcc = ev.webkitCompassAccuracy ?? null;
-        } else if(typeof ev.absolute === 'boolean' && ev.absolute && typeof ev.alpha === 'number'){
-          // Android/Chromium absolute heading
-          heading = 360 - ev.alpha; // convertir en sens horaire depuis le Nord
-        } else if(typeof ev.alpha === 'number'){
-          heading = 360 - ev.alpha;
-        }
-        if(heading!=null){
-          // ajuster coin gauche/droit : l'utilisateur colle le téléphone perpendiculaire au bord
-          const left = $('leftCorner').checked;
-          // La normale panneau suit le bord; l'azimut panneau ≈ cap + (left?+90:-90)
-          const panAz = norm360( heading + (left? 90 : -90) );
-          st.panAz = panAz;
-          $('panAz').textContent = fmtDeg(panAz);
-          $('acc').textContent = (st.headingAcc!=null)? `${st.headingAcc.toFixed(0)}°` : 'n/d';
-          computeRecommendation();
-        }
-      };
-      window.addEventListener('deviceorientationabsolute', compassHandler, {once:false, passive:true});
-      window.addEventListener('deviceorientation', compassHandler, {once:false, passive:true});
+            const solar = {
+                julianDay: (date) => date.getTime() / 86400000 + 2440587.5,
+                getPosition: (date, lat, lon) => {
+                    const d = solar.julianDay(date) - 2451545.0;
+                    const g = utils.toRadians(utils.normalizeAngle(357.529 + 0.98560028 * d));
+                    const q = utils.toRadians(utils.normalizeAngle(280.459 + 0.98564736 * d));
+                    const L = q + utils.toRadians(1.915) * Math.sin(g) + utils.toRadians(0.020) * Math.sin(2 * g);
+                    const e = utils.toRadians(23.439 - 0.00000036 * d);
+                    const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+                    const dec = Math.asin(Math.sin(e) * Math.sin(L));
+                    const GMST = utils.normalizeAngle(280.1600 + 360.9856235 * d);
+                    const LST = utils.toRadians(utils.normalizeAngle(GMST + lon));
+                    const HA = LST - ra;
+                    const latR = utils.toRadians(lat);
+                    const el = Math.asin(Math.sin(latR) * Math.sin(dec) + Math.cos(latR) * Math.cos(dec) * Math.cos(HA));
+                    const az = Math.atan2(-Math.sin(HA), Math.tan(dec) * Math.cos(latR) - Math.sin(latR) * Math.cos(HA));
+                    return {
+                        azimuth: utils.normalizeAngle(utils.toDegrees(az)),
+                        elevation: utils.toDegrees(el)
+                    };
+                }
+            };
 
-      st.sensorsOn = true; $('state').textContent = 'actifs'; $('state').className='ok';
-      $('btnSnap').disabled = false;
-    }
+            const calculations = {
+                calculateAndDisplayAll: () => {
+                    const dateValue = dom.dateInput.value;
+                    const latValueStr = dom.latitudeInput.value;
 
-    function stopSensors(){
-      if(orientationHandler){ window.removeEventListener('deviceorientation', orientationHandler); }
-      if(compassHandler){ window.removeEventListener('deviceorientationabsolute', compassHandler); window.removeEventListener('deviceorientation', compassHandler); }
-      st.sensorsOn = false; $('state').textContent = 'inactifs'; $('state').className='warn';
-      $('btnSnap').disabled = true;
-    }
+                    if (!dateValue || !latValueStr) {
+                        dom.resultDisplay.textContent = '--°';
+                        return;
+                    }
+                    const selectedDate = new Date(dateValue);
+                    if (Number.isNaN(selectedDate.getTime())) return;
 
-    function zeroSensors(){ st.zero = {alpha:0,beta:0,gamma:0}; }
+                    const lat = utils.safeParseFloat(latValueStr, NaN);
+                    if (isNaN(lat)) return;
+                    
+                    const sunPos = solar.getPosition(selectedDate, lat, state.currentLongitude);
+                    const panelAzimuth = state.memorizedAzimuthValue !== null ? state.memorizedAzimuthValue : 180; // Default South
 
-    // ======= Recommandation d'inclinaison (Math) =======
-    function computeRecommendation(){
-      if(st.sunAz==null||st.sunEl==null||st.panAz==null||st.panTilt==null) return;
-      const zen = 90 - st.sunEl; // ζ
-      const delta = deg2rad( norm360(st.sunAz - st.panAz) ); // Δ en [0..2π)
-      const cosD = Math.cos(delta);
-      const tanZen = Math.tan(deg2rad(zen));
-      let tiltOpt = rad2deg(Math.atan( tanZen * cosD ));
-      // borne et valeurs réelles
-      if(!Number.isFinite(tiltOpt)) tiltOpt = 90;
-      tiltOpt = clamp(tiltOpt, 0, 90);
+                    const zenith = 90 - sunPos.elevation;
+                    const delta = utils.toRadians(utils.normalizeAngle(sunPos.azimuth - panelAzimuth));
+                    const cosDelta = Math.cos(delta);
 
-      // Incidence minimale atteignable pour ce Δ
-      const z = deg2rad(zen), t = deg2rad(tiltOpt);
-      const cosTheta = Math.cos(z)*Math.cos(t) + Math.sin(z)*Math.sin(t)*cosD;
-      const theta = rad2deg(Math.acos( clamp(cosTheta,-1,1) ));
+                    let optimalTilt = utils.toDegrees(Math.atan(Math.tan(utils.toRadians(zenith)) * cosDelta));
+                    optimalTilt = utils.clamp(optimalTilt, 0, 90);
+                    
+                    const roundedTilt = Math.round(optimalTilt);
+                    state.lastRecommendedTilt = roundedTilt;
+                    dom.resultDisplay.textContent = `${roundedTilt}°`;
 
-      $('tiltOpt').textContent = fmtDeg(tiltOpt);
-      $('incidence').textContent = fmtDeg(theta);
+                    const clipping = dom.clippingCheckbox.checked && selectedDate.getMonth() >= 3 && selectedDate.getMonth() <= 8 ? CONFIG.clippingAdjustment : 0;
+                    dom.winterAngleDisplay.textContent = `${Math.round(lat + 15 - (Math.abs(panelAzimuth-180) / 10))}°`;
+                    dom.springFallAngleDisplay.textContent = `${Math.round(lat - (Math.abs(panelAzimuth-180) / 10))}°`;
+                    dom.summerAngleDisplay.textContent = `${Math.round((lat - 15 + clipping) - (Math.abs(panelAzimuth-180) / 10))}°`;
+                }
+            };
 
-      // Qualité et avertissements
-      let msg = '';
-      if(cosD < 0){
-        msg = '⚠️ Soleil derrière le panneau (Δ > 90°). Gains limités. Envisagez de réorienter l’azimut.';
-      } else if(theta < 10){
-        msg = '✅ Très bon alignement possible. Ajustez à la valeur recommandée.';
-      } else if(theta < 25){
-        msg = 'ℹ️ Alignement correct. Un réglage vers la valeur recommandée améliore le rendement.';
-      } else {
-        msg = '⚠️ Orientation défavorable. Si possible, pivotez le panneau vers le soleil (azimut).';
-      }
-      $('quality').textContent = msg;
-    }
+            const sensors = {
+                getTiltFromEvent: (e) => {
+                    const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+                    let tilt = Math.abs(screenAngle) === 90 ? e.gamma : e.beta;
+                    if (tilt == null) return null;
+                    if (dom.flipPhoneCheckbox.checked) tilt = -tilt;
+                    return utils.clamp(Math.round(tilt), 0, 90);
+                },
+                getHeadingFromEvent: (e) => {
+                    if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
+                    if (typeof e.alpha !== 'number') return null;
+                    const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+                    let heading = (e.alpha + screenAngle) % 360;
+                    if (heading < 0) heading += 360;
+                    return heading;
+                },
+                handleOrientation: (event) => {
+                    const tilt = sensors.getTiltFromEvent(event);
+                    if (tilt == null) dom.inclinometerError.textContent = 'Inclinomètre non dispo.';
+                    else {
+                        dom.currentAngleDisplay.textContent = tilt;
+                        dom.inclinometerError.textContent = '';
+                        dom.memorizeSensorsButton.disabled = false;
+                    }
 
-    // ======= Actions UI =======
-    $('btnGeo').addEventListener('click', askGeo);
-    $('btnSensors').addEventListener('click', ()=>{
-      if(!st.sensorsOn) startSensors(); else stopSensors();
-    });
-    $('btnZero').addEventListener('click', zeroSensors);
-    $('btnSim').addEventListener('click', ()=>{
-      // Exemple: soleil au SSW, panel Ouest; montre cas extrême Brésil/Ouest
-      st.lat = st.lat?? -22.9; st.lon = st.lon?? -43.2; // Rio
-      $('latlon').textContent = `${st.lat.toFixed(5)}, ${st.lon.toFixed(5)}`;
-      const now = new Date();
-      const s = sunPos(now, st.lat, st.lon); st.sunAz = s.az; st.sunEl = s.el;
-      $('sunAz').textContent = fmtDeg(s.az); $('sunEl').textContent = fmtDeg(s.el);
-      st.panAz = 270; $('panAz').textContent = fmtDeg(270);
-      st.panTilt = 25; $('panTilt').textContent = fmtDeg(25);
-      computeRecommendation();
-    });
+                    const heading = sensors.getHeadingFromEvent(event);
+                    if (heading == null) dom.compassError.textContent = 'Boussole non dispo.';
+                    else {
+                        dom.compassError.textContent = '';
+                        const panAz = utils.normalizeAngle(heading + (dom.leftCornerCheckbox.checked ? 90 : -90));
+                        state.panelAzimuthLive = panAz;
+                        dom.currentCompassDisplay.textContent = `${Math.round(panAz)}°`;
+                    }
+                },
+                start: async () => {
+                    dom.inclinometerError.textContent = '';
+                    dom.compassError.textContent = 'Activation...';
+                    dom.memorizeSensorsButton.disabled = true;
 
-    $('btnPVGIS').addEventListener('click', async ()=>{
-      if(st.lat==null||st.lon==null||st.panAz==null||st.panTilt==null){ alert('Mesure incomplète.'); return; }
-      // Appel simplifié PVGIS (beta). NB: nécessite internet. Les quotas peuvent limiter.
-      try{
-        const p1 = fetch(`https://re.jrc.ec.europa.eu/api/PVcalc?lat=${st.lat}&lon=${st.lon}&peakpower=1&loss=14&angle=${st.panTilt}&aspect=${st.panAz}&outputformat=json`);
-        // recompute opt
-        const tmpTilt = parseFloat($('tiltOpt').textContent) || st.panTilt;
-        const p2 = fetch(`https://re.jrc.ec.europa.eu/api/PVcalc?lat=${st.lat}&lon=${st.lon}&peakpower=1&loss=14&angle=${tmpTilt}&aspect=${st.panAz}&outputformat=json`);
-        const [r1,r2] = await Promise.all([p1,p2]);
-        const [j1,j2] = await Promise.all([r1.json(), r2.json()]);
-        const e1 = j1.outputs?.totals?.fixed?.E_y;
-        const e2 = j2.outputs?.totals?.fixed?.E_y;
-        if(e1 && e2){
-          const gain = ((e2-e1)/e1*100).toFixed(1);
-          alert(`Estimation PVGIS sur 1 kWc\nRéglage actuel: ${e1.toFixed(0)} kWh/an\nRéglage recommandé: ${e2.toFixed(0)} kWh/an\nGain estimé: ${gain}%`);
-        } else {
-          alert('Réponse PVGIS non exploitable.');
-        }
-      }catch(e){ alert('PVGIS indisponible : '+e.message); }
-    });
+                    const startListening = () => {
+                        if (!state.sensorsActive) {
+                            window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                            state.sensorsActive = true;
+                            dom.startSensorsButton.textContent = 'Arrêter les capteurs';
+                            dom.startSensorsButton.classList.remove('btn-primary');
+                            dom.startSensorsButton.classList.add('btn-danger');
+                            dom.memorizeSensorsButton.classList.remove('hidden');
+                        }
+                    };
 
-    $('btnSnap').addEventListener('click', ()=>{
-      if(st.panAz==null||st.panTilt==null||st.sunAz==null) { alert('Mesure incomplète.'); return; }
-      // Ici on pourrait sauvegarder localement l’instantané (localStorage)
-      const rec = $('tiltOpt').textContent;
-      alert(`Mesure enregistrée:\nAzimut panneau: ${fmtDeg(st.panAz)}\nInclinaison panneau: ${fmtDeg(st.panTilt)}\nAzimut solaire: ${fmtDeg(st.sunAz)}\nHauteur solaire: ${fmtDeg(st.sunEl)}\n\nInclinaison recommandée: ${rec}`);
-    });
+                    try {
+                        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                            const permission = await DeviceOrientationEvent.requestPermission();
+                            if (permission === 'granted') startListening();
+                            else dom.inclinometerError.textContent = 'Permission capteurs refusée.';
+                        } else if ('DeviceOrientationEvent' in window) {
+                            startListening();
+                        } else dom.inclinometerError.textContent = 'Capteurs non supportés.';
+                    } catch (err) {
+                        dom.inclinometerError.textContent = 'Erreur demande permission capteurs.';
+                        utils.log('DeviceOrientation permission error', err);
+                    }
+                },
+                stop: () => {
+                    if (state.sensorsActive) {
+                        window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                        state.sensorsActive = false;
+                        dom.startSensorsButton.textContent = 'Activer les capteurs';
+                        dom.startSensorsButton.classList.remove('btn-danger');
+                        dom.startSensorsButton.classList.add('btn-primary');
+                        dom.currentAngleDisplay.textContent = '--';
+                        dom.currentCompassDisplay.textContent = '--';
+                        dom.inclinometerError.textContent = '';
+                        dom.compassError.textContent = 'Activez les capteurs';
+                        dom.memorizeSensorsButton.classList.add('hidden');
+                        dom.memorizeSensorsButton.disabled = true;
+                        
+                        state.memorizedTilt = null;
+                        state.memorizedAzimuthValue = null;
+                        state.memorizedLongitude = null;
+                        dom.useMeasuredValuesButton.disabled = true;
+                        dom.gotoEstimationButton.classList.add('hidden');
+                        dom.memorizeSensorsButton.textContent = 'Mémoriser les mesures';
+                        dom.memorizeSensorsButton.classList.remove('bg-green-200', 'text-green-800');
+                        calculations.calculateAndDisplayAll();
+                    }
+                }
+            };
 
-    // Démarrage doux : on tente une geoloc + update soleil toutes les 30 s
-    askGeo();
-    setInterval(updateSun, 30000);
-  </script>
+            const geolocation = {
+                get: async () => {
+                    dom.locationError.textContent = 'Obtention de la position...';
+                    try {
+                        if (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation && Capacitor.Plugins.Geolocation.getCurrentPosition) {
+                            const pos = await Capacitor.Plugins.Geolocation.getCurrentPosition();
+                            ui.updateLocationFields(pos.coords.latitude, pos.coords.longitude);
+                        } else if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (p) => ui.updateLocationFields(p.coords.latitude, p.coords.longitude),
+                                (err) => {
+                                    dom.locationError.textContent = 'Impossible d’obtenir la position.';
+                                    utils.log('Browser geolocation error', err);
+                                }
+                            );
+                        } else {
+                            dom.locationError.textContent = 'Géolocalisation non supportée.';
+                        }
+                    } catch (err) {
+                        dom.locationError.textContent = 'Erreur géoloc.';
+                        utils.log('geolocation fallback error', err);
+                    }
+                }
+            };
+
+            const api = {
+                fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
+                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect-180}&outputformat=json`; // PVGIS aspect is from South
+                    const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const json = await res.json();
+                    if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète');
+                    return json;
+                },
+                getProductionEstimate: async () => {
+                    dom.pvgisError.textContent = '';
+                    dom.calculateText.classList.add('hidden');
+                    dom.calculateLoader.classList.remove('hidden');
+                    dom.productionResults.classList.add('hidden');
+
+                    const lat = utils.safeParseFloat(dom.latitudeInput.value);
+                    const lon = utils.safeParseFloat(dom.longitudeInput.value);
+                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value);
+                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value);
+                    const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value);
+                    const recommendedTilt = state.lastRecommendedTilt;
+
+                    if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => Number.isNaN(v))) {
+                        dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.';
+                        dom.calculateText.classList.remove('hidden');
+                        dom.calculateLoader.classList.add('hidden');
+                        return;
+                    }
+
+                    try {
+                        const [currentProd, optimalProd] = await Promise.all([
+                            api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth),
+                            api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, state.memorizedAzimuthValue)
+                        ]);
+
+                        let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0;
+                        let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0;
+                        let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0;
+                        let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0;
+
+                        if (optDaily < curDaily) {
+                            optDaily = curDaily;
+                            optMonthly = curMonthly;
+                            dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.';
+                        } else {
+                            dom.pvgisError.textContent = '';
+                        }
+
+                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`;
+                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`;
+
+                        const gainDaily = optDaily - curDaily;
+                        dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`;
+
+                        const gainMonthly = optMonthly - curMonthly;
+                        dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`;
+
+                        dom.productionResults.classList.remove('hidden');
+                    } catch (err) {
+                        dom.pvgisError.textContent = 'Erreur communication PVGIS.';
+                        utils.log('PVGIS error', err);
+                    } finally {
+                        dom.calculateText.classList.remove('hidden');
+                        dom.calculateLoader.classList.add('hidden');
+                    }
+                }
+            };
+
+            const handlers = {
+                toggleSensors: () => {
+                    state.sensorsActive ? sensors.stop() : sensors.start();
+                },
+                memorizeValues: () => {
+                    const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
+                    const az = state.panelAzimuthLive;
+                    if (!Number.isFinite(tilt) || !Number.isFinite(az)) {
+                        dom.inclinometerError.textContent = 'Mesures invalides.';
+                        return;
+                    }
+                    state.memorizedTilt = tilt;
+                    state.memorizedAzimuthValue = az;
+                    state.memorizedLongitude = state.currentLongitude;
+                    dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
+                    dom.useMeasuredValuesButton.disabled = false;
+                    dom.gotoEstimationButton.classList.remove('hidden');
+                    calculations.calculateAndDisplayAll();
+                },
+                useMeasuredValues: () => {
+                    if (state.memorizedTilt === null || state.memorizedAzimuthValue === null) {
+                        dom.pvgisError.textContent = 'Aucune valeur mémorisée.';
+                        return;
+                    }
+                    dom.currentTiltInput.value = state.memorizedTilt;
+                    dom.currentAzimuthInput.value = state.memorizedAzimuthValue;
+                    if (state.memorizedLongitude !== null) {
+                        dom.longitudeInput.value = state.memorizedLongitude;
+                    }
+                    dom.pvgisError.textContent = '';
+                },
+                handleModalKeydown: (e) => {
+                    if (e.key === 'Escape') modal.close();
+                }
+            };
+
+            function init() {
+                utils.log('Application initialisée.');
+                dom.donateLink.href = CONFIG.donateLink;
+                if(dom.donateLink2) dom.donateLink2.href = CONFIG.donateLink;
+
+                ['change', 'input'].forEach(evt => {
+                    dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.clippingCheckbox.addEventListener(evt, calculations.calculateAndDisplayAll);
+                });
+                
+                dom.startSensorsButton.addEventListener('click', handlers.toggleSensors);
+                dom.getLocationButton.addEventListener('click', geolocation.get);
+                dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeValues);
+                dom.useMeasuredValuesButton.addEventListener('click', handlers.useMeasuredValues);
+
+                dom.settingsButton.addEventListener('click', (e) => modal.open(dom.settingsModal, e.currentTarget));
+                dom.gotoEstimationButton.addEventListener('click', () => ui.showPage('settings'));
+                dom.backButton.addEventListener('click', () => ui.showPage('main'));
+                dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
+
+                dom.clippingHelpButton.addEventListener('click', (e) => modal.open(dom.clippingHelpModal, e.currentTarget));
+                dom.mainHelpButton.addEventListener('click', (e) => modal.open(dom.mainHelpModal, e.currentTarget));
+                dom.settingsHelpButton.addEventListener('click', (e) => modal.open(dom.settingsHelpModal, e.currentTarget));
+
+                dom.closeClippingModalButton.addEventListener('click', modal.close);
+                dom.closeMainModalButton.addEventListener('click', modal.close);
+                dom.closeSettingsModalButton.addEventListener('click', modal.close);
+                dom.closeSettingsModalMainButton.addEventListener('click', modal.close);
+
+                document.addEventListener('keydown', handlers.handleModalKeydown);
+
+                const today = new Date();
+                dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                calculations.calculateAndDisplayAll();
+            }
+
+            window.addEventListener('load', init);
+
+        })();
+    </script>
 </body>
 </html>

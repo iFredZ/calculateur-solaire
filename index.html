@@ -92,7 +92,7 @@
 
                 <!-- En-tête et Localisation -->
                 <div class="text-center border-b pb-6">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Optim'Angle Solaire</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mt-8">Optim'Angle Solaire</h1>
                     <div class="mt-4 max-w-xs mx-auto">
                         <label for="latitude-input" class="block text-sm font-medium text-gray-700 mb-1">Localisation</label>
                         <div class="flex items-center gap-2">
@@ -117,50 +117,29 @@
                         <p class="mt-4 text-lg text-blue-900">Angle Recommandé</p>
                         <p id="result" class="text-5xl md:text-6xl font-bold text-blue-600 my-1" aria-live="polite">--°</p>
                     </div>
-                    <!-- Angle Mesuré -->
-                    <div class="text-center md:border-l md:pl-6 border-gray-200">
-                         <p class="text-lg text-gray-700">Angle Actuel</p>
-                         <p class="text-5xl md:text-6xl font-bold text-gray-800 my-1"><span id="current-angle">--</span>°</p>
-                         <button type="button" id="start-sensors" class="mt-4 w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm">Activer les capteurs</button>
-                         <button type="button" id="memorize-sensors" class="mt-2 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-sm hidden" disabled>Mémoriser les mesures</button>
+                    <!-- Angle et Orientation Mesurés -->
+                    <div class="text-center md:border-l md:pl-6 border-gray-200 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-lg text-gray-700">Angle Actuel</p>
+                                <p class="text-4xl font-bold text-gray-800 my-1"><span id="current-angle">--</span>°</p>
+                            </div>
+                             <div>
+                                <p class="text-lg text-gray-700">Orientation</p>
+                                <p class="text-xl font-bold text-gray-800 my-1"><span id="current-compass">--</span></p>
+                            </div>
+                        </div>
+                         <button type="button" id="start-sensors" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm">Activer les capteurs</button>
+                         <button type="button" id="memorize-sensors" class="hidden mt-2 w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors text-base" disabled>Mémoriser les mesures</button>
                          <p id="inclinometer-error" class="text-xs text-red-500 h-4 mt-1" role="alert"></p>
+                         <button type="button" id="goto-estimation-button" class="hidden mt-2 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all text-base items-center justify-center">
+                            Calculer le Gain
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
-                <!-- [FIXED] Re-added the missing advanced settings section -->
-                <div class="mt-6">
-                     <h2 class="text-xl font-bold text-center text-gray-800 mb-4">Réglages Avancés</h2>
-                     <div class="bg-gray-50 p-4 rounded-lg border">
-                         <!-- Azimut & Boussole -->
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                             <!-- Cible Azimut -->
-                             <div class="text-center">
-                                  <label for="azimuth-slider" class="block text-sm font-medium text-gray-700">Déviation / Sud</label>
-                                  <input type="range" id="azimuth-slider" min="-90" max="90" value="0" step="1" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer mt-2" aria-label="Azimut cible">
-                                  <div class="flex justify-between text-xs text-gray-500 px-1 mt-1">
-                                       <span>90° Est</span>
-                                       <span id="azimuth-value" class="font-bold text-base text-gray-800">0° Plein Sud</span>
-                                       <span>90° Ouest</span>
-                                  </div>
-                             </div>
-                             <!-- Mesure Boussole -->
-                             <div class="text-center md:border-l md:pl-6 border-gray-200">
-                                 <p class="text-lg text-gray-700">Orientation Mesurée</p>
-                                 <p class="text-2xl font-bold text-gray-800 my-1"><span id="current-compass">--</span></p>
-                                 <p id="compass-error" class="text-xs text-red-500 h-4 mt-1">Activez les capteurs</p>
-                             </div>
-                         </div>
-                         <p class="text-center text-xs text-gray-500 pt-3 border-t mt-4">Ajustez la réglette pour qu'elle corresponde à votre orientation mesurée.</p>
-                       </div>
-                </div>
-
-                <!-- Button to go to estimation page -->
-                <button type="button" id="goto-estimation-button" class="hidden mt-6 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all text-lg flex items-center justify-center">
-                    Calculer le Gain Potentiel
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </button>
 
                 <!-- Recommandations saisonnières -->
                 <div class="mt-6">
@@ -441,11 +420,13 @@
             // --- UI MODULE ---
             const ui = {
                 updateAzimuthDisplay: (az) => {
-                    if (az === 0) dom.azimuthValueDisplay.textContent = '0° Plein Sud';
-                    else if (az === -90) dom.azimuthValueDisplay.textContent = 'Plein Est';
-                    else if (az === 90) dom.azimuthValueDisplay.textContent = 'Plein Ouest';
-                    else if (az < 0) dom.azimuthValueDisplay.textContent = `${Math.abs(az)}° Est`;
-                    else dom.azimuthValueDisplay.textContent = `${az}° Ouest`;
+                    if (dom.azimuthValueDisplay) {
+                        if (az === 0) dom.azimuthValueDisplay.textContent = '0° Plein Sud';
+                        else if (az === -90) dom.azimuthValueDisplay.textContent = 'Plein Est';
+                        else if (az === 90) dom.azimuthValueDisplay.textContent = 'Plein Ouest';
+                        else if (az < 0) dom.azimuthValueDisplay.textContent = `${Math.abs(az)}° Est`;
+                        else dom.azimuthValueDisplay.textContent = `${az}° Ouest`;
+                    }
                 },
                 showPage: (page) => {
                     dom.mainPage.classList.toggle('hidden', page !== 'main');
@@ -498,8 +479,11 @@
                     }
 
                     const lat = utils.safeParseFloat(dom.latitudeInput.value, CONFIG.defaultLatitude);
-                    const panelAzimuth = parseInt(dom.azimuthSlider.value, 10) || 0;
-                    ui.updateAzimuthDisplay(panelAzimuth);
+                    const panelAzimuth = state.memorizedAzimuthValue !== null ? state.memorizedAzimuthValue : 0;
+                    
+                    if(dom.azimuthSlider) { // Check if slider exists before using it
+                        ui.updateAzimuthDisplay(panelAzimuth);
+                    }
 
                     const month = selectedDate.getMonth();
                     const clipping = dom.clippingCheckbox.checked && month >= 3 && month <= 8 ? CONFIG.clippingAdjustment : 0;
@@ -605,6 +589,16 @@
                         dom.compassError.textContent = 'Activez les capteurs';
                         dom.memorizeSensorsButton.classList.add('hidden');
                         dom.memorizeSensorsButton.disabled = true;
+                        
+                        // [NEW] Reset memorized values
+                        state.memorizedTilt = null;
+                        state.memorizedAzimuthValue = null;
+                        state.memorizedLongitude = null;
+                        dom.useMeasuredValuesButton.disabled = true;
+                        dom.gotoEstimationButton.classList.add('hidden');
+                        dom.memorizeSensorsButton.textContent = 'Mémoriser les mesures';
+                        dom.memorizeSensorsButton.classList.remove('bg-green-200', 'text-green-800');
+                        calculations.calculateAndDisplayAll();
                     }
                 }
             };
@@ -688,7 +682,7 @@
                     try {
                         const [currentProd, optimalProd] = await Promise.all([
                             api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth),
-                            api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, parseInt(dom.azimuthSlider.value, 10))
+                            api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, state.memorizedAzimuthValue)
                         ]);
 
                         if (!currentProd?.outputs?.totals?.fixed || !optimalProd?.outputs?.totals?.fixed) {
@@ -758,6 +752,7 @@
                     dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
                     dom.useMeasuredValuesButton.disabled = false;
                     dom.gotoEstimationButton.classList.remove('hidden'); // Show button
+                    calculations.calculateAndDisplayAll(); // Recalculate with new azimuth
                 },
                 useMeasuredValues: () => {
                     if (state.memorizedTilt === null || state.memorizedAzimuthValue === null) {
@@ -786,7 +781,9 @@
                 ['change', 'input'].forEach(evt => {
                     dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
-                    dom.azimuthSlider.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    if (dom.azimuthSlider) { // Check if element exists before adding listener
+                        dom.azimuthSlider.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    }
                     dom.clippingCheckbox.addEventListener(evt, calculations.calculateAndDisplayAll);
                 });
                 

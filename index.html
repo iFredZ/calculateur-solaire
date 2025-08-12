@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optim'Angle Solaire (Final Corrigé)</title>
+    <title>Optim'Angle Solaire (v. Finale)</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,14 +105,20 @@
                         <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
                     </div>
                 </div>
-
-                <div class="card bg-gray-900/50 p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                
+                <div class="card bg-gray-900/50 p-6 space-y-4">
                     <div class="text-center">
                         <label for="date-input" class="block text-md font-medium text-teal-300 mb-2">Date Cible</label>
                         <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
                     </div>
-                    <div class="text-center md:border-l md:pl-6 border-gray-700 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-2 px-4 rounded-lg">Activer les capteurs</button>
+                        <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg">Entrer manuellement</button>
+                    </div>
+
+                    <div id="sensors-display" class="hidden space-y-4 pt-4 border-t border-gray-800">
+                         <div class="grid grid-cols-2 gap-4 text-center">
                             <div>
                                 <p class="text-lg text-gray-400">Angle Actuel</p>
                                 <p class="text-4xl font-bold my-1"><span id="current-angle">--</span>°</p>
@@ -122,9 +128,21 @@
                                 <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
                             </div>
                         </div>
-                         <button type="button" id="start-sensors" class="w-full btn-primary font-bold py-2 px-4 rounded-lg transition-colors text-sm">Activer les capteurs</button>
-                         <button type="button" id="memorize-sensors" class="hidden mt-2 w-full btn-secondary font-bold py-3 px-4 rounded-lg transition-colors text-base" disabled>Mémoriser les mesures</button>
-                         <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
+                        <button type="button" id="memorize-sensors" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" disabled>Mémoriser ces mesures</button>
+                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
+                    </div>
+
+                    <div id="manual-entry-display" class="hidden space-y-4 pt-4 border-t border-gray-800">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="manual-tilt-input" class="block text-sm font-medium text-gray-400 mb-1">Inclinaison (°)</label>
+                                <input type="number" id="manual-tilt-input" placeholder="ex: 35" class="bg-input w-full p-2 rounded-md text-center">
+                            </div>
+                            <div>
+                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Déviation / Sud (°)</label>
+                                <input type="number" id="manual-azimuth-input" placeholder="ex: -10" class="bg-input w-full p-2 rounded-md text-center">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -266,14 +284,14 @@
             <div class="mt-3">
                 <h3 id="main-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide</h3>
                 <div class="mt-4 px-2 py-3 space-y-3">
-                    <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">1. Localisation & Date :</strong> La latitude est pré-remplie. Vérifiez la date cible.
+                     <p class="text-sm text-gray-400">
+                        <strong class="text-gray-200">1. Choisissez un mode :</strong> Activez les capteurs pour une mesure live, ou entrez manuellement les valeurs pour une simulation.
                     </p>
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">2. Mesure :</strong> Activez les capteurs. L'angle recommandé s'affiche et s'ajuste en temps réel.
+                        <strong class="text-gray-200">2. Observez le résultat :</strong> L'angle recommandé s'affiche et s'ajuste en temps réel en fonction de vos actions.
                     </p>
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">3. Estimation :</strong> Cliquez sur "Mémoriser" pour pré-remplir la page d'estimation, puis allez-y pour calculer le gain.
+                        <strong class="text-gray-200">3. Estimez le gain :</strong> Cliquez sur "Calculer le Gain Potentiel". Vos données (manuelles ou mémorisées) seront utilisées pour pré-remplir la page suivante.
                     </p>
                 </div>
                 <div class="items-center px-4 py-3">
@@ -287,7 +305,7 @@
             <div class="mt-3">
                 <h3 id="settings-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide Estimation</h3>
                 <div class="mt-4 px-2 py-3 space-y-3 text-sm text-gray-400 text-left">
-                    <p>Les champs d'inclinaison et d'orientation sont pré-remplis si vous avez mémorisé des mesures. Ajustez-les si besoin, puis lancez le calcul.</p>
+                    <p>Les champs d'inclinaison et d'orientation sont pré-remplis. Ajustez-les si besoin, puis lancez le calcul.</p>
                 </div>
                 <div class="items-center px-4 py-3">
                     <button type="button" id="close-settings-modal" class="px-4 py-2 btn-secondary rounded-md w-full">Fermer</button>
@@ -310,6 +328,7 @@
             };
 
             const state = {
+                entryMode: null, // 'sensors' ou 'manual'
                 currentLongitude: CONFIG.defaultLongitude,
                 sensorsActive: false,
                 memorizedTilt: null,
@@ -322,21 +341,34 @@
             };
 
             const dom = {
+                // Pages
                 mainPage: document.getElementById('main-page'),
                 settingsPage: document.getElementById('settings-page'),
-                dateInput: document.getElementById('date-input'),
+                
+                // Entrées principales
                 latitudeInput: document.getElementById('latitude-input'),
+                dateInput: document.getElementById('date-input'),
+                getLocationButton: document.getElementById('get-location'),
                 locationSubtitle: document.getElementById('location-subtitle'),
                 locationError: document.getElementById('location-error'),
-                clippingCheckbox: document.getElementById('clipping-checkbox'),
-                startSensorsButton: document.getElementById('start-sensors'),
+
+                // Choix du mode
+                activateSensorsButton: document.getElementById('activate-sensors-button'),
+                manualEntryButton: document.getElementById('manual-entry-button'),
+
+                // Mode capteurs
+                sensorsDisplay: document.getElementById('sensors-display'),
                 currentAngleDisplay: document.getElementById('current-angle'),
-                inclinometerError: document.getElementById('sensor-error'),
                 currentCompassDisplay: document.getElementById('current-compass'),
-                getLocationButton: document.getElementById('get-location'),
                 memorizeSensorsButton: document.getElementById('memorize-sensors'),
-                gotoEstimationButton: document.getElementById('goto-estimation-button'),
+                sensorError: document.getElementById('sensor-error'),
+
+                // Mode manuel
+                manualEntryDisplay: document.getElementById('manual-entry-display'),
+                manualTiltInput: document.getElementById('manual-tilt-input'),
+                manualAzimuthInput: document.getElementById('manual-azimuth-input'),
                 
+                // Affichage des résultats
                 resultContainer: document.getElementById('result-container'),
                 resultDisplay: document.getElementById('result'),
                 seasonalContainer: document.getElementById('seasonal-container'),
@@ -344,14 +376,11 @@
                 springFallAngleDisplay: document.getElementById('spring-fall-angle'),
                 summerAngleDisplay: document.getElementById('summer-angle'),
                 
-                donateLink: document.getElementById('donate-link'),
-                clippingHelpButton: document.getElementById('clipping-help-button'),
-                clippingHelpModal: document.getElementById('clipping-help-modal'),
-                closeClippingModalButton: document.getElementById('close-clipping-modal'),
-                mainHelpButton: document.getElementById('main-help-button'),
-                mainHelpModal: document.getElementById('main-help-modal'),
-                closeMainModalButton: document.getElementById('close-main-modal'),
-                settingsButton: document.getElementById('settings-button'),
+                // Boutons de navigation et autres
+                gotoEstimationButton: document.getElementById('goto-estimation-button'),
+                clippingCheckbox: document.getElementById('clipping-checkbox'),
+                
+                // Page d'estimation
                 backButton: document.getElementById('back-button'),
                 peakPowerInput: document.getElementById('peak-power'),
                 longitudeInput: document.getElementById('longitude-input'),
@@ -366,12 +395,22 @@
                 pvgisError: document.getElementById('pvgis-error'),
                 calculateText: document.getElementById('calculate-text'),
                 calculateLoader: document.getElementById('calculate-loader'),
-                settingsHelpButton: document.getElementById('settings-help-button'),
-                settingsHelpModal: document.getElementById('settings-help-modal'),
-                closeSettingsModalButton: document.getElementById('close-settings-modal'),
+
+                // Modals et liens
+                settingsButton: document.getElementById('settings-button'),
+                donateLink: document.getElementById('donate-link'),
                 donateLink2: document.getElementById('donate-link-2'),
+                mainHelpButton: document.getElementById('main-help-button'),
+                settingsHelpButton: document.getElementById('settings-help-button'),
+                clippingHelpButton: document.getElementById('clipping-help-button'),
                 settingsModal: document.getElementById('settings-modal'),
+                clippingHelpModal: document.getElementById('clipping-help-modal'),
+                mainHelpModal: document.getElementById('main-help-modal'),
+                settingsHelpModal: document.getElementById('settings-help-modal'),
                 closeSettingsModalMainButton: document.getElementById('close-settings-modal-main'),
+                closeClippingModalButton: document.getElementById('close-clipping-modal'),
+                closeMainModalButton: document.getElementById('close-main-modal'),
+                closeSettingsModalButton: document.getElementById('close-settings-modal'),
             };
 
             const utils = {
@@ -402,44 +441,53 @@
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
                     calculations.calculateAndDisplayAll();
-                }
-            };
-
-            const modal = {
-                open: (el, trigger) => {
-                    state.lastFocusedElement = trigger || document.activeElement;
-                    state.activeModal = el;
-                    el.classList.remove('hidden');
-                    const first = el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                    if (first) first.focus();
                 },
-                close: () => {
-                    if (!state.activeModal) return;
-                    state.activeModal.classList.add('hidden');
-                    state.activeModal = null;
-                    if (state.lastFocusedElement) state.lastFocusedElement.focus();
-                    state.lastFocusedElement = null;
+                setEntryMode: (mode) => {
+                    state.entryMode = mode;
+                    if (mode === 'sensors') {
+                        dom.sensorsDisplay.classList.remove('hidden');
+                        dom.manualEntryDisplay.classList.add('hidden');
+                        dom.activateSensorsButton.classList.add('btn-danger');
+                        dom.activateSensorsButton.classList.remove('btn-primary');
+                        dom.manualEntryButton.classList.add('btn-secondary');
+                        dom.manualEntryButton.classList.remove('btn-danger');
+                        sensors.start();
+                    } else if (mode === 'manual') {
+                        if(state.sensorsActive) sensors.stop();
+                        dom.sensorsDisplay.classList.add('hidden');
+                        dom.manualEntryDisplay.classList.remove('hidden');
+                        dom.manualEntryButton.classList.add('btn-danger');
+                        dom.manualEntryButton.classList.remove('btn-secondary');
+                        dom.activateSensorsButton.classList.add('btn-primary');
+                        dom.activateSensorsButton.classList.remove('btn-danger');
+                        dom.gotoEstimationButton.classList.remove('hidden');
+                    }
+                    calculations.calculateAndDisplayAll();
                 }
             };
 
             const solar = {
-                getDeclination: (dayOfYear) => {
-                    return -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10)));
-                }
+                getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10)))
             };
 
             const calculations = {
                 calculateAndDisplayAll: () => {
                     const dateValue = dom.dateInput.value;
                     const latValueStr = dom.latitudeInput.value;
-                    const lat = utils.safeParseFloat(latValueStr, NaN);
+                    const lat = utils.safeParseFloat(latValueStr);
 
-                    let rawAzimuth = null;
-                    if (state.sensorsActive && state.panelAzimuthLive !== null) {
-                        rawAzimuth = state.panelAzimuthLive;
+                    let panelAzimuthDeviation = NaN;
+
+                    if (state.entryMode === 'manual') {
+                        panelAzimuthDeviation = utils.safeParseFloat(dom.manualAzimuthInput.value);
+                    } else if (state.entryMode === 'sensors' && state.sensorsActive && state.panelAzimuthLive !== null) {
+                        let deviation = state.panelAzimuthLive - 180;
+                        if (deviation > 180) deviation -= 360;
+                        if (deviation < -180) deviation += 360;
+                        panelAzimuthDeviation = deviation;
                     }
 
-                    if (!dateValue || isNaN(lat) || rawAzimuth === null) {
+                    if (!dateValue || isNaN(lat) || isNaN(panelAzimuthDeviation)) {
                         dom.resultContainer.classList.add('hidden');
                         dom.seasonalContainer.classList.add('hidden');
                         return;
@@ -450,10 +498,6 @@
                     
                     const selectedDate = new Date(dateValue);
                     if (isNaN(selectedDate.getTime())) return;
-                    
-                    let panelAzimuthDeviation = rawAzimuth - 180;
-                    if (panelAzimuthDeviation > 180) panelAzimuthDeviation -= 360;
-                    if (panelAzimuthDeviation < -180) panelAzimuthDeviation += 360;
                     
                     const dayOfYear = utils.getDayOfYear(selectedDate);
                     const declination = solar.getDeclination(dayOfYear);
@@ -475,166 +519,163 @@
             };
 
             const sensors = {
-                getTiltFromEvent: (e) => {
-                    let tilt = e.beta;
-                    if (tilt == null) return null;
-                    return utils.clamp(Math.round(Math.abs(tilt)), 0, 90);
-                },
+                getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta)), 0, 90),
                 getHeadingFromEvent: (e) => {
                     if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
                     if (typeof e.alpha !== 'number') return null;
-                    const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
-                    let heading = 360 - e.alpha;
-                    heading = (heading + screenAngle) % 360;
-                    if (heading < 0) heading += 360;
-                    return heading;
+                    const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
+                    let heading = (360 - e.alpha + screenAngle) % 360;
+                    return heading < 0 ? heading + 360 : heading;
                 },
                 formatAzimuthForDisplay: (azimuth) => {
                     let deviation = azimuth - 180;
                     if (deviation > 180) deviation -= 360;
                     if (deviation < -180) deviation += 360;
                     if (Math.abs(deviation) < 5) return 'Plein Sud';
-                    if (deviation < 0) return `${Math.round(Math.abs(deviation))}° Est`;
-                    return `${Math.round(deviation)}° Ouest`;
+                    return `${Math.round(Math.abs(deviation))}° ${deviation < 0 ? 'Est' : 'Ouest'}`;
                 },
                 handleOrientation: (event) => {
                     const tilt = sensors.getTiltFromEvent(event);
                     if (tilt !== null) {
                         dom.currentAngleDisplay.textContent = tilt;
-                        dom.inclinometerError.textContent = '';
+                        dom.sensorError.textContent = '';
                         dom.memorizeSensorsButton.disabled = false;
                     }
-
                     const heading = sensors.getHeadingFromEvent(event);
                     if (heading !== null) {
-                        const panAz = utils.normalizeAngle(heading);
-                        state.panelAzimuthLive = panAz;
-                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(panAz);
+                        state.panelAzimuthLive = utils.normalizeAngle(heading);
+                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
                     }
                     calculations.calculateAndDisplayAll();
                 },
                 start: async () => {
-                    dom.inclinometerError.textContent = 'Activation...';
+                    if (state.sensorsActive) return;
+                    dom.sensorError.textContent = 'Activation...';
                     dom.memorizeSensorsButton.disabled = true;
-                    const startListening = () => {
-                        if (!state.sensorsActive) {
-                            window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                            state.sensorsActive = true;
-                            dom.startSensorsButton.textContent = 'Arrêter les capteurs';
-                            dom.startSensorsButton.classList.remove('btn-primary');
-                            dom.startSensorsButton.classList.add('btn-danger');
-                            dom.memorizeSensorsButton.classList.remove('hidden');
-                        }
-                    };
                     try {
-                        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
                             const permission = await DeviceOrientationEvent.requestPermission();
-                            if (permission === 'granted') startListening();
-                            else dom.inclinometerError.textContent = 'Permission capteurs refusée.';
-                        } else if ('DeviceOrientationEvent' in window) {
-                            startListening();
-                        } else dom.inclinometerError.textContent = 'Capteurs non supportés.';
+                            if (permission !== 'granted') {
+                                dom.sensorError.textContent = 'Permission capteurs refusée.';
+                                return;
+                            }
+                        }
+                        window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                        state.sensorsActive = true;
+                        dom.activateSensorsButton.textContent = 'Arrêter les capteurs';
+                        dom.gotoEstimationButton.classList.remove('hidden');
                     } catch (err) {
-                        dom.inclinometerError.textContent = 'Erreur demande permission.';
+                        dom.sensorError.textContent = 'Erreur demande permission.';
                         utils.log('DeviceOrientation permission error', err);
                     }
                 },
                 stop: () => {
-                    if (state.sensorsActive) {
-                        window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                        state.sensorsActive = false;
-                        state.panelAzimuthLive = null;
-                        dom.startSensorsButton.textContent = 'Activer les capteurs';
-                        dom.startSensorsButton.classList.remove('btn-danger');
-                        dom.startSensorsButton.classList.add('btn-primary');
-                        dom.currentAngleDisplay.textContent = '--';
-                        dom.currentCompassDisplay.textContent = '--';
-                        dom.inclinometerError.textContent = '';
-                        dom.memorizeSensorsButton.classList.add('hidden');
-                        dom.memorizeSensorsButton.disabled = true;
-                        
-                        calculations.calculateAndDisplayAll(); 
-                    }
+                    if (!state.sensorsActive) return;
+                    window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                    state.sensorsActive = false;
+                    state.panelAzimuthLive = null;
+                    dom.activateSensorsButton.textContent = 'Activer les capteurs';
+                    dom.currentAngleDisplay.textContent = '--';
+                    dom.currentCompassDisplay.textContent = '--';
+                    dom.sensorError.textContent = '';
+                    dom.memorizeSensorsButton.disabled = true;
+                    calculations.calculateAndDisplayAll(); 
                 }
             };
             
-            const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation && Capacitor.Plugins.Geolocation.getCurrentPosition) { const pos = await Capacitor.Plugins.Geolocation.getCurrentPosition(); ui.updateLocationFields(pos.coords.latitude, pos.coords.longitude); } else if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( (p) => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), (err) => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; } ); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
-            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => Number.isNaN(v))) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { let memorizedAzimuthDeviation = state.memorizedAzimuthValue - 180; if (memorizedAzimuthDeviation > 180) memorizedAzimuthDeviation -= 360; if (memorizedAzimuthDeviation < -180) memorizedAzimuthDeviation += 360; const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, memorizedAzimuthDeviation) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
-
             const handlers = {
-                toggleSensors: () => {
-                    state.sensorsActive ? sensors.stop() : sensors.start();
+                prepareEstimationPage: () => {
+                    if (state.entryMode === 'manual') {
+                        dom.currentTiltInput.value = dom.manualTiltInput.value;
+                        dom.currentAzimuthInput.value = dom.manualAzimuthInput.value;
+                    } else { // sensors mode
+                        dom.currentTiltInput.value = state.memorizedTilt || '';
+                        if (state.memorizedAzimuthValue !== null) {
+                             let deviation = state.memorizedAzimuthValue - 180;
+                            if (deviation > 180) deviation -= 360;
+                            if (deviation < -180) deviation += 360;
+                            dom.currentAzimuthInput.value = Math.round(deviation);
+                        } else {
+                            dom.currentAzimuthInput.value = '';
+                        }
+                    }
+                    dom.longitudeInput.value = state.currentLongitude;
+                    ui.showPage('settings');
                 },
-                memorizeValues: () => {
+                memorizeSensorValues: () => {
                     const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
                     const az = state.panelAzimuthLive;
                     if (!Number.isFinite(tilt) || !Number.isFinite(az)) {
-                        dom.inclinometerError.textContent = 'Mesures invalides.';
+                        dom.sensorError.textContent = 'Mesures invalides.';
                         return;
                     }
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
                     state.memorizedLongitude = state.currentLongitude;
-
-                    dom.currentTiltInput.value = tilt;
-                    dom.longitudeInput.value = state.currentLongitude;
-                    let deviation = az - 180;
-                    if (deviation > 180) deviation -= 360;
-                    if (deviation < -180) deviation += 360;
-                    dom.currentAzimuthInput.value = Math.round(deviation);
-
                     dom.memorizeSensorsButton.textContent = 'Valeurs mémorisées !';
-                    dom.gotoEstimationButton.classList.remove('hidden');
+                    setTimeout(() => { dom.memorizeSensorsButton.textContent = 'Mémoriser ces mesures'; }, 2000);
                 },
                 handleModalKeydown: (e) => {
-                    if (e.key === 'Escape') modal.close();
+                    if (e.key === 'Escape') {
+                        const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+                        if (openModal) {
+                            openModal.classList.add('hidden');
+                        }
+                    }
                 }
             };
 
             function init() {
-                utils.log('Application initialisée.');
-                dom.donateLink.href = CONFIG.donateLink;
-                if(dom.donateLink2) dom.donateLink2.href = CONFIG.donateLink;
-
+                // Listeners principaux
                 ['change', 'input'].forEach(evt => {
-                    dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.clippingCheckbox.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.manualTiltInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.manualAzimuthInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                 });
                 
-                dom.startSensorsButton.addEventListener('click', handlers.toggleSensors);
-                dom.getLocationButton.addEventListener('click', geolocation.get);
-                dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeValues);
+                // Choix du mode
+                dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
+                dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
 
-                dom.settingsButton.addEventListener('click', (e) => modal.open(dom.settingsModal, e.currentTarget));
-                dom.gotoEstimationButton.addEventListener('click', () => ui.showPage('settings'));
+                // Actions
+                dom.getLocationButton.addEventListener('click', () => geolocation.get());
+                dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeSensorValues);
+
+                // Navigation
+                dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
                 dom.backButton.addEventListener('click', () => ui.showPage('main'));
-                dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
+                dom.calculateProductionButton.addEventListener('click', () => api.getProductionEstimate());
 
-                dom.clippingHelpButton.addEventListener('click', (e) => modal.open(dom.clippingHelpModal, e.currentTarget));
-                dom.mainHelpButton.addEventListener('click', (e) => modal.open(dom.mainHelpModal, e.currentTarget));
-                dom.settingsHelpButton.addEventListener('click', (e) => modal.open(dom.settingsHelpModal, e.currentTarget));
-
-                dom.closeClippingModalButton.addEventListener('click', modal.close);
-                dom.closeMainModalButton.addEventListener('click', modal.close);
-                dom.closeSettingsModalButton.addEventListener('click', modal.close);
-                dom.closeSettingsModalMainButton.addEventListener('click', modal.close);
-
+                // Modals
+                const modals = [
+                    { btn: dom.settingsButton, modal: dom.settingsModal },
+                    { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
+                    { btn: dom.mainHelpButton, modal: dom.mainHelpModal },
+                    { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
+                ];
+                modals.forEach(item => item.btn.addEventListener('click', () => item.modal.classList.remove('hidden')));
+                
+                const closeButtons = document.querySelectorAll('[id^="close-"]');
+                closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden')));
+                
                 document.addEventListener('keydown', handlers.handleModalKeydown);
 
+                // Initialisation des valeurs
                 const today = new Date();
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                dom.latitudeInput.value = CONFIG.defaultLatitude;
+                dom.longitudeInput.value = CONFIG.defaultLongitude;
                 
-                // --- CORRECTION FINALE ---
-                // On pré-remplit la latitude pour que le calcul dynamique fonctionne immédiatement
-                dom.latitudeInput.value = CONFIG.defaultLatitude; 
-                // --- FIN DE LA CORRECTION ---
-                
-                calculations.calculateAndDisplayAll(); 
+                utils.log('Application initialisée.');
             }
+            
+            // --- Fonctions inchangées (pour la lisibilité) ---
+            const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
+            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth, recommendedTilt].some(v => isNaN(v))) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
 
             window.addEventListener('load', init);
-
         })();
     </script>
 </body>

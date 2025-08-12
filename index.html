@@ -267,13 +267,13 @@
                 <h3 id="main-help-modal-title" class="text-xl leading-6 font-medium text-center">Guide</h3>
                 <div class="mt-4 px-2 py-3 space-y-3">
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">1. Localisation & Date :</strong> Renseignez votre latitude et la date cible.
+                        <strong class="text-gray-200">1. Localisation & Date :</strong> La latitude est pré-remplie. Vérifiez la date cible.
                     </p>
                     <p class="text-sm text-gray-400">
                         <strong class="text-gray-200">2. Mesure :</strong> Activez les capteurs. L'angle recommandé s'affiche et s'ajuste en temps réel.
                     </p>
                     <p class="text-sm text-gray-400">
-                        <strong class="text-gray-200">3. Estimation :</strong> Cliquez sur "Mémoriser" pour pré-remplir la page d'estimation avec vos mesures, puis allez-y pour calculer le gain.
+                        <strong class="text-gray-200">3. Estimation :</strong> Cliquez sur "Mémoriser" pour pré-remplir la page d'estimation, puis allez-y pour calculer le gain.
                     </p>
                 </div>
                 <div class="items-center px-4 py-3">
@@ -303,7 +303,7 @@
             const DEBUG = false;
             const CONFIG = {
                 donateLink: 'https://paypal.me/iFredZ',
-                defaultLatitude: 44.21446183336044,
+                defaultLatitude: 44.21446,
                 defaultLongitude: 4.028,
                 clippingAdjustment: 10,
                 sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
@@ -624,6 +624,11 @@
 
                 const today = new Date();
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                
+                // --- CORRECTION FINALE ---
+                // On pré-remplit la latitude pour que le calcul dynamique fonctionne immédiatement
+                dom.latitudeInput.value = CONFIG.defaultLatitude; 
+                // --- FIN DE LA CORRECTION ---
                 
                 calculations.calculateAndDisplayAll(); 
             }

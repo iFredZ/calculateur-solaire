@@ -375,8 +375,6 @@
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
                 settingsModal: document.getElementById('settings-modal'),
                 closeSettingsModalMainButton: document.getElementById('close-settings-modal-main'),
-                flipPhoneCheckbox: document.getElementById('flipPhone'),
-                leftCornerCheckbox: document.getElementById('leftCorner')
             };
 
             const utils = {
@@ -434,8 +432,9 @@
                 getPosition: (date, lat, lon) => {
                     const d = solar.julianDay(date) - 2451545.0;
                     const g = utils.toRadians(utils.normalizeAngle(357.529 + 0.98560028 * d));
-                    const q = utils.toRadians(utils.normalizeAngle(280.459 + 0.98564736 * d));
-                    const L = q + utils.toRadians(1.915) * Math.sin(g) + utils.toRadians(0.020) * Math.sin(2 * g);
+                    const q_deg = utils.normalizeAngle(280.459 + 0.98564736 * d);
+                    const L_deg = utils.normalizeAngle(q_deg + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g));
+                    const L = utils.toRadians(L_deg);
                     const e = utils.toRadians(23.439 - 0.00000036 * d);
                     const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
                     const dec = Math.asin(Math.sin(e) * Math.sin(L));
@@ -502,6 +501,15 @@
                     if (heading < 0) heading += 360;
                     return heading;
                 },
+                formatAzimuthForDisplay: (azimuth) => {
+                    let deviation = azimuth - 180;
+                    if (deviation > 180) deviation -= 360;
+                    if (deviation < -180) deviation += 360;
+
+                    if (Math.abs(deviation) < 5) return 'Plein Sud';
+                    if (deviation < 0) return `${Math.round(Math.abs(deviation))}° Est`;
+                    return `${Math.round(deviation)}° Ouest`;
+                },
                 handleOrientation: (event) => {
                     const tilt = sensors.getTiltFromEvent(event);
                     if (tilt == null) dom.inclinometerError.textContent = 'Inclinomètre non dispo.';
@@ -516,7 +524,7 @@
                     else {
                         const panAz = utils.normalizeAngle(heading);
                         state.panelAzimuthLive = panAz;
-                        dom.currentCompassDisplay.textContent = `${Math.round(panAz)}°`;
+                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(panAz);
                     }
                 },
                 start: async () => {

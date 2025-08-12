@@ -430,25 +430,8 @@
             };
 
             const solar = {
-                julianDay: (date) => date.getTime() / 86400000 + 2440587.5,
-                getPosition: (date, lat, lon) => {
-                    const d = solar.julianDay(date) - 2451545.0;
-                    const g_deg = utils.normalizeAngle(357.529 + 0.98560028 * d);
-                    const q_deg = utils.normalizeAngle(280.459 + 0.98564736 * d);
-                    const L_deg = utils.normalizeAngle(q_deg + 1.915 * Math.sin(utils.toRadians(g_deg)) + 0.020 * Math.sin(utils.toRadians(2 * g_deg)));
-                    const e = utils.toRadians(23.439 - 0.00000036 * d);
-                    const ra = Math.atan2(Math.cos(e) * Math.sin(utils.toRadians(L_deg)), Math.cos(utils.toRadians(L_deg)));
-                    const dec = Math.asin(Math.sin(e) * Math.sin(utils.toRadians(L_deg)));
-                    const GMST = utils.normalizeAngle(280.1600 + 360.9856235 * d);
-                    const LST = utils.toRadians(utils.normalizeAngle(GMST + lon));
-                    const HA = LST - ra;
-                    const latR = utils.toRadians(lat);
-                    const el = Math.asin(Math.sin(latR) * Math.sin(dec) + Math.cos(latR) * Math.cos(dec) * Math.cos(HA));
-                    const az = Math.atan2(-Math.sin(HA), Math.tan(dec) * Math.cos(latR) - Math.sin(latR) * Math.cos(HA));
-                    return {
-                        azimuth: utils.normalizeAngle(utils.toDegrees(az)),
-                        elevation: utils.toDegrees(el)
-                    };
+                getDeclination: (dayOfYear) => {
+                    return -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10)));
                 }
             };
 
@@ -467,24 +450,27 @@
                     const lat = utils.safeParseFloat(latValueStr, NaN);
                     if (isNaN(lat)) return;
                     
-                    const sunPos = solar.getPosition(selectedDate, lat, state.currentLongitude);
-                    const panelAzimuth = state.memorizedAzimuthValue !== null ? state.memorizedAzimuthValue : 180; // Default South
+                    const panelAzimuth = state.memorizedAzimuthValue !== null ? state.memorizedAzimuthValue : 0; // 0 = South
 
-                    const zenith = 90 - sunPos.elevation;
-                    const delta = utils.toRadians(utils.normalizeAngle(sunPos.azimuth - panelAzimuth));
-                    const cosDelta = Math.cos(delta);
+                    const dayOfYear = utils.getDayOfYear(selectedDate);
+                    const declination = solar.getDeclination(dayOfYear);
 
-                    let optimalTilt = utils.toDegrees(Math.atan(Math.tan(utils.toRadians(zenith)) * cosDelta));
+                    let optimalTilt = lat - declination;
+                    
+                    const clipping = dom.clippingCheckbox.checked && selectedDate.getMonth() >= 3 && selectedDate.getMonth() <= 8 ? CONFIG.clippingAdjustment : 0;
+                    optimalTilt += clipping;
+                    
+                    optimalTilt -= Math.abs(panelAzimuth) / 10;
+
                     optimalTilt = utils.clamp(optimalTilt, 0, 90);
                     
                     const roundedTilt = Math.round(optimalTilt);
                     state.lastRecommendedTilt = roundedTilt;
                     dom.resultDisplay.textContent = `${roundedTilt}°`;
 
-                    const clipping = dom.clippingCheckbox.checked && selectedDate.getMonth() >= 3 && selectedDate.getMonth() <= 8 ? CONFIG.clippingAdjustment : 0;
-                    dom.winterAngleDisplay.textContent = `${Math.round(lat + 15 - (Math.abs(panelAzimuth-180) / 10))}°`;
-                    dom.springFallAngleDisplay.textContent = `${Math.round(lat - (Math.abs(panelAzimuth-180) / 10))}°`;
-                    dom.summerAngleDisplay.textContent = `${Math.round((lat - 15 + clipping) - (Math.abs(panelAzimuth-180) / 10))}°`;
+                    dom.winterAngleDisplay.textContent = `${Math.round(lat + 15 - (Math.abs(panelAzimuth) / 10))}°`;
+                    dom.springFallAngleDisplay.textContent = `${Math.round(lat - (Math.abs(panelAzimuth) / 10))}°`;
+                    dom.summerAngleDisplay.textContent = `${Math.round((lat - 15 + clipping) - (Math.abs(panelAzimuth) / 10))}°`;
                 }
             };
 

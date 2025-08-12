@@ -492,7 +492,8 @@
                     compass_east: "Est",
                     compass_west: "Ouest",
                     fill_all_fields_error: "Veuillez remplir tous les champs valides.",
-                    settings_already_optimal: "Vos réglages actuels sont déjà optimaux."
+                    settings_already_optimal: "Vos réglages actuels sont déjà optimaux.",
+                    pvgis_error: "Erreur communication PVGIS."
                 },
                 en: {
                     activate_sensors: "Use Sensors",
@@ -559,7 +560,8 @@
                     compass_east: "East",
                     compass_west: "West",
                     fill_all_fields_error: "Please fill in all valid fields.",
-                    settings_already_optimal: "Your current settings are already optimal."
+                    settings_already_optimal: "Your current settings are already optimal.",
+                    pvgis_error: "PVGIS communication error."
                 }
             };
 
@@ -915,8 +917,8 @@
                 },
                 getProductionEstimate: async () => { 
                     dom.pvgisError.textContent = ''; 
-                    dom.calculateText.classList.add('hidden'); 
-                    dom.calculateLoader.classList.remove('hidden'); 
+                    dom.calculateText.classList.remove('hidden'); 
+                    dom.calculateLoader.classList.add('hidden'); 
                     dom.productionResults.classList.add('hidden');
                     dom.donationMessage.classList.add('hidden');
 
@@ -968,7 +970,7 @@
                         dom.productionResults.classList.remove('hidden');
                         dom.donationMessage.classList.remove('hidden');
                     } catch (err) { 
-                        dom.pvgisError.textContent = 'Erreur communication PVGIS.'; 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
                         utils.log('PVGIS error', err); 
                     } finally { 
                         dom.calculateText.classList.remove('hidden'); 

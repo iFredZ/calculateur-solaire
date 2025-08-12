@@ -72,17 +72,22 @@
             100% { transform: rotate(360deg); }
         }
         .lang-btn {
-            background-color: transparent;
-            border: 1px solid var(--btn-secondary-bg);
+            background-color: var(--card);
+            border: 1px solid rgba(255, 255, 255, .1);
             color: var(--muted);
-            padding: 4px 8px;
-            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .lang-btn:hover {
+            transform: scale(1.1);
             background-color: var(--btn-secondary-bg);
             color: var(--fg);
         }
@@ -107,6 +112,21 @@
             transform: scale(1.1);
             background-color: var(--btn-secondary-bg);
         }
+        .fab-sm {
+             background-color: var(--card);
+             border: 1px solid rgba(255, 255, 255, .1);
+             width: 40px;
+             height: 40px;
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             transition: all 0.2s ease-in-out;
+        }
+        .fab-sm:hover {
+            transform: scale(1.1);
+            background-color: var(--btn-secondary-bg);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -115,20 +135,9 @@
         <div id="app-container" class="w-full max-w-lg card rounded-2xl p-6 md:p-8 space-y-6 relative">
             
             <div id="main-page">
-                <div id="lang-switcher" class="absolute top-4 left-4 flex gap-2">
-                    <button data-lang="fr" class="lang-btn">FR</button>
-                    <button data-lang="en" class="lang-btn">EN</button>
-                </div>
-
                 <div class="absolute top-4 right-4 flex flex-col gap-2">
                     <button type="button" id="main-help-button" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Ouvrir le guide d'utilisation">
                         <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </button>
-                    <button type="button" id="settings-button" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Ouvrir les réglages">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
                     </button>
                 </div>
 
@@ -282,12 +291,23 @@
         </div>
     </div>
     
+    <div class="fixed top-4 inset-x-4 flex justify-between items-center z-50 pointer-events-none">
+        <div id="lang-switcher" class="flex gap-2 pointer-events-auto">
+            <button data-lang="fr" class="lang-btn">FR</button>
+            <button data-lang="en" class="lang-btn">EN</button>
+        </div>
+        <button id="settings-button" class="fab-sm pointer-events-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+    </div>
+
     <div class="fixed bottom-4 inset-x-4 flex justify-between items-center z-50 pointer-events-none">
         <a id="bug-report-button" href="#" class="fab text-yellow-400 pointer-events-auto relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
-                <path d="M12 12v.01" />
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>

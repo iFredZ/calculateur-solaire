@@ -117,33 +117,34 @@
                     </button>
                 </div>
 
-                <div class="text-center border-b border-gray-700 pb-6">
+                <div class="text-center space-y-6">
                     <h1 class="text-2xl md:text-3xl font-bold mt-8">Opti Solar</h1>
-                    <div class="mt-4 max-w-xs mx-auto">
-                        <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="location"></label>
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude" data-i18n-placeholder="latitude_placeholder">
-                            <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
-                                <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                            </button>
+                    <div class="max-w-xs mx-auto space-y-4">
+                        <div>
+                            <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="location"></label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude" data-i18n-placeholder="latitude_placeholder">
+                                <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
+                                    <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                </button>
+                            </div>
+                            <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
+                            <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
                         </div>
-                         <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
-                        <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
+                        <div>
+                             <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
+                             <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
+                        </div>
                     </div>
                 </div>
                 
-                <div class="card bg-gray-900/50 p-6 space-y-4">
-                    <div class="text-center">
-                        <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
-                        <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
-                    </div>
-
+                <div class="card bg-gray-900/50 p-6 mt-6">
                     <div class="grid grid-cols-2 gap-4">
                         <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-2 px-4 rounded-lg" data-i18n="activate_sensors"></button>
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
                     </div>
 
-                    <div id="sensors-display" class="hidden space-y-4 pt-4 border-t border-gray-800">
+                    <div id="sensors-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
                          <div class="grid grid-cols-2 gap-4 text-center">
                             <div>
                                 <p class="text-lg text-gray-400" data-i18n="current_angle"></p>
@@ -158,7 +159,7 @@
                         <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                     </div>
 
-                    <div id="manual-entry-display" class="hidden space-y-4 pt-4 border-t border-gray-800">
+                    <div id="manual-entry-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label for="manual-tilt-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="tilt"></label>
@@ -204,12 +205,8 @@
                     </div>
                 </div>
 
-                <div class="text-center pt-4 border-t border-gray-700 mt-6">
+                <div class="text-center pt-6 mt-6 border-t border-gray-700">
                     <a href="#" id="donate-link" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" data-i18n="support_project"></a>
-                </div>
-
-                <div class="text-center text-xs text-gray-500 pt-4 mt-6">
-                    <p>- By FredZ - 2025</p>
                 </div>
             </div>
 
@@ -431,12 +428,12 @@
             
             const translations = {
                 fr: {
+                    activate_sensors: "Utiliser Capteurs",
+                    stop_sensors: "Arrêter Capteurs",
+                    manual_entry: "Saisie Manuelle",
                     location: "Localisation",
                     latitude_placeholder: "Latitude requise",
                     target_date: "Date Cible",
-                    activate_sensors: "Activer les capteurs",
-                    stop_sensors: "Arrêter les capteurs",
-                    manual_entry: "Entrer manuellement",
                     current_angle: "Angle Actuel",
                     orientation: "Orientation",
                     memorize_sensors: "Mémoriser ces mesures",
@@ -495,12 +492,12 @@
                     compass_west: "Ouest",
                 },
                 en: {
+                    activate_sensors: "Use Sensors",
+                    stop_sensors: "Stop Sensors",
+                    manual_entry: "Manual Input",
                     location: "Location",
                     latitude_placeholder: "Latitude required",
                     target_date: "Target Date",
-                    activate_sensors: "Activate Sensors",
-                    stop_sensors: "Stop Sensors",
-                    manual_entry: "Manual Entry",
                     current_angle: "Current Angle",
                     orientation: "Orientation",
                     memorize_sensors: "Memorize these measures",
@@ -939,7 +936,7 @@
             }
             
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
-            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
+            const api = { fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`; const url = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`; const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`); const json = await res.json(); if (!json?.outputs?.totals?.fixed) throw new Error('Réponse PVGIS incomplète'); return json; }, getProductionEstimate: async () => { dom.pvgisError.textContent = ''; dom.calculateText.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.productionResults.classList.add('hidden'); const lat = utils.safeParseFloat(dom.latitudeInput.value); const lon = utils.safeParseFloat(dom.longitudeInput.value); const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); const recommendedTilt = state.lastRecommendedTilt; if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v)) || recommendedTilt === null) { dom.pvgisError.textContent = 'Veuillez remplir tous les champs valides.'; dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); return; } try { const [currentProd, optimalProd] = await Promise.all([ api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), api.fetchPVGIS(lat, lon, peakPower, recommendedTilt, 0) ]); let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; let optMonthly = Number(optimalProd.outputs.fixed.E_m) || 0; if (optDaily < curDaily) { optDaily = curDaily; optMonthly = curMonthly; dom.pvgisError.textContent = 'Vos réglages actuels sont déjà optimaux.'; } else { dom.pvgisError.textContent = ''; } dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; const gainDaily = optDaily - curDaily; dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; const gainMonthly = optMonthly - curMonthly; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; dom.productionResults.classList.remove('hidden'); } catch (err) { dom.pvgisError.textContent = 'Erreur communication PVGIS.'; utils.log('PVGIS error', err); } finally { dom.calculateText.classList.remove('hidden'); dom.calculateLoader.classList.add('hidden'); } } };
 
             window.addEventListener('load', init);
         })();

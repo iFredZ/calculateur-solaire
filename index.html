@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optim'Angle Solaire (Final)</title>
+    <title>Optim'Angle Solaire (Final Corrigé)</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -398,7 +398,7 @@
                 updateLocationFields: (lat, lon) => {
                     dom.latitudeInput.value = lat;
                     state.currentLongitude = lon;
-                    dom.longitudeInput.value = lon; // Mettre à jour aussi le champ de la page d'estimation
+                    dom.longitudeInput.value = lon;
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
                     calculations.calculateAndDisplayAll();
@@ -437,8 +437,6 @@
                     let rawAzimuth = null;
                     if (state.sensorsActive && state.panelAzimuthLive !== null) {
                         rawAzimuth = state.panelAzimuthLive;
-                    } else if (state.memorizedAzimuthValue !== null && !state.sensorsActive) {
-                        rawAzimuth = state.memorizedAzimuthValue;
                     }
 
                     if (!dateValue || isNaN(lat) || rawAzimuth === null) {

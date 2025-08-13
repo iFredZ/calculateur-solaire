@@ -16,23 +16,27 @@
             --muted: #7b8aa5;
             --fg: #e9f0ff;
             --accent: #41d1b7;
+            --accent-blue: #437eff; /* Bleu sombre pour le texte en mode sombre */
             --warn: #ffcc00;
             --bad: #ff6b6b;
             --btn-secondary-bg: #2a3957;
             --input-bg: #0e1423;
             --border-color: rgba(255, 255, 255, .06);
             --border-color-input: rgba(255,255,255,.1);
+            --info-box-bg: rgba(123, 138, 165, 0.1);
         }
-        /* NOUVEAU: Palette du thème clair "Professionnel" */
         .light-mode {
-            --bg: #f0f2f5; /* Fond de page gris très clair */
-            --card: #ffffff; /* Cartes blanches pour le contraste */
-            --muted: #525f7f; /* Texte secondaire gris foncé */
-            --fg: #1a202c; /* Texte principal quasi-noir */
+            --bg: #f1f5f9; /* Fond de page gris plus présent */
+            --card: #ffffff;
+            --muted: #475569;
+            --fg: #0f172a;
+            --accent: #41d1b7;
+            --accent-blue: #1d4ed8; /* Bleu pro pour les titres en mode clair */
             --btn-secondary-bg: #e2e8f0;
-            --input-bg: #f7fafc;
+            --input-bg: #f8fafc;
             --border-color: #e2e8f0;
             --border-color-input: #cbd5e1;
+            --info-box-bg: #f1f5f9; /* Fond unifié pour les boîtes d'info */
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -48,6 +52,12 @@
         }
         .light-mode .card {
              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+        .app-title {
+            color: var(--fg);
+        }
+        .page-title {
+            color: var(--accent-blue);
         }
         .btn-primary {
             background-color: var(--accent);
@@ -85,7 +95,7 @@
             color: var(--muted);
         }
         .loader {
-            border: 4px solid #2a3957;
+            border: 4px solid var(--btn-secondary-bg);
             border-radius: 50%;
             border-top: 4px solid var(--accent);
             width: 24px;
@@ -188,31 +198,19 @@
         input:checked + .slider:before {
             transform: translateX(24px);
         }
-
-        /* NOUVEAU: Styles spécifiques pour les cartes en mode clair */
-        .light-mode #seasonal-container .bg-gray-900\/50,
-        .light-mode #production-results .bg-gray-900\/50,
-        .light-mode #production-results .bg-green-900\/30,
-        .light-mode #production-results .bg-blue-900\/30 {
-            background-color: #e5e7eb; /* Base gris clair */
+        /* Styles spécifiques pour les cartes d'information */
+        .info-box {
+            background-color: var(--info-box-bg);
         }
-        .light-mode #seasonal-container .text-sky-400 { color: #0c4a6e; }
-        .light-mode #seasonal-container .text-amber-400 { color: #92400e; }
+        .light-mode .text-gray-400 { color: var(--muted); }
+        .light-mode .text-teal-300 { color: var(--accent-blue); }
+        .light-mode .text-teal-400 { color: var(--accent); }
+        .light-mode #seasonal-container .text-sky-400 { color: #0369a1; }
+        .light-mode #seasonal-container .text-amber-400 { color: #b45309; }
         .light-mode #seasonal-container .text-red-400 { color: #991b1b; }
-        
-        /* Correction des couleurs pour le mode clair dans les résultats */
-        .light-mode #production-results .text-gray-400 {
-            color: #4b5563; /* Un gris plus foncé */
-        }
-        .light-mode #production-results .text-green-300 {
-            color: #065f46; /* Un vert foncé */
-        }
-        .light-mode #production-results .text-blue-300 {
-            color: #1e40af; /* Un bleu foncé */
-        }
-        .light-mode #production-results .font-bold {
-            color: var(--fg);
-        }
+        .light-mode #production-results .text-green-300 { color: #065f46; }
+        .light-mode #production-results .text-blue-300 { color: #1e40af; }
+        .light-mode #production-results .font-bold { color: var(--fg); }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -243,7 +241,7 @@
             
             <div id="main-page">
                 <div class="text-center space-y-6">
-                    <h1 class="text-2xl md:text-3xl font-bold">Opti Solar</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold app-title">Opti Solar</h1>
                     <div class="max-w-xs mx-auto space-y-4">
                         <div>
                             <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="location"></label>
@@ -311,22 +309,22 @@
                 </div>
                 
                 <div id="seasonal-container" class="mt-6 hidden">
-                    <h2 class="text-xl font-bold text-center mb-4" data-i18n="seasonal_settings"></h2>
+                    <h2 class="text-xl font-bold text-center mb-4 page-title" data-i18n="seasonal_settings"></h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                        <div class="bg-gray-900/50 rounded-lg p-4">
+                        <div class="info-box rounded-lg p-4">
                             <p class="font-bold text-lg" data-i18n="winter"></p>
                             <p id="winter-angle" class="text-3xl font-bold text-sky-400">--°</p>
-                            <p class="text-xs text-gray-500" data-i18n="winter_date"></p>
+                            <p class="text-xs text-gray-400" data-i18n="winter_date"></p>
                         </div>
-                        <div class="bg-gray-900/50 rounded-lg p-4">
+                        <div class="info-box rounded-lg p-4">
                             <p class="font-bold text-lg" data-i18n="mid_season"></p>
                             <p id="spring-fall-angle" class="text-3xl font-bold text-amber-400">--°</p>
-                            <p class="text-xs text-gray-500" data-i18n="mid_season_date"></p>
+                            <p class="text-xs text-gray-400" data-i18n="mid_season_date"></p>
                         </div>
-                        <div class="bg-gray-900/50 rounded-lg p-4">
+                        <div class="info-box rounded-lg p-4">
                             <p class="font-bold text-lg" data-i18n="summer"></p>
                             <p id="summer-angle" class="text-3xl font-bold text-red-400">--°</p>
-                            <p class="text-xs text-gray-500" data-i18n="summer_date"></p>
+                            <p class="text-xs text-gray-400" data-i18n="summer_date"></p>
                         </div>
                     </div>
                 </div>
@@ -336,7 +334,7 @@
                  <button type="button" id="back-button" class="absolute top-4 left-4 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" aria-label="Retour à la page principale">
                      <svg class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                  </button>
-                <h2 class="text-2xl md:text-3xl font-bold text-center pt-8" data-i18n="estimation_title"></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-center pt-8 page-title" data-i18n="estimation_title"></h2>
                 
                 <div class="space-y-4 mt-6">
                     <div class="bg-teal-900/20 p-4 rounded-lg border-2 border-teal-500">
@@ -366,19 +364,19 @@
                 </button>
 
                 <div id="production-results" class="mt-6 space-y-4 hidden">
-                    <div class="bg-gray-900/50 p-4 rounded-lg text-center">
+                    <div class="info-box p-4 rounded-lg text-center">
                         <p class="text-sm text-gray-400" data-i18n="prod_current_settings"></p>
                         <p id="current-production" class="text-2xl font-bold">-- kWh</p>
                     </div>
-                    <div class="bg-green-900/30 p-4 rounded-lg text-center">
+                    <div class="info-box p-4 rounded-lg text-center">
                         <p class="text-sm text-green-300" data-i18n="prod_optimal_settings"></p>
                         <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
                     </div>
-                    <div class="bg-blue-900/30 p-4 rounded-lg text-center">
+                    <div class="info-box p-4 rounded-lg text-center">
                         <p class="text-sm text-blue-300" data-i18n="daily_gain"></p>
                         <p id="potential-gain" class="text-3xl font-bold text-blue-300">~ -- Wh</p>
                     </div>
-                     <div class="bg-blue-900/30 p-4 rounded-lg text-center">
+                     <div class="info-box p-4 rounded-lg text-center">
                         <p class="text-sm text-blue-300" data-i18n="monthly_gain"></p>
                         <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
                     </div>
@@ -401,7 +399,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.2.1</p>
+        <p class="text-xs text-gray-600">v2.3.0</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -414,7 +412,7 @@
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
-                <h3 id="settings-modal-title" class="text-lg leading-6 font-bold text-teal-300" data-i18n="settings_title"></h3>
+                <h3 id="settings-modal-title" class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="settings_title"></h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -448,7 +446,7 @@
     <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
-                <h3 id="clipping-modal-title" class="text-lg leading-6 font-bold text-teal-300" data-i18n="clipping_title"></h3>
+                <h3 id="clipping-modal-title" class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="clipping_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -482,7 +480,7 @@
      <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
         <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
-                <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-teal-300" data-i18n="main_guide_title"></h3>
+                <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="main_guide_title"></h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -536,7 +534,7 @@
     <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
         <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
-                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300" data-i18n="estimation_guide_title"></h3>
+                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="estimation_guide_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>

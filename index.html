@@ -184,7 +184,21 @@
         }
         input:checked + .slider:before {
             transform: translateX(24px);
-        }
+		}
+		/* NOUVEAU: Correction des couleurs pour le mode clair dans les résultats */
+		.light-mode #production-results .text-gray-400 {
+			color: #4b5563; /* Un gris plus foncé */
+		}
+		.light-mode #production-results .text-green-300 {
+			color: #065f46; /* Un vert foncé */
+		}
+		.light-mode #production-results .text-blue-300 {
+			color: #1e40af; /* Un bleu foncé */
+		}
+		/* On s'assure que les grands chiffres sont bien lisibles aussi */
+		.light-mode #production-results .font-bold {
+			color: var(--fg);
+		}
     </style>
 </head>
 <body class="flex flex-col h-screen">

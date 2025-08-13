@@ -19,16 +19,32 @@
             --warn: #ffcc00;
             --bad: #ff6b6b;
             --btn-secondary-bg: #2a3957;
+            --input-bg: #0e1423;
+            --border-color: rgba(255, 255, 255, .06);
+            --border-color-input: rgba(255,255,255,.1);
+        }
+        /* NOUVEAU: Thème clair */
+        .light-mode {
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --fg: #111827;
+            --btn-secondary-bg: #e5e7eb;
+            --input-bg: #f9fafb;
+            --border-color: rgba(0, 0, 0, .06);
+            --border-color-input: rgba(0,0,0,.1);
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--fg);
+            transition: background-color 0.3s, color 0.3s;
         }
         .card {
             background-color: var(--card);
-            border: 1px solid rgba(255, 255, 255, .06);
+            border: 1px solid var(--border-color);
             box-shadow: 0 8px 30px rgba(0,0,0,.35);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .btn-primary {
             background-color: var(--accent);
@@ -41,8 +57,14 @@
             background-color: var(--btn-secondary-bg);
             color: var(--fg);
         }
+        .light-mode .btn-secondary {
+             color: #1f2937;
+        }
         .btn-secondary:hover {
             background-color: #3a4a6a;
+        }
+        .light-mode .btn-secondary:hover {
+            background-color: #d1d5db;
         }
         .btn-danger {
              background-color: var(--bad);
@@ -52,8 +74,8 @@
             background-color: #ff8a8a;
         }
         input, .bg-input {
-            background-color: #0e1423;
-            border: 1px solid rgba(255,255,255,.1);
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color-input);
             color: var(--fg);
         }
         input::placeholder {
@@ -120,6 +142,49 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        /* NOUVEAU: Style pour le switch de thème */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 48px;
+        }
+        .theme-switch input {
+            display: none;
+        }
+        .slider {
+            background-color: #374151;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -172,8 +237,8 @@
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
                     </div>
 
-                    <div id="sensors-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
-                         <div class="grid grid-cols-2 gap-4 text-center">
+                    <div id="sensors-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800 cursor-pointer rounded-lg hover:bg-gray-800/20 active:bg-gray-800/40 transition-colors">
+                         <div class="grid grid-cols-2 gap-4 text-center pointer-events-none">
                             <div>
                                 <p class="text-lg text-gray-400" data-i18n="current_angle"></p>
                                 <p class="text-4xl font-bold my-1"><span id="current-angle">--</span>°</p>
@@ -183,11 +248,8 @@
                                 <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-2">
-                            <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
-                            <button type="button" id="memorize-sensors" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" disabled data-i18n="memorize_sensors"></button>
-                        </div>
-                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
+                        <p id="memorize-helper-text" class="text-center text-teal-400 text-sm font-bold pointer-events-none" data-i18n="memorize_sensors_helper"></p>
+                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center pointer-events-none" role="alert"></p>
                     </div>
 
                     <div id="manual-entry-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
@@ -249,7 +311,7 @@
                 <h2 class="text-2xl md:text-3xl font-bold text-center pt-8" data-i18n="estimation_title"></h2>
                 
                 <div class="space-y-4 mt-6">
-                    <div class="bg-gray-900/50 p-4 rounded-lg border border-teal-500/30">
+                    <div class="bg-teal-900/20 p-4 rounded-lg border-2 border-teal-500">
                         <label for="peak-power" class="block text-sm font-medium text-teal-300" data-i18n="peak_power"></label>
                         <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
                     </div>
@@ -311,7 +373,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.1.2</p>
+        <p class="text-xs text-gray-600">v2.2.0</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -322,27 +384,41 @@
     </footer>
 
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
-        <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
                 <h3 id="settings-modal-title" class="text-lg leading-6 font-bold text-teal-300" data-i18n="settings_title"></h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <div class="mt-4 p-4">
-                 <div class="flex items-center justify-center">
-                    <input type="checkbox" id="clipping-checkbox" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
-                    <label for="clipping-checkbox" class="ml-2 block text-sm font-medium" data-i18n="clipping_label"></label>
-                    <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </button>
+            <div class="mt-4 p-4 space-y-6">
+                 <div class="flex items-center justify-between">
+                    <label for="clipping-checkbox" class="font-medium flex items-center">
+                        <span data-i18n="clipping_label"></span>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </label>
+                    <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
+                </div>
+                <div class="flex items-center justify-between">
+                     <label for="theme-toggle" class="font-medium" data-i18n="light_theme_label"></label>
+                     <div class="theme-switch-wrapper">
+                         <label class="theme-switch" for="theme-toggle">
+                             <input type="checkbox" id="theme-toggle" />
+                             <div class="slider"></div>
+                         </label>
+                     </div>
+                </div>
+                 <div class="pt-4 border-t border-gray-800">
+                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
                 </div>
             </div>
         </div>
     </div>
     
     <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
-        <div class="relative top-20 mx-auto p-5 border border-gray-700 w-96 shadow-lg rounded-md card">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
                 <h3 id="clipping-modal-title" class="text-lg leading-6 font-bold text-teal-300" data-i18n="clipping_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
@@ -376,7 +452,7 @@
     </div>
     
      <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
-        <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
                 <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-teal-300" data-i18n="main_guide_title"></h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
@@ -430,7 +506,7 @@
     </div>
     
     <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
-        <div class="relative top-10 mx-auto p-5 border border-gray-700 w-full max-w-lg shadow-lg rounded-md card">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
             <div class="flex justify-between items-center">
                 <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300" data-i18n="estimation_guide_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
@@ -529,10 +605,11 @@
                     target_date: "Date Cible",
                     current_angle: "Angle Actuel",
                     orientation: "Orientation",
-                    memorize_sensors: "Mémoriser ces mesures",
+                    memorize_sensors_helper: "Appuyez ici pour mémoriser",
                     memorized: "Valeurs mémorisées !",
                     calibrate_tilt: "Calibrer à plat",
                     calibrate_tilt_success: "Calibration effectuée !",
+                    light_theme_label: "Mode Clair",
                     tilt: "Inclinaison (°)",
                     tilt_placeholder: "ex: 35",
                     orientation_short: "Orientation (°)",
@@ -550,7 +627,7 @@
                     summer_date: "~21 Juin",
                     donation_message: "Si cette estimation vous a été utile, pensez à soutenir ce projet en m'offrant un petit café ! ☕",
                     estimation_title: "Estimation de Production",
-                    peak_power: "Puissance crête (kWc)",
+                    peak_power: "Puissance crête de votre installation (kWc)",
                     longitude: "Longitude",
                     current_tilt: "Inclinaison actuelle (°)",
                     current_azimuth: "Orientation actuelle (Déviation / Sud)",
@@ -561,7 +638,7 @@
                     daily_gain: "Gain potentiel journalier",
                     monthly_gain: "Gain potentiel mensuel",
                     settings_title: "Réglages",
-                    clipping_label: "Optimiser pour éviter l'écrêtage",
+                    clipping_label: "Optimiser pour l'écrêtage",
                     clipping_title: "Optimisation pour l'Écrêtage",
                     clipping_problem_title: "Le Problème",
                     clipping_problem_desc: "En été, votre production solaire peut dépasser la puissance maximale de votre onduleur. Cette énergie excédentaire est perdue : c'est l'écrêtage (ou \"clipping\").",
@@ -603,10 +680,11 @@
                     target_date: "Target Date",
                     current_angle: "Current Angle",
                     orientation: "Orientation",
-                    memorize_sensors: "Memorize these measures",
+                    memorize_sensors_helper: "Tap here to memorize",
                     memorized: "Values Saved!",
                     calibrate_tilt: "Calibrate Flat",
                     calibrate_tilt_success: "Calibrated!",
+                    light_theme_label: "Light Mode",
                     tilt: "Tilt (°)",
                     tilt_placeholder: "e.g. 35",
                     orientation_short: "Orientation (°)",
@@ -624,7 +702,7 @@
                     summer_date: "~Jun 21",
                     donation_message: "If this estimate was helpful, consider supporting this project by buying me a small coffee! ☕",
                     estimation_title: "Production Estimate",
-                    peak_power: "Peak Power (kWp)",
+                    peak_power: "Your installation's peak power (kWp)",
                     longitude: "Longitude",
                     current_tilt: "Current Tilt (°)",
                     current_azimuth: "Current Azimuth (Deviation / South)",
@@ -635,7 +713,7 @@
                     daily_gain: "Potential Daily Gain",
                     monthly_gain: "Potential Monthly Gain",
                     settings_title: "Settings",
-                    clipping_label: "Optimize to avoid clipping",
+                    clipping_label: "Optimize for clipping",
                     clipping_title: "Clipping Optimization",
                     clipping_problem_title: "The Problem",
                     clipping_problem_desc: "In summer, your solar production might exceed your inverter's maximum power. This excess energy is lost: this is clipping.",
@@ -722,7 +800,7 @@
                 sensorsDisplay: document.getElementById('sensors-display'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
-                memorizeSensorsButton: document.getElementById('memorize-sensors'),
+                memorizeHelperText: document.getElementById('memorize-helper-text'),
                 calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
                 sensorError: document.getElementById('sensor-error'),
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
@@ -736,6 +814,7 @@
                 summerAngleDisplay: document.getElementById('summer-angle'),
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
                 clippingCheckbox: document.getElementById('clipping-checkbox'),
+                themeToggle: document.getElementById('theme-toggle'),
                 backButton: document.getElementById('back-button'),
                 peakPowerInput: document.getElementById('peak-power'),
                 longitudeInput: document.getElementById('longitude-input'),
@@ -776,7 +855,6 @@
                 toDegrees: (rad) => rad * 180 / Math.PI,
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
                 getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-                // MODIFIÉ: Formatage des nombres dynamique
                 formatNumber: (n, dec = 2) =>
                   Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US',
                     { minimumFractionDigits: dec, maximumFractionDigits: dec }),
@@ -803,7 +881,6 @@
                     dom.longitudeInput.value = lon;
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
-                    // MODIFIÉ: Correction persistance
                     try { localStorage.setItem('userLocation', JSON.stringify({lat, lon})); } catch(e) {}
                     calculations.calculateAndDisplayAll();
                 },
@@ -921,7 +998,6 @@
                     if (tilt !== null) {
                         dom.currentAngleDisplay.textContent = tilt;
                         dom.sensorError.textContent = '';
-                        dom.memorizeSensorsButton.disabled = false;
                     }
                     const heading = sensors.getHeadingFromEvent(event);
                     if (heading !== null) {
@@ -936,7 +1012,6 @@
                         return;
                     }
                     dom.sensorError.textContent = 'Activation...';
-                    dom.memorizeSensorsButton.disabled = true;
                     try {
                         if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
                             const permission = await DeviceOrientationEvent.requestPermission();
@@ -966,7 +1041,6 @@
                     dom.currentAngleDisplay.textContent = '--';
                     dom.currentCompassDisplay.textContent = '--';
                     dom.sensorError.textContent = '';
-                    dom.memorizeSensorsButton.disabled = true;
                     calculations.calculateAndDisplayAll(); 
                 }
             };
@@ -1009,8 +1083,8 @@
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
                     state.memorizedLongitude = state.currentLongitude;
-                    dom.memorizeSensorsButton.textContent = translations[i18n.currentLang].memorized;
-                    setTimeout(() => { dom.memorizeSensorsButton.textContent = translations[i18n.currentLang].memorize_sensors; }, 2000);
+                    dom.memorizeHelperText.textContent = translations[i18n.currentLang].memorized;
+                    setTimeout(() => { dom.memorizeHelperText.textContent = translations[i18n.currentLang].memorize_sensors_helper; }, 2000);
                 },
                 handleModalKeydown: (e) => {
                     if (e.key === 'Escape') {
@@ -1076,9 +1150,24 @@
                 }
             };
 
+            const theme = {
+                apply: (themeName) => {
+                    document.body.classList.toggle('light-mode', themeName === 'light');
+                    dom.themeToggle.checked = (themeName === 'light');
+                },
+                toggle: () => {
+                    const newTheme = dom.themeToggle.checked ? 'light' : 'dark';
+                    theme.apply(newTheme);
+                    localStorage.setItem('userTheme', newTheme);
+                },
+                load: () => {
+                    const savedTheme = localStorage.getItem('userTheme') || 'dark';
+                    theme.apply(savedTheme);
+                }
+            };
+
             const api = {
                 fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
-                    // MODIFIÉ: Logique de cache de session
                     const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
                     try {
                         const cachedData = sessionStorage.getItem(cacheKey);
@@ -1204,13 +1293,13 @@
 
             function init() {
                 try {
+                    theme.load(); // Charger le thème en premier
                     const savedLang = localStorage.getItem('userLang') || 'fr';
                     i18n.setLanguage(savedLang);
 
                     const savedLocation = localStorage.getItem('userLocation');
                     if (savedLocation) {
                         const { lat, lon } = JSON.parse(savedLocation);
-                        // On utilise les inputs directement, updateLocationFields sera appelé par le listener
                         dom.latitudeInput.value = lat;
                         dom.longitudeInput.value = lon;
                         dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
@@ -1252,7 +1341,7 @@
                 dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
 
                 dom.getLocationButton.addEventListener('click', () => geolocation.get());
-                dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeSensorValues);
+                dom.sensorsDisplay.addEventListener('click', handlers.memorizeSensorValues);
                 dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
                 dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
                 dom.bugReportButton.addEventListener('click', handlers.openBugReport);
@@ -1277,6 +1366,8 @@
                 dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
                 dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
                 dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
+
+                dom.themeToggle.addEventListener('change', theme.toggle);
 
 
                 document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => {

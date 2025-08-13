@@ -108,6 +108,18 @@
             transform: scale(1.1);
             background-color: var(--btn-secondary-bg);
         }
+        /* Styles pour le tutoriel */
+        .onboarding-dot.active {
+            background-color: var(--accent);
+            transform: scale(1.5);
+        }
+        #onboarding-modal {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -293,7 +305,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.0.3</p>
+        <p class="text-xs text-gray-600">v2.0.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -440,6 +452,47 @@
             </div>
             <div class="items-center px-4 pt-3">
                 <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
+        <div class="card w-full max-w-sm rounded-2xl p-6 text-center flex flex-col shadow-2xl">
+            
+            <div class="flex-grow">
+                <div class="onboarding-slide">
+                    <img src="" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 1 : Calibrer</h3>
+                    <p class="text-gray-400">Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="" alt="Illustration activation" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 2 : Activer</h3>
+                    <p class="text-gray-400">Appuyez sur le bouton "Utiliser Capteurs" pour démarrer la réception des données.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="" alt="Illustration placement" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 3 : Placer</h3>
+                    <p class="text-gray-400">Maintenant, posez votre téléphone bien à plat sur votre panneau solaire.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 4 : Mémoriser</h3>
+                    <p class="text-gray-400">Une fois les valeurs d'angle et d'orientation stables, appuyez sur "Mémoriser ces mesures" !</p>
+                </div>
+            </div>
+
+            <div id="onboarding-dots" class="flex justify-center gap-2 my-4">
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <button id="onboarding-prev-btn" class="btn-secondary px-4 py-2 rounded-lg invisible">Précédent</button>
+                <button id="onboarding-next-btn" class="btn-primary px-4 py-2 rounded-lg">Suivant</button>
+                <button id="onboarding-finish-btn" class="btn-primary px-4 py-2 rounded-lg hidden">Terminer</button>
             </div>
         </div>
     </div>
@@ -692,6 +745,12 @@
                 clippingHelpModal: document.getElementById('clipping-help-modal'),
                 mainHelpModal: document.getElementById('main-help-modal'),
                 settingsHelpModal: document.getElementById('settings-help-modal'),
+                onboardingModal: document.getElementById('onboarding-modal'),
+                onboardingSlides: document.querySelectorAll('.onboarding-slide'),
+                onboardingDots: document.querySelectorAll('.onboarding-dot'),
+                onboardingPrevBtn: document.getElementById('onboarding-prev-btn'),
+                onboardingNextBtn: document.getElementById('onboarding-next-btn'),
+                onboardingFinishBtn: document.getElementById('onboarding-finish-btn')
             };
 
             const utils = {
@@ -930,6 +989,40 @@
                 }
             };
 
+            const onboarding = {
+                currentIndex: 0,
+                start: function() {
+                    dom.onboardingModal.classList.remove('hidden');
+                    this.showSlide(0);
+                },
+                showSlide: function(index) {
+                    this.currentIndex = index;
+                    dom.onboardingSlides.forEach((slide, i) => {
+                        slide.classList.toggle('hidden', i !== index);
+                    });
+                    dom.onboardingDots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+
+                    dom.onboardingPrevBtn.classList.toggle('invisible', index === 0);
+                    dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
+                    dom.onboardingFinishBtn.classList.toggle('hidden', index !== dom.onboardingSlides.length - 1);
+                },
+                next: function() {
+                    if (this.currentIndex < dom.onboardingSlides.length - 1) {
+                        this.showSlide(this.currentIndex + 1);
+                    }
+                },
+                finish: function() {
+                    dom.onboardingModal.classList.add('hidden');
+                    try {
+                        localStorage.setItem('onboardingComplete', 'true');
+                    } catch (e) {
+                        utils.log("Could not save to localStorage", e);
+                    }
+                }
+            };
+
             const api = {
                 fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
                     const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
@@ -1036,6 +1129,15 @@
             };
 
             function init() {
+                // Lance le tutoriel si c'est la première visite
+                try {
+                    if (!localStorage.getItem('onboardingComplete')) {
+                        onboarding.start();
+                    }
+                } catch (e) {
+                    utils.log("Could not access localStorage", e);
+                }
+
                 // Listeners principaux
                 ['change', 'input'].forEach(evt => {
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
@@ -1074,6 +1176,12 @@
                 closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden')));
                 
                 document.addEventListener('keydown', handlers.handleModalKeydown);
+
+                // Listeners du tutoriel
+                dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
+                dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
+                dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
+
 
                 // Langue
                 document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => {

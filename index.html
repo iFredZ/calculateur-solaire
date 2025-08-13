@@ -464,7 +464,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.4.0</p>
+        <p class="text-xs text-gray-600">v2.4.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -881,7 +881,9 @@
                 memorizedLongitude: null,
                 lastRecommendedTilt: null,
                 panelAzimuthLive: null,
-                tiltOffset: 0
+                tiltOffset: 0,
+                lastCurrentProd: null,
+                lastOptimalProd: null
             };
 
             const dom = {
@@ -1234,36 +1236,44 @@
                     localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
                 },
                 exportToPDF: () => {
+                    if (!state.lastCurrentProd || !state.lastOptimalProd) {
+                        alert("Veuillez d'abord calculer une estimation avant d'exporter.");
+                        return;
+                    }
                     const btn = dom.exportPdfBtn;
                     const originalText = btn.querySelector('span').textContent;
                     btn.disabled = true;
                     btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
 
                     const now = new Date();
-                    const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                    const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
                     
                     const reportElement = document.createElement('div');
+                    // CORRIGÉ: Utilisation de state.last...Prod pour les données
+                    const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
+                    const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
+                    
                     reportElement.innerHTML = `
                         <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
-                            <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport Opti Solar</h1>
-                            <p style="text-align: right; font-size: 12px;">Généré le ${formattedDate}</p>
+                            <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
+                            <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                             
                             <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
-                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.dateInput.value}</td></tr>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
                                 <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
                             </table>
                             
-                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production</h2>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Annuelle Estimée</h2>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
                                 <thead>
                                     <tr style="background-color: #1d4ed8; color: white; text-align: left;">
                                         <th style="padding: 8px;">Configuration</th>
                                         <th style="padding: 8px;">Inclinaison</th>
                                         <th style="padding: 8px;">Orientation</th>
-                                        <th style="padding: 8px;">Gain Journalier</th>
-                                        <th style="padding: 8px;">Gain Mensuel</th>
+                                        <th style="padding: 8px;">Prod. Journalière</th>
+                                        <th style="padding: 8px;">Prod. Mensuelle</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1272,26 +1282,27 @@
                                         <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentProductionDisplay.textContent}</td>
-                                        <td style="padding: 8px; border: 1px solid #ddd;">${utils.formatNumber(Number(currentProd.outputs.totals.fixed.E_m))} kWh</td> </tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
+                                    </tr>
                                     <tr>
                                         <td style="padding: 8px; border: 1px solid #ddd;">Optimale</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">0° / Sud</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${dom.optimalProductionDisplay.textContent}</td>
-                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.potentialGainMonthlyDisplay.textContent.replace('~ ','')}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${optMonthlyProd} kWh</td>
                                     </tr>
                                 </tbody>
                             </table>
 
                              <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
-                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
+                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
                                 <tr><td style="padding: 8px; border: 1px solid #ddd;">Gain Mensuel</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
                             </table>
                         </div>
                     `;
 
-                    const filename = `OptiSolar_Rapport_${now.toISOString().split('T')[0]}.pdf`;
+                    const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
                     html2pdf().from(reportElement).set({
                         margin: 10,
                         filename: filename,
@@ -1450,7 +1461,6 @@
                             api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
                         ]);
 
-                        // NOUVEAU: Stocker les résultats complets pour le PDF
                         state.lastCurrentProd = currentProd;
                         state.lastOptimalProd = optimalProd;
 
@@ -1476,7 +1486,7 @@
                         
                         dom.productionResults.classList.remove('hidden');
                         dom.donationMessage.classList.remove('hidden');
-                        dom.exportContainer.classList.remove('hidden'); // Afficher le bouton PDF
+                        dom.exportContainer.classList.remove('hidden');
 
                     } catch (err) { 
                         dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 

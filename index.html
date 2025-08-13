@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --bg: #0b1220;
@@ -53,11 +55,16 @@
         .light-mode .card {
              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
         }
-        .app-title {
+        .app-title { /* DEPRECATED - Remplacé par header-title */
             color: var(--fg);
         }
         .page-title {
             color: var(--accent-blue);
+        }
+        .header-title {
+            font-family: 'Exo 2', sans-serif;
+            color: var(--fg);
+            letter-spacing: 0.05em;
         }
         .btn-primary {
             background-color: var(--accent);
@@ -213,7 +220,7 @@
         .light-mode #production-results .text-blue-300 { color: #1e40af; }
         .light-mode #production-results .font-bold { color: var(--fg); }
         
-        /* NOUVEAU: Styles pour le bouton de mémorisation repensé */
+        /* Styles pour le bouton de mémorisation repensé */
         #memorize-ring-btn {
             width: 110px;
             height: 110px;
@@ -248,23 +255,32 @@
 <body class="flex flex-col h-screen">
 
     <header class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
-        <div id="lang-switcher" class="flex gap-2">
-            <button data-lang="fr" class="lang-btn">FR</button>
-            <button data-lang="en" class="lang-btn">EN</button>
+        <div class="flex-1 flex justify-start">
+            <div id="lang-switcher" class="flex gap-2">
+                <button data-lang="fr" class="lang-btn">FR</button>
+                <button data-lang="en" class="lang-btn">EN</button>
+            </div>
         </div>
-        <div class="flex gap-2 items-center">
-            <button type="button" id="main-help-button" class="icon-btn">
-                 <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </button>
-             <button type="button" id="settings-help-button" class="icon-btn hidden">
-                 <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </button>
-            <button id="settings-button" class="icon-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
+        
+        <div class="flex-1 flex justify-center">
+             <h1 class="text-2xl font-bold header-title">Opti Solar</h1>
+        </div>
+
+        <div class="flex-1 flex justify-end">
+            <div class="flex gap-2 items-center">
+                <button type="button" id="main-help-button" class="icon-btn">
+                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                 <button type="button" id="settings-help-button" class="icon-btn hidden">
+                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                <button id="settings-button" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -272,8 +288,7 @@
         <div id="app-container" class="w-full max-w-lg card rounded-2xl p-6 md:p-8 space-y-6 relative mx-auto">
             
             <div id="main-page">
-                <div class="text-center space-y-6">
-                    <h1 class="text-2xl md:text-3xl font-bold app-title">Opti Solar</h1>
+                <div class="text-center space-y-4">
                     <div class="max-w-xs mx-auto space-y-4">
                         <div>
                             <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="location"></label>
@@ -289,7 +304,7 @@
                     </div>
                 </div>
                 
-                <div class="card bg-gray-900/50 p-6 mt-6">
+                <div class="card bg-gray-900/50 p-6 mt-4">
                     <div class="grid grid-cols-2 gap-4">
                         <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-2 px-4 rounded-lg" data-i18n="activate_sensors"></button>
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
@@ -333,22 +348,22 @@
                     </div>
                 </div>
 
-                <div id="result-container" class="text-center mt-6 hidden">
+                <div id="result-container" class="text-center mt-4 hidden">
                     <p class="text-lg text-teal-300" data-i18n="recommended_angle"></p>
                     <p id="result" class="text-5xl md:text-6xl font-bold text-teal-400 my-1" aria-live="polite">--°</p>
                 </div>
 
-                <button type="button" id="goto-estimation-button" class="hidden mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-all text-lg flex items-center justify-center">
+                <button type="button" id="goto-estimation-button" class="hidden mt-4 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-all text-lg flex items-center justify-center">
                     <span data-i18n="calculate_gain"></span>
                     <svg class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                 </button>
                 
-                <div class="mt-6">
+                <div class="mt-4">
                      <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
                      <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
                 </div>
                 
-                <div id="seasonal-container" class="mt-6 hidden">
+                <div id="seasonal-container" class="mt-4 hidden">
                     <h2 class="text-xl font-bold text-center mb-4 page-title" data-i18n="seasonal_settings"></h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                         <div class="info-box rounded-lg p-4">
@@ -421,6 +436,16 @@
                         <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
                     </div>
                 </div>
+                
+                <div id="export-container" class="mt-6 text-center hidden">
+                    <button type="button" id="export-pdf-btn" class="btn-secondary font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center w-full">
+                        <svg class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                        </svg>
+                        <span data-i18n="export_pdf"></span>
+                    </button>
+                </div>
+                 
                  <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
                 
                  <div class="text-center pt-4 border-t border-gray-700 mt-6 space-y-4">
@@ -439,7 +464,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.3.0</p>
+        <p class="text-xs text-gray-600">v2.4.0</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -737,6 +762,8 @@
                     bug_report_title: "Signaler un bug ou une suggestion",
                     donate_title: "Soutenir le projet",
                     bug_report_subject: "Suggestion / Bug pour Opti Solar",
+                    export_pdf: "Exporter en PDF",
+                    exporting_pdf: "Génération...",
                 },
                 en: {
                     activate_sensors: "Use Sensors",
@@ -813,6 +840,8 @@
                     bug_report_title: "Report a bug or suggestion",
                     donate_title: "Support the project",
                     bug_report_subject: "Suggestion / Bug for Opti Solar",
+                    export_pdf: "Export to PDF",
+                    exporting_pdf: "Generating...",
                 }
             };
 
@@ -892,6 +921,8 @@
                 currentAzimuthInput: document.getElementById('current-azimuth-input'),
                 calculateProductionButton: document.getElementById('calculate-production'),
                 productionResults: document.getElementById('production-results'),
+                exportContainer: document.getElementById('export-container'),
+                exportPdfBtn: document.getElementById('export-pdf-btn'),
                 currentProductionDisplay: document.getElementById('current-production'),
                 optimalProductionDisplay: document.getElementById('optimal-production'),
                 potentialGainDisplay: document.getElementById('potential-gain'),
@@ -1162,7 +1193,6 @@
                     
                     setTimeout(() => {
                         dom.memorizeRingBtn.classList.remove('shockwave');
-                        // On ne réaffiche le texte qu'après un délai
                         setTimeout(() => {
                             dom.memorizeCheckmarkIcon.classList.add('hidden');
                             dom.memorizeBtnText.classList.remove('hidden');
@@ -1202,6 +1232,76 @@
                 },
                 savePeakPower: () => {
                     localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
+                },
+                exportToPDF: () => {
+                    const btn = dom.exportPdfBtn;
+                    const originalText = btn.querySelector('span').textContent;
+                    btn.disabled = true;
+                    btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
+
+                    const now = new Date();
+                    const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                    
+                    const reportElement = document.createElement('div');
+                    reportElement.innerHTML = `
+                        <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+                            <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport Opti Solar</h1>
+                            <p style="text-align: right; font-size: 12px;">Généré le ${formattedDate}</p>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.dateInput.value}</td></tr>
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
+                            </table>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production</h2>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr style="background-color: #1d4ed8; color: white; text-align: left;">
+                                        <th style="padding: 8px;">Configuration</th>
+                                        <th style="padding: 8px;">Inclinaison</th>
+                                        <th style="padding: 8px;">Orientation</th>
+                                        <th style="padding: 8px;">Gain Journalier</th>
+                                        <th style="padding: 8px;">Gain Mensuel</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: #f1f5f9;">
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${utils.formatNumber(Number(currentProd.outputs.totals.fixed.E_m))} kWh</td> </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Optimale</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">0° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.optimalProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.potentialGainMonthlyDisplay.textContent.replace('~ ','')}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                             <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
+                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Gain Mensuel</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                            </table>
+                        </div>
+                    `;
+
+                    const filename = `OptiSolar_Rapport_${now.toISOString().split('T')[0]}.pdf`;
+                    html2pdf().from(reportElement).set({
+                        margin: 10,
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).save().then(() => {
+                        btn.disabled = false;
+                        btn.querySelector('span').textContent = originalText;
+                    });
                 }
             };
 
@@ -1312,6 +1412,7 @@
                     throw new Error('All PVGIS fetch strategies failed.');
                 },
                 getProductionEstimate: async () => { 
+                    dom.exportContainer.classList.add('hidden');
                     dom.pvgisError.textContent = ''; 
                     dom.productionResults.classList.add('hidden');
                     dom.donationMessage.classList.add('hidden');
@@ -1349,6 +1450,10 @@
                             api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
                         ]);
 
+                        // NOUVEAU: Stocker les résultats complets pour le PDF
+                        state.lastCurrentProd = currentProd;
+                        state.lastOptimalProd = optimalProd;
+
                         let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
                         let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
                         let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
@@ -1368,8 +1473,11 @@
                         dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
                         const gainMonthly = optMonthly - curMonthly; 
                         dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
+                        
                         dom.productionResults.classList.remove('hidden');
                         dom.donationMessage.classList.remove('hidden');
+                        dom.exportContainer.classList.remove('hidden'); // Afficher le bouton PDF
+
                     } catch (err) { 
                         dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
                         utils.log('PVGIS error', err); 
@@ -1439,6 +1547,7 @@
                 dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
                 dom.backButton.addEventListener('click', () => ui.showPage('main'));
                 dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
+                dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 
                 const modals = [
                     { btn: dom.settingsButton, modal: dom.settingsModal }, { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },

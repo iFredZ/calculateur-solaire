@@ -277,7 +277,7 @@
                  <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
                 
                  <div class="text-center pt-4 border-t border-gray-700 mt-6 space-y-4">
-                    <p id="donation-message" class="text-sm text-gray-400 hidden" data-i18n="donation_message"></p>
+                    <p id="donation-message" class="text-sm text-gray-400 hidden cursor-pointer hover:underline" data-i18n="donation_message"></p>
                 </div>
             </div>
 
@@ -1042,7 +1042,7 @@
                 dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeSensorValues);
                 dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
                 dom.bugReportButton.addEventListener('click', handlers.openBugReport);
-
+				dom.donationMessage.addEventListener('click', handlers.openExternalLink);
 
                 // Navigation
                 dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);

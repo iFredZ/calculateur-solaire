@@ -291,6 +291,9 @@
             </svg>
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
+
+        <p class="text-xs text-gray-600">v2.0.2</p>
+
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 18.828l-8.485-8.485a4 4 0 010-5.656z" clip-rule="evenodd" />
@@ -473,7 +476,7 @@
                     orientation_helper: "EST (-) | SUD (0) | OUEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Angle Recommandé",
-                    calculate_gain: "Calculer le Gain Potentiel",
+                    calculate_gain: "Estimez votre production",
                     seasonal_settings: "Réglages Saisonniers",
                     winter: "Hiver",
                     winter_date: "~21 Déc.",
@@ -510,7 +513,7 @@
                     guide_step3_title: "Étape 3 : Lecture du Résultat",
                     guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel. Les réglages saisonniers apparaissent également pour information.",
                     guide_step4_title: "Étape 4 : Estimation du Gain",
-                    guide_step4_desc: "Cliquez sur \"Calculer le Gain Potentiel\". Vos données seront automatiquement reportées sur la page suivante pour une simulation précise.",
+                    guide_step4_desc: "Cliquez sur \"Estimez votre production\". Vos données seront automatiquement reportées sur la page suivante pour une simulation précise.",
                     estimation_guide_title: "Guide de l'Estimation",
                     estimation_guide_step1_title: "Vérifiez vos Données",
                     estimation_guide_step1_desc: "Les champs sont pré-remplis à partir de la page précédente. Vous pouvez les modifier pour simuler d'autres configurations.",
@@ -543,7 +546,7 @@
                     orientation_helper: "EAST (-) | SOUTH (0) | WEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Recommended Angle",
-                    calculate_gain: "Calculate Potential Gain",
+                    calculate_gain: "Estimate your production",
                     seasonal_settings: "Seasonal Settings",
                     winter: "Winter",
                     winter_date: "~Dec 21",
@@ -580,7 +583,7 @@
                     guide_step3_title: "Step 3: Read the Result",
                     guide_step3_desc: "The recommended angle appears and adjusts in real-time. Seasonal settings are also shown for reference.",
                     guide_step4_title: "Step 4: Estimate Gain",
-                    guide_step4_desc: "Click \"Calculate Potential Gain\". Your data will be automatically carried over to the next page for an accurate simulation.",
+                    guide_step4_desc: "Click \"Estimate your production\". Your data will be automatically carried over to the next page for an accurate simulation.",
                     estimation_guide_title: "Estimation Guide",
                     estimation_guide_step1_title: "Check Your Data",
                     estimation_guide_step1_desc: "The fields are pre-filled from the previous page. You can edit them to simulate other configurations.",
@@ -963,6 +966,9 @@
                     dom.calculateLoader.classList.add('hidden'); 
                     dom.productionResults.classList.add('hidden');
                     dom.donationMessage.classList.add('hidden');
+                    
+                    dom.calculateLoader.classList.remove('hidden');
+                    dom.calculateText.classList.add('hidden');
 
                     const lat = utils.safeParseFloat(dom.latitudeInput.value); 
                     const lon = utils.safeParseFloat(dom.longitudeInput.value); 

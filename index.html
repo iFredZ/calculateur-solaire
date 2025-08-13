@@ -993,7 +993,7 @@
                         let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
                         let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
                         let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
-                        let optMonthly = Number(optimalProd.outputs.fixed.E_m) || 0; 
+                        let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
 
                         if (optDaily < curDaily) { 
                             optDaily = curDaily; 

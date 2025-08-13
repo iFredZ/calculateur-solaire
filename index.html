@@ -183,7 +183,7 @@
                                 <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
                             </div>
                         </div>
-                        <div class="flex gap-4">
+                        <div class="flex gap-4 mt-2">
                             <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
                             <button type="button" id="memorize-sensors" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" disabled data-i18n="memorize_sensors"></button>
                         </div>
@@ -249,10 +249,13 @@
                 <h2 class="text-2xl md:text-3xl font-bold text-center pt-8" data-i18n="estimation_title"></h2>
                 
                 <div class="space-y-4 mt-6">
-                    <div>
-                        <label for="peak-power" class="block text-sm font-medium text-gray-400" data-i18n="peak_power"></label>
+                    <div class="bg-gray-900/50 p-4 rounded-lg border border-teal-500/30">
+                        <label for="peak-power" class="block text-sm font-medium text-teal-300" data-i18n="peak_power"></label>
                         <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
                     </div>
+                    
+                    <div class="border-t border-gray-800 my-4"></div>
+
                      <div>
                         <label for="longitude-input" class="block text-sm font-medium text-gray-400" data-i18n="longitude"></label>
                         <input type="number" id="longitude-input" value="4.028" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
@@ -308,7 +311,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.1.0</p>
+        <p class="text-xs text-gray-600">v2.1.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -455,7 +458,7 @@
                 </div>
             </div>
             <div class="items-center px-4 pt-3">
-                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i1ba8n="got_it"></button>
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
             </div>
         </div>
     </div>
@@ -1035,6 +1038,9 @@
                         window.removeEventListener(CONFIG.sensorEventName, once, true);
                     };
                     window.addEventListener(CONFIG.sensorEventName, once, true);
+                },
+                savePeakPower: () => {
+                    localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
                 }
             };
 
@@ -1201,6 +1207,12 @@
                     
                     // Charger l'offset de calibration du tilt
                     state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
+                    
+                    // Charger la puissance crête
+                    const savedPeakPower = localStorage.getItem('userPeakPower');
+                    if (savedPeakPower) {
+                        dom.peakPowerInput.value = savedPeakPower;
+                    }
 
                     // Lance le tutoriel si c'est la première visite
                     if (!localStorage.getItem('onboardingComplete')) {
@@ -1222,6 +1234,8 @@
                     dom.manualTiltInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.manualAzimuthInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                 });
+                
+                dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);
                 
                 // Choix du mode
                 dom.activateSensorsButton.addEventListener('click', () => {
@@ -1280,4 +1294,3 @@
     </script>
 </body>
 </html>
-}

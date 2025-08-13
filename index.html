@@ -23,16 +23,16 @@
             --border-color: rgba(255, 255, 255, .06);
             --border-color-input: rgba(255,255,255,.1);
         }
-        /* NOUVEAU: Thème clair */
+        /* NOUVEAU: Palette du thème clair "Professionnel" */
         .light-mode {
-            --bg: #f3f4f6;
-            --card: #ffffff;
-            --muted: #6b7280;
-            --fg: #111827;
-            --btn-secondary-bg: #e5e7eb;
-            --input-bg: #f9fafb;
-            --border-color: rgba(0, 0, 0, .06);
-            --border-color-input: rgba(0,0,0,.1);
+            --bg: #f0f2f5; /* Fond de page gris très clair */
+            --card: #ffffff; /* Cartes blanches pour le contraste */
+            --muted: #525f7f; /* Texte secondaire gris foncé */
+            --fg: #1a202c; /* Texte principal quasi-noir */
+            --btn-secondary-bg: #e2e8f0;
+            --input-bg: #f7fafc;
+            --border-color: #e2e8f0;
+            --border-color-input: #cbd5e1;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -43,8 +43,11 @@
         .card {
             background-color: var(--card);
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 30px rgba(0,0,0,.35);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
             transition: background-color 0.3s, border-color 0.3s;
+        }
+        .light-mode .card {
+             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
         }
         .btn-primary {
             background-color: var(--accent);
@@ -142,7 +145,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        /* NOUVEAU: Style pour le switch de thème */
+        /* Style pour le switch de thème */
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
@@ -184,21 +187,32 @@
         }
         input:checked + .slider:before {
             transform: translateX(24px);
-		}
-		/* NOUVEAU: Correction des couleurs pour le mode clair dans les résultats */
-		.light-mode #production-results .text-gray-400 {
-			color: #4b5563; /* Un gris plus foncé */
-		}
-		.light-mode #production-results .text-green-300 {
-			color: #065f46; /* Un vert foncé */
-		}
-		.light-mode #production-results .text-blue-300 {
-			color: #1e40af; /* Un bleu foncé */
-		}
-		/* On s'assure que les grands chiffres sont bien lisibles aussi */
-		.light-mode #production-results .font-bold {
-			color: var(--fg);
-		}
+        }
+
+        /* NOUVEAU: Styles spécifiques pour les cartes en mode clair */
+        .light-mode #seasonal-container .bg-gray-900\/50,
+        .light-mode #production-results .bg-gray-900\/50,
+        .light-mode #production-results .bg-green-900\/30,
+        .light-mode #production-results .bg-blue-900\/30 {
+            background-color: #e5e7eb; /* Base gris clair */
+        }
+        .light-mode #seasonal-container .text-sky-400 { color: #0c4a6e; }
+        .light-mode #seasonal-container .text-amber-400 { color: #92400e; }
+        .light-mode #seasonal-container .text-red-400 { color: #991b1b; }
+        
+        /* Correction des couleurs pour le mode clair dans les résultats */
+        .light-mode #production-results .text-gray-400 {
+            color: #4b5563; /* Un gris plus foncé */
+        }
+        .light-mode #production-results .text-green-300 {
+            color: #065f46; /* Un vert foncé */
+        }
+        .light-mode #production-results .text-blue-300 {
+            color: #1e40af; /* Un bleu foncé */
+        }
+        .light-mode #production-results .font-bold {
+            color: var(--fg);
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -251,7 +265,7 @@
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
                     </div>
 
-                    <div id="sensors-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800 cursor-pointer rounded-lg hover:bg-gray-800/20 active:bg-gray-800/40 transition-colors">
+                    <div id="sensors-display" class="hidden space-y-4 p-4 mt-4 border-t border-gray-800 cursor-pointer rounded-lg hover:bg-gray-800/20 active:bg-gray-800/40 transition-colors">
                          <div class="grid grid-cols-2 gap-4 text-center pointer-events-none">
                             <div>
                                 <p class="text-lg text-gray-400" data-i18n="current_angle"></p>
@@ -387,7 +401,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.2.0</p>
+        <p class="text-xs text-gray-600">v2.2.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -1307,7 +1321,7 @@
 
             function init() {
                 try {
-                    theme.load(); // Charger le thème en premier
+                    theme.load();
                     const savedLang = localStorage.getItem('userLang') || 'fr';
                     i18n.setLanguage(savedLang);
 

@@ -453,7 +453,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.5.0</p>
+        <p class="text-xs text-gray-600">v2.5.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -1045,7 +1045,6 @@
                     const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
                     
                     const dev = Math.abs(panelAzimuthDeviation);
-                    // Commentaire: Plafonne la pénalité à 6° max pour éviter les corrections excessives
                     const penalty = Math.min(6, dev / 12);
                     
                     const solarNoonAltitude = 90 - Math.abs(lat - declination);
@@ -1058,7 +1057,6 @@
                     state.lastRecommendedTilt = optimalTilt;
                     dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
 
-                    // Commentaire: Projette la déclinaison actuelle sur une échelle de 0-15° pour un ajustement saisonnier dynamique
                     const f = Math.round((Math.abs(declination) / 23.44) * 15);
                     dom.winterAngleDisplay.textContent = `${Math.round(lat + f - penalty)}°`;
                     dom.springFallAngleDisplay.textContent = `${Math.round(lat - penalty)}°`;
@@ -1180,7 +1178,12 @@
                         return;
                     }
                     
-                    if (navigator.vibrate) navigator.vibrate(100);
+                    try {
+                        const { Haptics, ImpactStyle } = Capacitor.Plugins;
+                        Haptics.impact({ style: ImpactStyle.Medium });
+                    } catch(e) {
+                         if (navigator.vibrate) navigator.vibrate(100);
+                    }
                     
                     dom.memorizeRingBtn.classList.add('shockwave');
                     dom.memorizeBtnText.classList.add('hidden');
@@ -1188,6 +1191,7 @@
                     
                     setTimeout(() => {
                         dom.memorizeRingBtn.classList.remove('shockwave');
+                        dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorized;
                         setTimeout(() => {
                             dom.memorizeCheckmarkIcon.classList.add('hidden');
                             dom.memorizeBtnText.classList.remove('hidden');
@@ -1198,7 +1202,6 @@
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
                     state.memorizedLongitude = state.currentLongitude;
-                    dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorized;
                 },
                 handleModalKeydown: (e) => {
                     if (e.key === 'Escape') {

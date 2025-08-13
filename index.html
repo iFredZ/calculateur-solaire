@@ -27,7 +27,7 @@
         }
         .light-mode {
             --bg: #f1f5f9; /* Fond de page gris plus présent */
-            --card: #ffffff;
+            --card: #ffffff; /* Cartes blanches pour le contraste */
             --muted: #475569;
             --fg: #0f172a;
             --accent: #41d1b7;
@@ -198,6 +198,7 @@
         input:checked + .slider:before {
             transform: translateX(24px);
         }
+
         /* Styles spécifiques pour les cartes d'information */
         .info-box {
             background-color: var(--info-box-bg);
@@ -211,6 +212,30 @@
         .light-mode #production-results .text-green-300 { color: #065f46; }
         .light-mode #production-results .text-blue-300 { color: #1e40af; }
         .light-mode #production-results .font-bold { color: var(--fg); }
+        
+        /* NOUVEAU: Styles pour le bouton de mémorisation */
+        #memorize-ring-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        #memorize-ring-btn:disabled {
+            border-color: var(--muted);
+            opacity: 0.5;
+        }
+        #memorize-ring-btn.pulse {
+            animation: pulse-animation 0.5s ease-out;
+        }
+        @keyframes pulse-animation {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(65, 209, 183, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(65, 209, 183, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(65, 209, 183, 0); }
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -263,8 +288,8 @@
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
                     </div>
 
-                    <div id="sensors-display" class="hidden space-y-4 p-4 mt-4 border-t border-gray-800 cursor-pointer rounded-lg hover:bg-gray-800/20 active:bg-gray-800/40 transition-colors">
-                         <div class="grid grid-cols-2 gap-4 text-center pointer-events-none">
+                    <div id="sensors-display" class="hidden space-y-2 pt-4 mt-4 border-t border-gray-800">
+                         <div class="grid grid-cols-2 gap-4 text-center">
                             <div>
                                 <p class="text-lg text-gray-400" data-i18n="current_angle"></p>
                                 <p class="text-4xl font-bold my-1"><span id="current-angle">--</span>°</p>
@@ -274,8 +299,13 @@
                                 <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
                             </div>
                         </div>
-                        <p id="memorize-helper-text" class="text-center text-teal-400 text-sm font-bold pointer-events-none" data-i18n="memorize_sensors_helper"></p>
-                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center pointer-events-none" role="alert"></p>
+                        <div class="flex flex-col items-center justify-center pt-4 space-y-2">
+                           <button id="memorize-ring-btn" disabled>
+                                <span id="memorize-btn-text" data-i18n="memorize_action"></span>
+                           </button>
+                           <p class="text-xs text-gray-400" data-i18n="memorize_action_info"></p>
+                        </div>
+                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                     </div>
 
                     <div id="manual-entry-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
@@ -399,7 +429,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.3.0</p>
+        <p class="text-xs text-gray-600">v2.2.2</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -631,8 +661,9 @@
                     target_date: "Date Cible",
                     current_angle: "Angle Actuel",
                     orientation: "Orientation",
-                    memorize_sensors_helper: "Appuyez ici pour mémoriser",
-                    memorized: "Valeurs mémorisées !",
+                    memorize_action: "Mémoriser",
+                    memorize_action_info: "Quand les valeurs sont stables",
+                    memorized: "Mémorisé !",
                     calibrate_tilt: "Calibrer à plat",
                     calibrate_tilt_success: "Calibration effectuée !",
                     light_theme_label: "Mode Clair",
@@ -706,8 +737,9 @@
                     target_date: "Target Date",
                     current_angle: "Current Angle",
                     orientation: "Orientation",
-                    memorize_sensors_helper: "Tap here to memorize",
-                    memorized: "Values Saved!",
+                    memorize_action: "Memorize",
+                    memorize_action_info: "When values are stable",
+                    memorized: "Saved!",
                     calibrate_tilt: "Calibrate Flat",
                     calibrate_tilt_success: "Calibrated!",
                     light_theme_label: "Light Mode",
@@ -826,7 +858,8 @@
                 sensorsDisplay: document.getElementById('sensors-display'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
-                memorizeHelperText: document.getElementById('memorize-helper-text'),
+                memorizeRingBtn: document.getElementById('memorize-ring-btn'),
+                memorizeBtnText: document.getElementById('memorize-btn-text'),
                 calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
                 sensorError: document.getElementById('sensor-error'),
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
@@ -1024,6 +1057,7 @@
                     if (tilt !== null) {
                         dom.currentAngleDisplay.textContent = tilt;
                         dom.sensorError.textContent = '';
+                        dom.memorizeRingBtn.disabled = false;
                     }
                     const heading = sensors.getHeadingFromEvent(event);
                     if (heading !== null) {
@@ -1038,6 +1072,7 @@
                         return;
                     }
                     dom.sensorError.textContent = 'Activation...';
+                    dom.memorizeRingBtn.disabled = true;
                     try {
                         if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
                             const permission = await DeviceOrientationEvent.requestPermission();
@@ -1067,6 +1102,7 @@
                     dom.currentAngleDisplay.textContent = '--';
                     dom.currentCompassDisplay.textContent = '--';
                     dom.sensorError.textContent = '';
+                    dom.memorizeRingBtn.disabled = true;
                     calculations.calculateAndDisplayAll(); 
                 }
             };
@@ -1106,11 +1142,16 @@
                         dom.sensorError.textContent = 'Mesures invalides.';
                         return;
                     }
+                    
+                    if (navigator.vibrate) navigator.vibrate(100);
+                    dom.memorizeRingBtn.classList.add('pulse');
+                    setTimeout(() => dom.memorizeRingBtn.classList.remove('pulse'), 500);
+
                     state.memorizedTilt = tilt;
                     state.memorizedAzimuthValue = az;
                     state.memorizedLongitude = state.currentLongitude;
-                    dom.memorizeHelperText.textContent = translations[i18n.currentLang].memorized;
-                    setTimeout(() => { dom.memorizeHelperText.textContent = translations[i18n.currentLang].memorize_sensors_helper; }, 2000);
+                    dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorized;
+                    setTimeout(() => { dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorize_action; }, 2000);
                 },
                 handleModalKeydown: (e) => {
                     if (e.key === 'Escape') {
@@ -1367,7 +1408,7 @@
                 dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
 
                 dom.getLocationButton.addEventListener('click', () => geolocation.get());
-                dom.sensorsDisplay.addEventListener('click', handlers.memorizeSensorValues);
+                dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
                 dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
                 dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
                 dom.bugReportButton.addEventListener('click', handlers.openBugReport);

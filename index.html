@@ -311,7 +311,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.1.1</p>
+        <p class="text-xs text-gray-600">v2.1.2</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -676,7 +676,7 @@
                     if (!translations[lang]) return;
                     this.currentLang = lang;
                     document.documentElement.lang = lang;
-                    localStorage.setItem('userLang', lang); // MODIFIÉ: Persistance
+                    localStorage.setItem('userLang', lang);
                     document.querySelectorAll('[data-i18n]').forEach(el => {
                         const key = el.dataset.i18n;
                         if (translations[lang][key]) el.innerHTML = translations[lang][key];
@@ -706,7 +706,7 @@
                 memorizedLongitude: null,
                 lastRecommendedTilt: null,
                 panelAzimuthLive: null,
-                tiltOffset: 0 // NOUVEAU: Pour la calibration
+                tiltOffset: 0
             };
 
             const dom = {
@@ -723,7 +723,7 @@
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
                 memorizeSensorsButton: document.getElementById('memorize-sensors'),
-                calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'), // NOUVEAU
+                calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
                 sensorError: document.getElementById('sensor-error'),
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
                 manualTiltInput: document.getElementById('manual-tilt-input'),
@@ -776,7 +776,10 @@
                 toDegrees: (rad) => rad * 180 / Math.PI,
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
                 getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-                formatNumber: (n, dec = 2) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
+                // MODIFIÉ: Formatage des nombres dynamique
+                formatNumber: (n, dec = 2) =>
+                  Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US',
+                    { minimumFractionDigits: dec, maximumFractionDigits: dec }),
                 safeParseFloat: (v, fallback = NaN) => {
                     if (v === null || v === undefined || v === '') return fallback;
                     const s = String(v).replace(',', '.').trim();
@@ -800,7 +803,8 @@
                     dom.longitudeInput.value = lon;
                     dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     dom.locationError.textContent = '';
-                    localStorage.setItem('userLocation', JSON.stringify({lat, lon})); // MODIFIÉ: Persistance
+                    // MODIFIÉ: Correction persistance
+                    try { localStorage.setItem('userLocation', JSON.stringify({lat, lon})); } catch(e) {}
                     calculations.calculateAndDisplayAll();
                 },
                 setEntryMode: (mode) => {
@@ -867,10 +871,8 @@
                     const dayOfYear = utils.getDayOfYear(selectedDate);
                     const declination = utils.getDeclination(dayOfYear);
                     
-                    // MODIFIÉ: Logique de clipping affinée
                     const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
                     
-                    // MODIFIÉ: Logique de pénalité d'azimut affinée
                     const dev = Math.abs(panelAzimuthDeviation);
                     const penalty = Math.min(6, dev / 12);
                     
@@ -881,10 +883,9 @@
                     
                     optimalTilt = utils.clamp(optimalTilt, 0, 90);
                     
-                    state.lastRecommendedTilt = optimalTilt; // MODIFIÉ: On garde les décimales
-                    dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`; // On arrondit seulement à l'affichage
+                    state.lastRecommendedTilt = optimalTilt;
+                    dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
 
-                    // MODIFIÉ: Logique saisonnière affinée
                     const f = Math.round((Math.abs(declination) / 23.44) * 15);
                     dom.winterAngleDisplay.textContent = `${Math.round(lat + f - penalty)}°`;
                     dom.springFallAngleDisplay.textContent = `${Math.round(lat - penalty)}°`;
@@ -893,8 +894,7 @@
             };
 
             const sensors = {
-                lastUpdate: 0, // NOUVEAU: Pour le throttle
-                // MODIFIÉ: Prise en compte de l'offset de calibration
+                lastUpdate: 0,
                 getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta - state.tiltOffset)), 0, 90),
                 getHeadingFromEvent: (e) => {
                     if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
@@ -912,10 +912,9 @@
                     const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
                     return `${Math.round(Math.abs(deviation))}° ${direction}`;
                 },
-                // MODIFIÉ: Throttle (limitation) des updates de l'UI
                 handleOrientation: (event) => {
                     const now = performance.now();
-                    if (now - sensors.lastUpdate < 100) return; // Limite à 10Hz
+                    if (now - sensors.lastUpdate < 100) return;
                     sensors.lastUpdate = now;
                     
                     const tilt = sensors.getTiltFromEvent(event);
@@ -1025,7 +1024,6 @@
                     dom.mainHelpModal.classList.add('hidden');
                     onboarding.start();
                 },
-                // NOUVEAU: Handler pour la calibration du tilt
                 calibrateTilt: () => {
                     const once = (e) => {
                         if (e.beta !== null) {
@@ -1080,6 +1078,18 @@
 
             const api = {
                 fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
+                    // MODIFIÉ: Logique de cache de session
+                    const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
+                    try {
+                        const cachedData = sessionStorage.getItem(cacheKey);
+                        if (cachedData) {
+                            utils.log('Returning cached PVGIS data.');
+                            return JSON.parse(cachedData);
+                        }
+                    } catch (e) {
+                        utils.log('Could not access sessionStorage', e);
+                    }
+
                     const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
                     
                     const strategies = [
@@ -1109,6 +1119,11 @@
                             const json = await strategies[i]();
                             if (json?.outputs?.totals?.fixed) {
                                 utils.log(`Strategy #${i + 1} succeeded.`);
+                                try {
+                                    sessionStorage.setItem(cacheKey, JSON.stringify(json));
+                                } catch (e) {
+                                    utils.log('Could not save to sessionStorage', e);
+                                }
                                 return json;
                             }
                         } catch (error) {
@@ -1144,7 +1159,6 @@
                         const dayOfYear = utils.getDayOfYear(selectedDate);
                         const declination = utils.getDeclination(dayOfYear);
                         
-                        // Logique de clipping et pénalité azimut affinée
                         const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
                         const dev = Math.abs(currentAzimuth);
                         const penalty = Math.min(6, dev / 12);
@@ -1189,44 +1203,39 @@
             };
 
             function init() {
-                // NOUVEAU : Logique de persistance
                 try {
-                    // Charger la langue
                     const savedLang = localStorage.getItem('userLang') || 'fr';
                     i18n.setLanguage(savedLang);
 
-                    // Charger la dernière position
                     const savedLocation = localStorage.getItem('userLocation');
                     if (savedLocation) {
                         const { lat, lon } = JSON.parse(savedLocation);
-                        ui.updateLocationFields(lat, lon);
+                        // On utilise les inputs directement, updateLocationFields sera appelé par le listener
+                        dom.latitudeInput.value = lat;
+                        dom.longitudeInput.value = lon;
+                        dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
                     } else {
                         dom.latitudeInput.value = CONFIG.defaultLatitude;
                         dom.longitudeInput.value = CONFIG.defaultLongitude;
                     }
                     
-                    // Charger l'offset de calibration du tilt
                     state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
                     
-                    // Charger la puissance crête
                     const savedPeakPower = localStorage.getItem('userPeakPower');
                     if (savedPeakPower) {
                         dom.peakPowerInput.value = savedPeakPower;
                     }
 
-                    // Lance le tutoriel si c'est la première visite
                     if (!localStorage.getItem('onboardingComplete')) {
                         onboarding.start();
                     }
                 } catch (e) {
                     utils.log("Could not access localStorage", e);
-                    // Mettre des valeurs par défaut si localStorage échoue
                     i18n.setLanguage('fr');
                     dom.latitudeInput.value = CONFIG.defaultLatitude;
                     dom.longitudeInput.value = CONFIG.defaultLongitude;
                 }
 
-                // Listeners principaux
                 ['change', 'input'].forEach(evt => {
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
@@ -1237,13 +1246,11 @@
                 
                 dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);
                 
-                // Choix du mode
                 dom.activateSensorsButton.addEventListener('click', () => {
                     state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors');
                 });
                 dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
 
-                // Actions
                 dom.getLocationButton.addEventListener('click', () => geolocation.get());
                 dom.memorizeSensorsButton.addEventListener('click', handlers.memorizeSensorValues);
                 dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
@@ -1251,12 +1258,10 @@
                 dom.bugReportButton.addEventListener('click', handlers.openBugReport);
 				dom.donationMessage.addEventListener('click', handlers.openExternalLink);
 
-                // Navigation
                 dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
                 dom.backButton.addEventListener('click', () => ui.showPage('main'));
                 dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
 
-                // Modals
                 const modals = [
                     { btn: dom.settingsButton, modal: dom.settingsModal }, { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
                     { btn: dom.mainHelpButton, modal: dom.mainHelpModal }, { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
@@ -1268,22 +1273,20 @@
                 
                 document.addEventListener('keydown', handlers.handleModalKeydown);
 
-                // Listeners du tutoriel
                 dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
                 dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
                 dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
                 dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
 
 
-                // Langue
                 document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => i18n.setLanguage(e.target.dataset.lang));
                 });
 
-                // Initialisation des valeurs (la date seulement, le reste est géré par la persistance)
                 const today = new Date();
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
+                calculations.calculateAndDisplayAll();
                 utils.log('Application initialisée.');
             }
             

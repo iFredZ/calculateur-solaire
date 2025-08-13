@@ -18,7 +18,7 @@
             --muted: #7b8aa5;
             --fg: #e9f0ff;
             --accent: #41d1b7;
-            --accent-blue: #437eff; /* Bleu sombre pour le texte en mode sombre */
+            --accent-blue: #437eff;
             --warn: #ffcc00;
             --bad: #ff6b6b;
             --btn-secondary-bg: #2a3957;
@@ -28,17 +28,16 @@
             --info-box-bg: rgba(123, 138, 165, 0.1);
         }
         .light-mode {
-            --bg: #f1f5f9; /* Fond de page gris plus présent */
-            --card: #ffffff; /* Cartes blanches pour le contraste */
+            --bg: #f1f5f9;
+            --card: #ffffff;
             --muted: #475569;
             --fg: #0f172a;
-            --accent: #41d1b7;
-            --accent-blue: #1d4ed8; /* Bleu pro pour les titres en mode clair */
+            --accent-blue: #1d4ed8;
             --btn-secondary-bg: #e2e8f0;
             --input-bg: #f8fafc;
             --border-color: #e2e8f0;
             --border-color-input: #cbd5e1;
-            --info-box-bg: #f1f5f9; /* Fond unifié pour les boîtes d'info */
+            --info-box-bg: #f1f5f9;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -54,9 +53,6 @@
         }
         .light-mode .card {
              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-        }
-        .app-title { /* DEPRECATED - Remplacé par header-title */
-            color: var(--fg);
         }
         .page-title {
             color: var(--accent-blue);
@@ -150,7 +146,6 @@
             transform: scale(1.1);
             background-color: var(--btn-secondary-bg);
         }
-        /* Styles pour le tutoriel */
         .onboarding-dot.active {
             background-color: var(--accent);
             transform: scale(1.5);
@@ -162,7 +157,6 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        /* Style pour le switch de thème */
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
@@ -205,8 +199,6 @@
         input:checked + .slider:before {
             transform: translateX(24px);
         }
-
-        /* Styles spécifiques pour les cartes d'information */
         .info-box {
             background-color: var(--info-box-bg);
         }
@@ -220,7 +212,6 @@
         .light-mode #production-results .text-blue-300 { color: #1e40af; }
         .light-mode #production-results .font-bold { color: var(--fg); }
         
-        /* Styles pour le bouton de mémorisation repensé */
         #memorize-ring-btn {
             width: 110px;
             height: 110px;
@@ -235,7 +226,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         #memorize-ring-btn:not(:disabled):active {
-            transform: scale(0.95); /* Effet de pression */
+            transform: scale(0.95);
         }
         #memorize-ring-btn:disabled {
             background-color: transparent;
@@ -261,11 +252,9 @@
                 <button data-lang="en" class="lang-btn">EN</button>
             </div>
         </div>
-        
         <div class="flex-1 flex justify-center">
              <h1 class="text-2xl font-bold header-title">Opti Solar</h1>
         </div>
-
         <div class="flex-1 flex justify-end">
             <div class="flex gap-2 items-center">
                 <button type="button" id="main-help-button" class="icon-btn">
@@ -1195,6 +1184,7 @@
                     
                     setTimeout(() => {
                         dom.memorizeRingBtn.classList.remove('shockwave');
+                        // On ne réaffiche le texte qu'après un délai
                         setTimeout(() => {
                             dom.memorizeCheckmarkIcon.classList.add('hidden');
                             dom.memorizeBtnText.classList.remove('hidden');
@@ -1249,7 +1239,6 @@
                     const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
                     
                     const reportElement = document.createElement('div');
-                    // CORRIGÉ: Utilisation de state.last...Prod pour les données
                     const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
                     const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
                     

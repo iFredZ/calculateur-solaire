@@ -305,7 +305,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.0.4</p>
+        <p class="text-xs text-gray-600">v2.0.5</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -416,7 +416,8 @@
                     </div>
                 </div>
             </div>
-            <div class="items-center px-4 pt-3">
+            <div class="items-center px-4 pt-3 flex gap-4">
+                <button type="button" id="replay-tutorial-btn" class="px-4 py-2 btn-primary rounded-md w-full" data-i18n="replay_tutorial"></button>
                 <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
             </div>
         </div>
@@ -461,22 +462,22 @@
             
             <div class="flex-grow">
                 <div class="onboarding-slide">
-                    <img src="etape1_calibrage.png" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
+                    <img src="" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 1 : Calibrer</h3>
                     <p class="text-gray-400">Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.</p>
                 </div>
                 <div class="onboarding-slide hidden">
-                    <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
+                    <img src="" alt="Illustration activation" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 2 : Activer</h3>
                     <p class="text-gray-400">Appuyez sur le bouton "Utiliser Capteurs" pour démarrer la réception des données.</p>
                 </div>
                 <div class="onboarding-slide hidden">
-                    <img src="etape3_placement.png" alt="Illustration placement" class="mx-auto h-32 mb-4">
+                    <img src="" alt="Illustration placement" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 3 : Placer</h3>
                     <p class="text-gray-400">Maintenant, posez votre téléphone bien à plat sur votre panneau solaire.</p>
                 </div>
                 <div class="onboarding-slide hidden">
-                    <img src="etape4_memorisation.png" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
+                    <img src="" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 4 : Mémoriser</h3>
                     <p class="text-gray-400">Une fois les valeurs d'angle et d'orientation stables, appuyez sur "Mémoriser ces mesures" !</p>
                 </div>
@@ -559,6 +560,7 @@
                     clipping_solution_title: "La Solution",
                     clipping_solution_desc: "Cocher cette case augmente volontairement l'angle de vos panneaux. Cela réduit le pic de production à midi (évitant la saturation) et augmente la production le matin et le soir, pour un gain global sur la journée.",
                     got_it: "Compris",
+                    replay_tutorial: "Revoir le guide",
                     main_guide_title: "Guide d'Utilisation",
                     guide_step1_title: "Étape 1 : Localisation & Date",
                     guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
@@ -630,6 +632,7 @@
                     clipping_solution_title: "The Solution",
                     clipping_solution_desc: "Checking this box intentionally increases the panel angle. This slightly reduces the production peak at noon (avoiding saturation) and increases morning and evening production, for an overall daily gain.",
                     got_it: "Got it",
+                    replay_tutorial: "Replay Guide",
                     main_guide_title: "User Guide",
                     guide_step1_title: "Step 1: Location & Date",
                     guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
@@ -750,7 +753,8 @@
                 onboardingDots: document.querySelectorAll('.onboarding-dot'),
                 onboardingPrevBtn: document.getElementById('onboarding-prev-btn'),
                 onboardingNextBtn: document.getElementById('onboarding-next-btn'),
-                onboardingFinishBtn: document.getElementById('onboarding-finish-btn')
+                onboardingFinishBtn: document.getElementById('onboarding-finish-btn'),
+                replayTutorialBtn: document.getElementById('replay-tutorial-btn')
             };
 
             const utils = {
@@ -986,6 +990,10 @@
                             openModal.classList.add('hidden');
                         }
                     }
+                },
+                replayTutorial: () => {
+                    dom.mainHelpModal.classList.add('hidden');
+                    onboarding.start();
                 }
             };
 
@@ -1181,6 +1189,7 @@
                 dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
                 dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
                 dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
+                dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
 
 
                 // Langue

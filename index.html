@@ -1170,7 +1170,7 @@
                     dom.longitudeInput.value = state.currentLongitude;
                     ui.showPage('settings');
                 },
-                memorizeSensorValues: () => {
+                memorizeSensorValues: async () => {
                     const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
                     const az = state.panelAzimuthLive;
                     if (!Number.isFinite(tilt) || !Number.isFinite(az)) {
@@ -1180,9 +1180,9 @@
                     
                     try {
                         const { Haptics, ImpactStyle } = Capacitor.Plugins;
-                        Haptics.impact({ style: ImpactStyle.Medium });
+                        await Haptics.impact({ style: ImpactStyle.Medium });
                     } catch(e) {
-                         if (navigator.vibrate) navigator.vibrate(100);
+                         utils.log("Haptics not available", e);
                     }
                     
                     dom.memorizeRingBtn.classList.add('shockwave');

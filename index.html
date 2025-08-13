@@ -151,10 +151,6 @@
                             <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
                             <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
                         </div>
-                        <div>
-                             <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
-                             <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
-                        </div>
                     </div>
                 </div>
                 
@@ -203,6 +199,11 @@
                     <span data-i18n="calculate_gain"></span>
                     <svg class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                 </button>
+                
+                <div class="mt-6">
+                     <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
+                     <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
+                </div>
                 
                 <div id="seasonal-container" class="mt-6 hidden">
                     <h2 class="text-xl font-bold text-center mb-4" data-i18n="seasonal_settings"></h2>
@@ -292,7 +293,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.0.2</p>
+        <p class="text-xs text-gray-600">v2.0.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -476,6 +477,7 @@
                     orientation_helper: "EST (-) | SUD (0) | OUEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Angle Recommandé",
+                    waiting_for_sensor: "Orientez votre appareil...",
                     calculate_gain: "Estimez votre production",
                     seasonal_settings: "Réglages Saisonniers",
                     winter: "Hiver",
@@ -546,6 +548,7 @@
                     orientation_helper: "EAST (-) | SOUTH (0) | WEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Recommended Angle",
+                    waiting_for_sensor: "Point your device...",
                     calculate_gain: "Estimate your production",
                     seasonal_settings: "Seasonal Settings",
                     winter: "Winter",
@@ -732,6 +735,11 @@
                         dom.activateSensorsButton.classList.remove('btn-primary');
                         dom.manualEntryButton.classList.add('btn-secondary');
                         dom.manualEntryButton.classList.remove('btn-danger');
+                        
+                        dom.resultContainer.classList.remove('hidden');
+                        dom.resultDisplay.textContent = translations[i18n.currentLang].waiting_for_sensor;
+                        dom.seasonalContainer.classList.add('hidden');
+
                         sensors.start();
                     } else if (mode === 'manual') {
                         if(state.sensorsActive) sensors.stop();
@@ -766,7 +774,9 @@
                     }
 
                     if (!dateValue || isNaN(lat) || isNaN(panelAzimuthDeviation)) {
-                        dom.resultContainer.classList.add('hidden');
+                        if (state.entryMode !== 'sensors') {
+                           dom.resultContainer.classList.add('hidden');
+                        }
                         dom.seasonalContainer.classList.add('hidden');
                         return;
                     }
@@ -962,8 +972,6 @@
                 },
                 getProductionEstimate: async () => { 
                     dom.pvgisError.textContent = ''; 
-                    dom.calculateText.classList.remove('hidden'); 
-                    dom.calculateLoader.classList.add('hidden'); 
                     dom.productionResults.classList.add('hidden');
                     dom.donationMessage.classList.add('hidden');
                     

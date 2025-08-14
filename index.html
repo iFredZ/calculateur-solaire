@@ -458,7 +458,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.3</p>
+        <p class="text-xs text-gray-600">v2.6.4</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -561,7 +561,6 @@
                     <div>
                         <h4 class="font-bold text-lg" data-i18n="guide_step2_title"></h4>
                         <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step2_desc_sensors"></p>
-                        <p class="text-sm text-gray-400" data-i18n="guide_step2_desc_manual"></p>
                     </div>
                 </div>
                 <div class="flex items-start space-x-4">
@@ -636,12 +635,12 @@
                 <div class="onboarding-slide hidden">
                     <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 2 : Activer</h3>
-                    <p class="text-gray-400">Appuyez sur le bouton "Utiliser Capteurs" pour démarrer la réception des données.</p>
+                    <p class="text-gray-400">Appuyez sur "Utiliser Capteurs" pour démarrer la réception des données.</p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape3_placement.png" alt="Illustration placement" class="mx-auto h-32 mb-4">
                     <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 3 : Placer</h3>
-                    <p class="text-gray-400">Maintenant, posez votre téléphone bien à plat sur votre panneau solaire.</p>
+                    <p class="text-gray-400">Maintenant, posez votre téléphone (sans coque magnétique) bien à plat sur votre panneau solaire.</p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape4_memorisation.png" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
@@ -741,7 +740,7 @@
                     guide_step1_title: "Étape 1 : Localisation & Date",
                     guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
                     guide_step2_title: "Étape 2 : Choix du Mode",
-                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.",
+                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong class='text-yellow-400'>Attention : retirez toute coque magnétique pour éviter de fausser la mesure d'orientation.</strong>",
                     guide_step2_desc_manual: "<strong class='text-gray-200'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation de votre installation.",
                     guide_step3_title: "Étape 3 : Lecture du Résultat",
                     guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel. Les réglages saisonniers apparaissent également pour information.",
@@ -766,6 +765,8 @@
                     export_error_no_data: "Faites\ d’abord\ un\ calcul\ de\ production\.",
                     pdf_explanation_title: "Explication des estimations",
                     pdf_explanation_text: "La 'Production Optimale' compare votre inclinaison actuelle à la meilleure inclinaison possible pour VOTRE orientation. La 'Production Idéale' est une valeur de référence qui montre le potentiel si votre installation était parfaitement orientée plein Sud avec une inclinaison optimale.",
+                    pdf_disclaimer_title: "Avertissement Important Concernant la Précision",
+                    pdf_disclaimer_text: "Les données de production et les mesures d'inclinaison/orientation fournies dans ce rapport sont des estimations. La précision des capteurs (boussole, accéléromètre) peut varier d'un téléphone à l'autre. De plus, la présence d'objets métalliques, et plus particulièrement l'utilisation de <strong>coques ou supports magnétiques</strong> pour téléphone, peut entraîner des erreurs d'orientation significatives. Il est fortement recommandé de retirer toute coque magnétique avant la mesure et de corroborer ces données avec des outils professionnels. Les créateurs de cette application ne sauraient être tenus responsables des écarts entre les estimations et la production réelle.",
                     sensors_activating: "Activation des capteurs...",
                     invalid_measurements: "Mesures invalides."
                 },
@@ -829,7 +830,7 @@
                     guide_step1_title: "Step 1: Location & Date",
                     guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
                     guide_step2_title: "Step 2: Choose Mode",
-                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.",
+                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case to avoid incorrect orientation readings.</strong>",
                     guide_step2_desc_manual: "<strong class='text-gray-200'>Manual:</strong> For a simulation, enter your installation's tilt and orientation.",
                     guide_step3_title: "Step 3: Read the Result",
                     guide_step3_desc: "The recommended angle appears and adjusts in real-time. Seasonal settings are also shown for reference.",
@@ -854,6 +855,8 @@
                     export_error_no_data: "Please\ run\ a\ production\ estimate\ first\.",
                     pdf_explanation_title: "About the Estimates",
                     pdf_explanation_text: "The 'Optimal Production' compares your current tilt to the best possible tilt for YOUR orientation. The 'Ideal Production' is a reference value showing the potential if your installation were perfectly South-facing with an optimal tilt.",
+                    pdf_disclaimer_title: "Important Disclaimer Regarding Accuracy",
+                    pdf_disclaimer_text: "The production data and tilt/orientation measurements in this report are estimates. Sensor accuracy (compass, accelerometer) can vary significantly between phone models. Furthermore, the presence of nearby metallic objects, and especially the use of <strong>magnetic cases or mounts</strong>, can cause significant orientation errors. It is strongly recommended to remove any magnetic case before measuring and to corroborate this data with professional measurement tools for any critical installation. The creators of this application cannot be held responsible for discrepancies between the estimates and actual production.",
                     sensors_activating: "Activating sensors...",
                     invalid_measurements: "Invalid measurements."
                 }
@@ -1334,6 +1337,11 @@
                             <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
                                 <h3 style="color: #1d4ed8; margin-top: 0;">${translations[i18n.currentLang].pdf_explanation_title}</h3>
                                 <p>${translations[i18n.currentLang].pdf_explanation_text}</p>
+                            </div>
+
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
+                                <h4 style="color: #333; margin-top: 0; font-size: 12px;">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
+                                <p>${translations[i18n.currentLang].pdf_disclaimer_text}</p>
                             </div>
                         </div>
                     `;

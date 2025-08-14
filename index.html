@@ -243,7 +243,7 @@
             50% { box-shadow: 0 0 20px rgba(65, 209, 183, 0.5), 0 0 40px rgba(65, 209, 183, 0.5); }
         }
 
-        /* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v3.1.0) ====== */
+        /* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v3.1.1) ====== */
         
         /* ---------- Style A : Classique HD ---------- */
         .btn-style-default {
@@ -335,7 +335,8 @@
         }
         @keyframes radarSpin { to { transform: rotate(360deg); } }
 
-        #settings-modal {
+        /* Correction de la superposition des modales v3.1.1 */
+        #settings-modal, #clipping-help-modal, #main-help-modal, #settings-help-modal, #onboarding-modal {
             z-index: 100;
         }
     </style>
@@ -555,7 +556,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v3.1.0</p>
+        <p class="text-xs text-gray-600">v3.1.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -1877,7 +1878,7 @@
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
                 calculations.calculateAndDisplayAll();
-                utils.log('Application initialisée v3.1.0.');
+                utils.log('Application initialisée v3.1.1.');
             }
             
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };

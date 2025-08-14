@@ -271,9 +271,18 @@
             0%, 100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.3; }
             50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
+        
+        /* Styles harmonisés pour les anneaux - v3.0.2 */
+        #stabilization-ring-container.ring-style-neon .ring { border-color: rgba(65, 209, 183, 0.4); }
+        #stabilization-ring-container.ring-style-neon.stable .ring { border-color: var(--accent); }
 
+        #stabilization-ring-container.ring-style-glass .ring { border-color: rgba(255, 255, 255, 0.15); }
+        #stabilization-ring-container.ring-style-glass.stable .ring { border-color: rgba(65, 209, 183, 0.7); }
+
+        #stabilization-ring-container.ring-style-radar .ring { border-color: rgba(16, 185, 129, 0.5); }
+        #stabilization-ring-container.ring-style-radar.stable .ring { border-color: rgba(16, 185, 129, 0.9); }
     
-/* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v3.0.1) ====== */
+/* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v3.0.2) ====== */
 #memorize-ring-btn.btn-style-neon {
   background: radial-gradient(100px 100px at 50% 50%, rgba(65,209,183,.15), rgba(65,209,183,0) 70%),
               linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.2));
@@ -606,7 +615,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v3.0.1</p>
+        <p class="text-xs text-gray-600">v3.0.2</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -1851,15 +1860,29 @@
 
                 const BTN_STYLE_KEY = 'memorizeBtnStyle';
                 const applyMemorizeBtnStyle = (style) => {
-                    const el = dom.memorizeRingBtn;
-                    if (!el) return;
-                    el.classList.remove('btn-style-default', 'btn-style-neon', 'btn-style-glass', 'btn-style-radar');
+                    const btnEl = dom.memorizeRingBtn;
+                    const ringContainerEl = dom.stabilizationRingContainer;
+                    if (!btnEl || !ringContainerEl) return;
+                    
+                    btnEl.classList.remove('btn-style-default', 'btn-style-neon', 'btn-style-glass', 'btn-style-radar');
+                    ringContainerEl.classList.remove('ring-style-neon', 'ring-style-glass', 'ring-style-radar');
                     
                     switch (style) {
-                        case 'neon':  el.classList.add('btn-style-neon'); break;
-                        case 'glass': el.classList.add('btn-style-glass'); break;
-                        case 'radar': el.classList.add('btn-style-radar'); break;
-                        default:      el.classList.add('btn-style-default'); break;
+                        case 'neon':
+                            btnEl.classList.add('btn-style-neon');
+                            ringContainerEl.classList.add('ring-style-neon');
+                            break;
+                        case 'glass':
+                            btnEl.classList.add('btn-style-glass');
+                            ringContainerEl.classList.add('ring-style-glass');
+                            break;
+                        case 'radar':
+                            btnEl.classList.add('btn-style-radar');
+                            ringContainerEl.classList.add('ring-style-radar');
+                            break;
+                        default:
+                            btnEl.classList.add('btn-style-default');
+                            break;
                     }
                 };
                 const styleRadios = document.querySelectorAll('input.memorize-style-radio[name="memorize-style"]');
@@ -1929,7 +1952,7 @@
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
                 calculations.calculateAndDisplayAll();
-                utils.log('Application initialisée v3.0.1.');
+                utils.log('Application initialisée v3.0.2.');
             }
             
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };

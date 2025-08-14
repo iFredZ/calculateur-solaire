@@ -453,7 +453,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.1</p>
+        <p class="text-xs text-gray-600">v2.6.2</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -677,7 +677,11 @@
             
             const translations = {
                 fr: {
-                    activate_sensors: "Utiliser Capteurs",
+                    
+                    
+                    
+                    
+                    geoloc_error: "Erreur géoloc.",geoloc_not_supported: "Géolocalisation non supportée.",location_unavailable: "Impossible d’obtenir la position.",location_getting: "Obtention de la position...",activate_sensors: "Utiliser Capteurs",
                     stop_sensors: "Arrêter Capteurs",
                     manual_entry: "Saisie Manuelle",
                     location: "Localisation",
@@ -758,7 +762,11 @@
                     invalid_measurements: "Mesures invalides."
                 },
                 en: {
-                    activate_sensors: "Use Sensors",
+                    
+                    
+                    
+                    
+                    geoloc_error: "Geolocation error.",geoloc_not_supported: "Geolocation not supported.",location_unavailable: "Unable to get location.",location_getting: "Getting location...",activate_sensors: "Use Sensors",
                     stop_sensors: "Stop Sensors",
                     manual_entry: "Manual Input",
                     location: "Location",
@@ -1388,7 +1396,7 @@
                             controller.abort();
                             reject(new Error('Fetch timeout'));
                         }, timeout);
-                        fetch(resource, { ...options, signal: controller.signal })
+                        fetch(resource, { .....options, signal: controller.signal })
                           .then(response => {
                             clearTimeout(id);
                             resolve(response);

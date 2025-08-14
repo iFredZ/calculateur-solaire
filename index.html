@@ -754,7 +754,6 @@
                     export_pdf: "Exporter en PDF",
                     exporting_pdf: "Génération...",
                     sensors_activating: "Activation des capteurs...",
-                    export_error_no_data: "Faites d’abord un calcul de production.",
                     invalid_measurements: "Mesures invalides."
                 },
                 en: {
@@ -835,7 +834,6 @@
                     export_pdf: "Export to PDF",
                     exporting_pdf: "Generating...",
                     sensors_activating: "Activating sensors...",
-                    export_error_no_data: "Please run a production estimate first.",
                     invalid_measurements: "Invalid measurements."
                 }
             };
@@ -1046,7 +1044,8 @@
                     const dayOfYear = utils.getDayOfYear(selectedDate);
                     const declination = utils.getDeclination(dayOfYear);
                     
-                    const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
+                    const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
+                    const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
                     
                     const dev = Math.abs(panelAzimuthDeviation);
                     const penalty = Math.min(6, dev / 12);
@@ -1062,9 +1061,10 @@
                     dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
 
                     const f = Math.round((Math.abs(declination) / 23.44) * 15);
-                    dom.winterAngleDisplay.textContent = `${Math.round(lat + f - penalty)}°`;
-                    dom.springFallAngleDisplay.textContent = `${Math.round(lat - penalty)}°`;
-                    dom.summerAngleDisplay.textContent = `${Math.round(lat - f + clipping - penalty)}°`;
+                    const absLat = Math.abs(lat);
+                    dom.winterAngleDisplay.textContent = `${Math.round(utils.clamp(absLat + f - penalty, 0, 90))}°`;
+                    dom.springFallAngleDisplay.textContent = `${Math.round(utils.clamp(absLat - penalty, 0, 90))}°`;
+                    dom.summerAngleDisplay.textContent = `${Math.round(utils.clamp(absLat - f + clipping - penalty, 0, 90))}°`;
                 }
             };
 
@@ -1421,6 +1421,7 @@
                         }
                     ];
 
+
                     for (let i = 0; i < strategies.length; i++) {
                         try {
                             utils.log(`Attempting PVGIS fetch with strategy #${i + 1}`);
@@ -1468,12 +1469,14 @@
                         const dayOfYear = utils.getDayOfYear(selectedDate);
                         const declination = utils.getDeclination(dayOfYear);
                         
-                        const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
+                        const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
+                    const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
                         const dev = Math.abs(currentAzimuth);
                         const penalty = Math.min(6, dev / 12);
                         
                         let trueOptimalTilt = 90 - (90 - Math.abs(lat - declination));
-                        const finalOptimalTilt = Math.round(trueOptimalTilt + clipping - penalty);
+                        let finalOptimalTilt = Math.round(trueOptimalTilt + clipping - penalty);
+                        finalOptimalTilt = utils.clamp(finalOptimalTilt, 0, 90);
 
                         const [currentProd, optimalProd] = await Promise.all([ 
                             api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 

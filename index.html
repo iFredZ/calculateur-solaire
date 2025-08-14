@@ -211,6 +211,7 @@
         .light-mode #production-results .text-green-300 { color: #065f46; }
         .light-mode #production-results .text-blue-300 { color: #1e40af; }
         .light-mode #production-results .font-bold { color: var(--fg); }
+        .light-mode #production-results .text-amber-300 { color: #b45309; }
         
         #memorize-ring-btn {
             width: 110px;
@@ -424,6 +425,10 @@
                         <p class="text-sm text-blue-300" data-i18n="monthly_gain"></p>
                         <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
                     </div>
+                    <div class="info-box p-4 rounded-lg text-center border border-amber-500/50">
+                        <p class="text-sm text-amber-300" data-i18n="prod_truly_optimal_settings"></p>
+                        <p id="truly-optimal-production" class="text-2xl font-bold text-amber-300">-- kWh</p>
+                    </div>
                 </div>
                 
                 <div id="export-container" class="mt-6 text-center hidden">
@@ -453,7 +458,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.2</p>
+        <p class="text-xs text-gray-600">v2.6.3</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -718,9 +723,10 @@
                     current_azimuth: "Orientation actuelle (Déviation / Sud)",
                     azimuth_placeholder: "ex: -10 (10° Est)",
                     calculate_gain_long: "Calculer le gain potentiel",
-                    prod_current_settings: "Production estimée (réglage actuel)",
-                    prod_optimal_settings: "Production estimée (réglage optimal)",
-                    daily_gain: "Gain potentiel journalier",
+                    prod_current_settings: "Production (votre inclinaison actuelle)",
+                    prod_optimal_settings: "Production (inclinaison optimale pour VOTRE orientation)",
+                    prod_truly_optimal_settings: "Production IDÉALE (si orienté plein Sud)",
+                    daily_gain: "Gain potentiel journalier (en ajustant l'inclinaison)",
                     monthly_gain: "Gain potentiel mensuel",
                     settings_title: "Réglages",
                     clipping_label: "Optimiser pour l'écrêtage",
@@ -758,6 +764,8 @@
                     export_pdf: "Exporter en PDF",
                     exporting_pdf: "Génération...",
                     export_error_no_data: "Faites\ d’abord\ un\ calcul\ de\ production\.",
+                    pdf_explanation_title: "Explication des estimations",
+                    pdf_explanation_text: "La 'Production Optimale' compare votre inclinaison actuelle à la meilleure inclinaison possible pour VOTRE orientation. La 'Production Idéale' est une valeur de référence qui montre le potentiel si votre installation était parfaitement orientée plein Sud avec une inclinaison optimale.",
                     sensors_activating: "Activation des capteurs...",
                     invalid_measurements: "Mesures invalides."
                 },
@@ -803,9 +811,10 @@
                     current_azimuth: "Current Azimuth (Deviation / South)",
                     azimuth_placeholder: "e.g. -10 (10° East)",
                     calculate_gain_long: "Calculate potential gain",
-                    prod_current_settings: "Estimated production (current settings)",
-                    prod_optimal_settings: "Estimated production (optimal settings)",
-                    daily_gain: "Potential Daily Gain",
+                    prod_current_settings: "Production (your current tilt)",
+                    prod_optimal_settings: "Production (optimal tilt for YOUR orientation)",
+                    prod_truly_optimal_settings: "IDEAL Production (if South-facing)",
+                    daily_gain: "Potential Daily Gain (by adjusting tilt only)",
                     monthly_gain: "Potential Monthly Gain",
                     settings_title: "Settings",
                     clipping_label: "Optimize for clipping",
@@ -843,6 +852,8 @@
                     export_pdf: "Export to PDF",
                     exporting_pdf: "Generating...",
                     export_error_no_data: "Please\ run\ a\ production\ estimate\ first\.",
+                    pdf_explanation_title: "About the Estimates",
+                    pdf_explanation_text: "The 'Optimal Production' compares your current tilt to the best possible tilt for YOUR orientation. The 'Ideal Production' is a reference value showing the potential if your installation were perfectly South-facing with an optimal tilt.",
                     sensors_activating: "Activating sensors...",
                     invalid_measurements: "Invalid measurements."
                 }
@@ -886,7 +897,8 @@
                 panelAzimuthLive: null,
                 tiltOffset: 0,
                 lastCurrentProd: null,
-                lastOptimalProd: null
+                lastOptimalProd: null,
+                lastTrulyOptimalProd: null
             };
 
             const dom = {
@@ -930,6 +942,7 @@
                 exportPdfBtn: document.getElementById('export-pdf-btn'),
                 currentProductionDisplay: document.getElementById('current-production'),
                 optimalProductionDisplay: document.getElementById('optimal-production'),
+                trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
                 potentialGainDisplay: document.getElementById('potential-gain'),
                 potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
                 pvgisError: document.getElementById('pvgis-error'),
@@ -1262,7 +1275,8 @@
                     const reportElement = document.createElement('div');
                     const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
                     const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
-                    
+                    const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
+
                     reportElement.innerHTML = `
                         <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
                             <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
@@ -1275,7 +1289,7 @@
                                 <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
                             </table>
                             
-                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Annuelle Estimée</h2>
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Estimée</h2>
                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
                                 <thead>
                                     <tr style="background-color: #1d4ed8; color: white; text-align: left;">
@@ -1295,20 +1309,32 @@
                                         <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px; border: 1px solid #ddd;">Optimale</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
-                                        <td style="padding: 8px; border: 1px solid #ddd;">0° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${dom.optimalProductionDisplay.textContent}</td>
                                         <td style="padding: 8px; border: 1px solid #ddd;">${optMonthlyProd} kWh</td>
+                                    </tr>
+                                     <tr style="background-color: #f1f5f9;">
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${dom.trulyOptimalProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptMonthlyProd} kWh</td>
                                     </tr>
                                 </tbody>
                             </table>
 
                              <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
                              <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
-                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Gain Mensuel</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].daily_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
                             </table>
+
+                            <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
+                                <h3 style="color: #1d4ed8; margin-top: 0;">${translations[i18n.currentLang].pdf_explanation_title}</h3>
+                                <p>${translations[i18n.currentLang].pdf_explanation_text}</p>
+                            </div>
                         </div>
                     `;
 
@@ -1480,7 +1506,7 @@
                         const declination = utils.getDeclination(dayOfYear);
                         
                         const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
-                    const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+                        const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
                         const dev = Math.abs(currentAzimuth);
                         const penalty = Math.min(6, dev / 12);
                         
@@ -1488,16 +1514,19 @@
                         let finalOptimalTilt = Math.round(trueOptimalTilt + clipping - penalty);
                         finalOptimalTilt = utils.clamp(finalOptimalTilt, 0, 90);
 
-                        const [currentProd, optimalProd] = await Promise.all([ 
+                        const [currentProd, optimalProd, trulyOptimalProd] = await Promise.all([ 
                             api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
+                            api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, currentAzimuth),
                             api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
                         ]);
 
                         state.lastCurrentProd = currentProd;
                         state.lastOptimalProd = optimalProd;
+                        state.lastTrulyOptimalProd = trulyOptimalProd;
 
                         let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
                         let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
+                        let trulyOptDaily = Number(trulyOptimalProd.outputs.totals.fixed.E_d) || 0;
                         let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
                         let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
 
@@ -1511,6 +1540,8 @@
 
                         dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
                         dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
+                        dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyOptDaily)} kWh`;
+
                         const gainDaily = optDaily - curDaily; 
                         dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
                         const gainMonthly = optMonthly - curMonthly; 

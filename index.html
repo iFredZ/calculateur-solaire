@@ -245,20 +245,29 @@
             100% { transform: scale(1); box-shadow: 0 0 0 40px rgba(65, 209, 183, 0); }
         }
 
-        #stabilization-ring {
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid var(--btn-secondary-bg);
             transition: all 0.3s ease-in-out;
-            border: 3px solid var(--btn-secondary-bg);
-            animation: pulse-animation 2s infinite;
+            animation: pulse-ring 2s ease-in-out infinite;
         }
-        #stabilization-ring.stable {
+        .ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+        .ring:nth-child(2) { width: 120%; height: 120%; animation-delay: 0.3s; }
+        .ring:nth-child(3) { width: 140%; height: 140%; animation-delay: 0.6s; }
+
+        #stabilization-ring-container.stable .ring {
             border-color: var(--accent);
             animation: none;
-            transform: scale(1.05);
+            opacity: 1;
         }
-        @keyframes pulse-animation {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
+        
+        @keyframes pulse-ring {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
 
     </style>
@@ -345,8 +354,12 @@
                     </div>
                     
                     <div id="memorize-container" class="hidden flex-col items-center justify-center pt-4 space-y-2">
-                        <div class="relative w-[120px] h-[120px] flex items-center justify-center">
-                            <div id="stabilization-ring" class="absolute top-0 left-0 w-full h-full rounded-full z-0"></div>
+                        <div class="relative w-[140px] h-[140px] flex items-center justify-center">
+                            <div id="stabilization-ring-container" class="absolute top-0 left-0 w-full h-full">
+                                <div class="ring"></div>
+                                <div class="ring"></div>
+                                <div class="ring"></div>
+                            </div>
                             <button type="button" id="memorize-ring-btn" disabled>
                                 <span id="memorize-btn-text" class="font-bold text-lg" data-i18n="memorize_action"></span>
                                 <svg id="memorize-checkmark-icon" class="h-10 w-10 text-teal-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -354,7 +367,7 @@
                                 </svg>
                            </button>
                         </div>
-                       <p class="text-xs text-gray-400" data-i18n="memorize_action_info"></p>
+                       <p class="text-xs text-gray-400 mt-6" data-i18n="memorize_action_info"></p>
                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                     </div>
                 </div>
@@ -480,7 +493,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.5</p>
+        <p class="text-xs text-gray-600">v2.6.6</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -942,7 +955,7 @@
                 manualEntryButton: document.getElementById('manual-entry-button'),
                 sensorsReadout: document.getElementById('sensors-readout'),
                 memorizeContainer: document.getElementById('memorize-container'),
-                stabilizationRing: document.getElementById('stabilization-ring'),
+                stabilizationRingContainer: document.getElementById('stabilization-ring-container'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
                 memorizeRingBtn: document.getElementById('memorize-ring-btn'),
@@ -1135,7 +1148,7 @@
                 setStable: (isStable) => {
                     if (state.isStable === isStable) return;
                     state.isStable = isStable;
-                    dom.stabilizationRing.classList.toggle('stable', isStable);
+                    dom.stabilizationRingContainer.classList.toggle('stable', isStable);
                     dom.memorizeRingBtn.disabled = !isStable;
                 },
                 getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta - state.tiltOffset)), 0, 90),
@@ -1170,6 +1183,7 @@
                     }
                     
                     if(tilt !== null && heading !== null){
+                         dom.sensorError.textContent = '';
                          sensors.setStable(sensors.checkStability({tilt, heading}));
                     }
                     

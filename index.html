@@ -106,6 +106,9 @@
             height: 24px;
             animation: spin 2s linear infinite;
         }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         .lang-btn {
             background-color: var(--card);
             color: var(--muted);
@@ -713,12 +716,9 @@
                     waiting_for_sensor: "Orientez votre appareil…",
                     calculate_gain: "Estimez votre production",
                     seasonal_settings: "Réglages Saisonniers",
-                    winter: "Hiver",
-                    winter_date: "~21 Déc.",
-                    mid_season: "Mi-saison",
-                    mid_season_date: "~20 Mars & ~22 Sep.",
-                    summer: "Été",
-                    summer_date: "~21 Juin",
+                    winter: "Hiver", winter_date: "~21 Déc.",
+                    mid_season: "Mi-saison", mid_season_date: "~20 Mars & ~22 Sep.",
+                    summer: "Été", summer_date: "~21 Juin",
                     estimation_title: "Estimation de Production",
                     peak_power: "Puissance crête (kWc)",
                     longitude: "Longitude",
@@ -806,20 +806,17 @@
                 memorizedAzimuthValue: null,
                 memorizedLongitude: null,
                 lastSensorTs: 0,
-                stabilityBuf: [] // last N tilt values
+                stabilityBuf: []
             };
 
             const dom = {
-                // pages
                 mainPage: document.getElementById('main-page'),
                 settingsPage: document.getElementById('settings-page'),
-                // inputs
                 latitudeInput: document.getElementById('latitude-input'),
                 dateInput: document.getElementById('date-input'),
                 getLocationButton: document.getElementById('get-location'),
                 locationSubtitle: document.getElementById('location-subtitle'),
                 locationError: document.getElementById('location-error'),
-                // sensors
                 activateSensorsButton: document.getElementById('activate-sensors-button'),
                 manualEntryButton: document.getElementById('manual-entry-button'),
                 sensorsDisplay: document.getElementById('sensors-display'),
@@ -828,11 +825,9 @@
                 memorizeRing: document.getElementById('memorize-ring'),
                 memorizeRingLabel: document.getElementById('memorize-ring-label'),
                 sensorError: document.getElementById('sensor-error'),
-                // manual
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
                 manualTiltInput: document.getElementById('manual-tilt-input'),
                 manualAzimuthInput: document.getElementById('manual-azimuth-input'),
-                // results
                 resultContainer: document.getElementById('result-container'),
                 resultDisplay: document.getElementById('result'),
                 seasonalContainer: document.getElementById('seasonal-container'),
@@ -840,7 +835,6 @@
                 springFallAngleDisplay: document.getElementById('spring-fall-angle'),
                 summerAngleDisplay: document.getElementById('summer-angle'),
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
-                // settings page
                 backButton: document.getElementById('back-button'),
                 peakPowerInput: document.getElementById('peak-power'),
                 longitudeInput: document.getElementById('longitude-input'),
@@ -856,7 +850,6 @@
                 calculateText: document.getElementById('calculate-text'),
                 calculateLoader: document.getElementById('calculate-loader'),
                 exportPdfBtn: document.getElementById('export-pdf-btn'),
-                // footer buttons
                 bugReportButton: document.getElementById('bug-report-button'),
                 donateButtonFab: document.getElementById('donate-button-fab')
             };
@@ -871,7 +864,7 @@
                 },
                 safeParseFloat:(v,fb=NaN)=>{ if(v==null||v==='') return fb; const s=String(v).replace(',','.').trim(); const n=parseFloat(s); return Number.isFinite(n)?n:fb;},
                 getDayOfYear:(d)=>Math.floor((d - new Date(d.getFullYear(),0,0))/86400000),
-                getDeclination:(N)=> -23.44 * Math.cos(utils.toRad((360/365)*(N+10))) // simple & robust
+                getDeclination:(N)=> -23.44 * Math.cos(utils.toRad((360/365)*(N+10)))
             };
 
             const ui = {
@@ -1124,6 +1117,6 @@
 
             window.addEventListener('load', init);
         })();
-  </script>
+    </script>
 </body>
 </html>

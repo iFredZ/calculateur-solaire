@@ -19,7 +19,6 @@
             --fg: #e9f0ff;
             --accent: #41d1b7;
             --accent-blue: #437eff;
-            --ok: #31d087;
             --warn: #ffcc00;
             --bad: #ff6b6b;
             --btn-secondary-bg: #2a3957;
@@ -68,7 +67,7 @@
             color: #00110e;
         }
         .btn-primary:hover {
-            filter: brightness(1.05);
+            background-color: #52d9c3;
         }
         .btn-secondary {
             background-color: var(--btn-secondary-bg);
@@ -78,7 +77,7 @@
              color: #1f2937;
         }
         .btn-secondary:hover {
-            filter: brightness(1.1);
+            background-color: #3a4a6a;
         }
         .light-mode .btn-secondary:hover {
             background-color: #d1d5db;
@@ -88,7 +87,7 @@
              color: #fff;
         }
         .btn-danger:hover {
-            filter: brightness(1.05);
+            background-color: #ff8a8a;
         }
         input, .bg-input {
             background-color: var(--input-bg);
@@ -107,7 +106,8 @@
             animation: spin 2s linear infinite;
         }
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .lang-btn {
             background-color: var(--card);
@@ -212,48 +212,34 @@
         .light-mode #production-results .text-blue-300 { color: #1e40af; }
         .light-mode #production-results .font-bold { color: var(--fg); }
         
-        #memorize-ring {
-            width: 120px;
-            height: 120px;
-            border-radius: 9999px;
-            border: 6px solid #375070;
-            position: relative;
+        #memorize-ring-btn {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background-color: var(--btn-secondary-bg);
+            border: 2px solid var(--border-color);
+            color: var(--fg);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: border-color 0.3s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        #memorize-ring.ok {
-            border-color: var(--ok);
+        #memorize-ring-btn:not(:disabled):active {
+            transform: scale(0.95);
         }
-        #memorize-ring::after {
-            content: "";
-            position: absolute;
-            inset: -6px;
-            border-radius: 9999px;
-            border: 6px solid transparent;
-            border-top-color: var(--accent);
-            animation: spin 1.2s linear infinite;
-            opacity: .25;
-            transition: opacity 0.3s;
+        #memorize-ring-btn:disabled {
+            background-color: transparent;
+            border-color: var(--muted);
+            opacity: 0.5;
+            box-shadow: none;
         }
-        #memorize-ring.paused::after {
-            animation-play-state: paused;
-            opacity: .12;
+        #memorize-ring-btn.shockwave {
+            animation: shockwave-animation 0.7s ease-out;
         }
-        .shockwave {
-            position: absolute;
-            inset: 0;
-            border-radius: 9999px;
-            border: 2px solid var(--accent);
-            opacity: 0;
-        }
-        .shockwave.run {
-            animation: wave .6s ease-out;
-        }
-        @keyframes wave {
-            0% { transform: scale(1); opacity: .6; }
-            100% { transform: scale(1.6); opacity: 0; }
+        @keyframes shockwave-animation {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(65, 209, 183, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 0 40px rgba(65, 209, 183, 0); }
         }
     </style>
 </head>
@@ -298,7 +284,7 @@
                             <div class="flex items-center gap-2">
                                 <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude" data-i18n-placeholder="latitude_placeholder">
                                 <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
-                                     <svg class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                                 </button>
                             </div>
                             <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
@@ -324,15 +310,16 @@
                                 <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
                             </div>
                         </div>
-                        <div class="flex flex-col items-center gap-3 pt-4">
-                            <div class="relative">
-                                <div id="memorize-ring" class="ring paused">
-                                    <div class="shockwave" id="ring-wave"></div>
-                                    <span id="memorize-ring-label" class="text-sm text-center text-gray-300 px-2" data-i18n="memorize_action_info"></span>
-                                </div>
-                            </div>
+                        <div class="flex flex-col items-center justify-center pt-4 space-y-2">
+                           <button type="button" id="memorize-ring-btn" disabled>
+                                <span id="memorize-btn-text" class="font-bold text-lg" data-i18n="memorize_action"></span>
+                                <svg id="memorize-checkmark-icon" class="h-10 w-10 text-teal-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                           </button>
+                           <p class="text-xs text-gray-400" data-i18n="memorize_action_info"></p>
                         </div>
-                        <p id="sensor-error" class="text-xs text-red-400 h-4 text-center"></p>
+                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                     </div>
 
                     <div id="manual-entry-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
@@ -466,7 +453,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.0</p>
+        <p class="text-xs text-gray-600">v2.5.1</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -699,7 +686,7 @@
                     current_angle: "Angle Actuel",
                     orientation: "Orientation",
                     memorize_action: "Mémoriser",
-                    memorize_action_info: "Quand l'anneau est vert, appuyez",
+                    memorize_action_info: "Quand les valeurs sont stables",
                     memorized: "Mémorisé !",
                     calibrate_tilt: "Calibrer à plat",
                     calibrate_tilt_success: "Calibration effectuée !",
@@ -710,7 +697,7 @@
                     orientation_helper: "EST (-) | SUD (0) | OUEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Angle Recommandé",
-                    waiting_for_sensor: "Orientez votre appareil…",
+                    waiting_for_sensor: "Orientez votre appareil...",
                     calculate_gain: "Estimez votre production",
                     seasonal_settings: "Réglages Saisonniers",
                     winter: "Hiver",
@@ -767,6 +754,7 @@
                     export_pdf: "Exporter en PDF",
                     exporting_pdf: "Génération...",
                     sensors_activating: "Activation des capteurs...",
+                    export_error_no_data: "Faites d’abord un calcul de production.",
                     invalid_measurements: "Mesures invalides."
                 },
                 en: {
@@ -790,7 +778,7 @@
                     orientation_helper: "EAST (-) | SOUTH (0) | WEST (+)",
                     orientation_placeholder: "0",
                     recommended_angle: "Recommended Angle",
-                    waiting_for_sensor: "Point your device…",
+                    waiting_for_sensor: "Point your device...",
                     calculate_gain: "Estimate your production",
                     seasonal_settings: "Seasonal Settings",
                     winter: "Winter",
@@ -847,6 +835,7 @@
                     export_pdf: "Export to PDF",
                     exporting_pdf: "Generating...",
                     sensors_activating: "Activating sensors...",
+                    export_error_no_data: "Please run a production estimate first.",
                     invalid_measurements: "Invalid measurements."
                 }
             };
@@ -889,8 +878,7 @@
                 panelAzimuthLive: null,
                 tiltOffset: 0,
                 lastCurrentProd: null,
-                lastOptimalProd: null,
-                stabilityBuf: []
+                lastOptimalProd: null
             };
 
             const dom = {
@@ -906,8 +894,9 @@
                 sensorsDisplay: document.getElementById('sensors-display'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
-                memorizeRing: document.getElementById('memorize-ring'),
-                memorizeRingLabel: document.getElementById('memorize-ring-label'),
+                memorizeRingBtn: document.getElementById('memorize-ring-btn'),
+                memorizeBtnText: document.getElementById('memorize-btn-text'),
+                memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
                 calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
                 sensorError: document.getElementById('sensor-error'),
                 manualEntryDisplay: document.getElementById('manual-entry-display'),
@@ -977,29 +966,14 @@
                 normalizeAngle: (a) => (a % 360 + 360) % 360
             };
 
-            async function vibrateFeedback(ms = 80) {
-                try {
-                    const H = window.Capacitor?.Plugins?.Haptics;
-                    if (H && typeof H.impact === 'function') {
-                        await H.impact({ style: 'Medium' });
-                        return true;
-                    }
-                } catch (_) {}
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(ms);
-                    return true;
-                }
-                return false;
-            }
-
             const ui = {
-                showPage(page) {
+                showPage: (page) => {
                     dom.mainPage.classList.toggle('hidden', page !== 'main');
                     dom.settingsPage.classList.toggle('hidden', page !== 'settings');
                     dom.mainHelpButton.classList.toggle('hidden', page !== 'main');
                     dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
                 },
-                updateLocationFields(lat, lon) {
+                updateLocationFields: (lat, lon) => {
                     dom.latitudeInput.value = lat;
                     state.currentLongitude = lon;
                     dom.longitudeInput.value = lon;
@@ -1008,7 +982,7 @@
                     try { localStorage.setItem('userLocation', JSON.stringify({lat, lon})); } catch(e) {}
                     calculations.calculateAndDisplayAll();
                 },
-                setEntryMode(mode) {
+                setEntryMode: (mode) => {
                     state.entryMode = mode;
                     if (mode === 'sensors') {
                         dom.sensorsDisplay.classList.remove('hidden');
@@ -1017,15 +991,21 @@
                         dom.activateSensorsButton.classList.remove('btn-primary');
                         dom.manualEntryButton.classList.add('btn-secondary');
                         dom.manualEntryButton.classList.remove('btn-danger');
-                        dom.memorizeRing.classList.add('paused');
-                        dom.memorizeRingLabel.textContent = translations[i18n.currentLang].memorize_action_info;
+                        
+                        dom.resultContainer.classList.remove('hidden');
+                        dom.resultDisplay.textContent = translations[i18n.currentLang].waiting_for_sensor;
+                        dom.seasonalContainer.classList.add('hidden');
+
                         sensors.start();
                     } else if (mode === 'manual') {
                         if(state.sensorsActive) sensors.stop();
                         dom.sensorsDisplay.classList.add('hidden');
                         dom.manualEntryDisplay.classList.remove('hidden');
+                        dom.manualEntryButton.classList.add('btn-danger');
+                        dom.manualEntryButton.classList.remove('btn-secondary');
                         dom.activateSensorsButton.classList.add('btn-primary');
                         dom.activateSensorsButton.classList.remove('btn-danger');
+                        dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
                         dom.gotoEstimationButton.classList.remove('hidden');
                     }
                     calculations.calculateAndDisplayAll();
@@ -1033,205 +1013,602 @@
             };
 
             const calculations = {
-                calculateAndDisplayAll() {
+                calculateAndDisplayAll: () => {
                     const dateValue = dom.dateInput.value;
-                    const lat = utils.safeParseFloat(dom.latitudeInput.value);
-                    let panelAzDev = NaN;
+                    const latValueStr = dom.latitudeInput.value;
+                    const lat = utils.safeParseFloat(latValueStr);
+
+                    let panelAzimuthDeviation = NaN;
+
                     if (state.entryMode === 'manual') {
-                        panelAzDev = utils.safeParseFloat(dom.manualAzimuthInput.value);
-                    } else if (state.entryMode === 'sensors' && state.sensorsActive && state.panelAzimuthLive != null) {
-                        let dev = state.panelAzimuthLive - 180; if(dev>180) dev-=360; if(dev<-180) dev+=360; panelAzDev = dev;
+                        panelAzimuthDeviation = utils.safeParseFloat(dom.manualAzimuthInput.value);
+                    } else if (state.entryMode === 'sensors' && state.sensorsActive && state.panelAzimuthLive !== null) {
+                        let deviation = state.panelAzimuthLive - 180;
+                        if (deviation > 180) deviation -= 360;
+                        if (deviation < -180) deviation += 360;
+                        panelAzimuthDeviation = deviation;
                     }
-                    if (!dateValue || isNaN(lat) || isNaN(panelAzDev)) {
-                        if (state.entryMode !== 'sensors') dom.resultContainer.classList.add('hidden');
+
+                    if (!dateValue || isNaN(lat) || isNaN(panelAzimuthDeviation)) {
+                        if (state.entryMode !== 'sensors') {
+                           dom.resultContainer.classList.add('hidden');
+                        }
                         dom.seasonalContainer.classList.add('hidden');
                         return;
                     }
+
                     dom.resultContainer.classList.remove('hidden');
                     dom.seasonalContainer.classList.remove('hidden');
-
-                    const d = new Date(dateValue);
-                    const N = utils.getDayOfYear(d);
-                    const decl = utils.getDeclination(N);
-                    const solarNoonAlt = 90 - Math.abs(lat - decl);
-                    let optimalTilt = 90 - solarNoonAlt;
-
-                    const clipping = (decl > 10) ? CONFIG.clippingAdjustment : 0;
-                    const dev = Math.abs(panelAzDev);
-                    const basePenalty = Math.min(6, dev / 12);
-                    const seasonWeight = 0.7 + 0.3 * (Math.abs(decl) / 23.44);
-                    const penalty = basePenalty * seasonWeight;
-
-                    optimalTilt = utils.clamp(optimalTilt + clipping - penalty, 0, 90);
-
-                    state.lastRecommendedTilt = Math.round(optimalTilt * 10) / 10;
+                    
+                    const selectedDate = new Date(dateValue);
+                    if (isNaN(selectedDate.getTime())) return;
+                    
+                    const dayOfYear = utils.getDayOfYear(selectedDate);
+                    const declination = utils.getDeclination(dayOfYear);
+                    
+                    const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
+                    
+                    const dev = Math.abs(panelAzimuthDeviation);
+                    const penalty = Math.min(6, dev / 12);
+                    
+                    const solarNoonAltitude = 90 - Math.abs(lat - declination);
+                    let optimalTilt = 90 - solarNoonAltitude;
+                    optimalTilt += clipping;
+                    optimalTilt -= penalty;
+                    
+                    optimalTilt = utils.clamp(optimalTilt, 0, 90);
+                    
+                    state.lastRecommendedTilt = optimalTilt;
                     dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
 
-                    const f = Math.round((Math.abs(decl) / 23.44) * 15);
+                    const f = Math.round((Math.abs(declination) / 23.44) * 15);
                     dom.winterAngleDisplay.textContent = `${Math.round(lat + f - penalty)}°`;
                     dom.springFallAngleDisplay.textContent = `${Math.round(lat - penalty)}°`;
-                    dom.summerAngleDisplay.textContent = `${Math.round((lat - f + clipping) - penalty)}°`;
+                    dom.summerAngleDisplay.textContent = `${Math.round(lat - f + clipping - penalty)}°`;
                 }
             };
 
             const sensors = {
-                getTiltFromEvent(e){ if(e.beta==null) return null; const t = Math.abs(e.beta - state.tiltOffset); return utils.clamp(Math.round(t),0,90); },
-                getHeadingFromEvent(e){
-                    if(typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
-                    if(typeof e.alpha !== 'number') return null;
+                lastUpdate: 0,
+                getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta - state.tiltOffset)), 0, 90),
+                getHeadingFromEvent: (e) => {
+                    if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
+                    if (typeof e.alpha !== 'number') return null;
                     const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
-                    let heading = (360 - e.alpha + screenAngle) % 360; if(heading<0) heading+=360; return heading;
+                    let heading = (360 - e.alpha + screenAngle) % 360;
+                    return heading < 0 ? heading + 360 : heading;
                 },
-                formatAzimuthForDisplay(az){ let dev = az-180; if(dev>180) dev-=360; if(dev<-180) dev+=360; const L=i18n.currentLang; if(Math.abs(dev)<5) return translations[L].compass_south; const dir = dev<0? translations[L].compass_east: translations[L].compass_west; return `${Math.round(Math.abs(dev))}° ${dir}`; },
-                handleOrientation(event){
-                    const now = performance.now(); if(now-state.lastSensorTs<100) return; state.lastSensorTs=now;
+                formatAzimuthForDisplay: (azimuth) => {
+                    let deviation = azimuth - 180;
+                    if (deviation > 180) deviation -= 360;
+                    if (deviation < -180) deviation += 360;
+                    const lang = i18n.currentLang;
+                    if (Math.abs(deviation) < 5) return translations[lang].compass_south;
+                    const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
+                    return `${Math.round(Math.abs(deviation))}° ${direction}`;
+                },
+                handleOrientation: (event) => {
+                    const now = performance.now();
+                    if (now - sensors.lastUpdate < 100) return;
+                    sensors.lastUpdate = now;
+                    
                     const tilt = sensors.getTiltFromEvent(event);
-                    const head = sensors.getHeadingFromEvent(event);
-                    if(tilt!=null){ dom.currentAngleDisplay.textContent = tilt; dom.sensorError.textContent=''; }
-                    if(head!=null){ state.panelAzimuthLive = ((head%360)+360)%360; dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive); }
-
-                    if(tilt!=null){
-                        const buf = state.stabilityBuf; buf.push(tilt); if(buf.length>7) buf.shift();
-                        if(buf.length>=5){
-                            const avg = buf.reduce((a,b)=>a+b,0)/buf.length; const sd = Math.sqrt(buf.reduce((s,x)=>s+Math.pow(x-avg,2),0)/buf.length);
-                            const stable = sd < 0.8;
-                            dom.memorizeRing.classList.toggle('ok', stable);
-                            dom.memorizeRing.classList.toggle('paused', !stable);
-                            dom.memorizeRingLabel.textContent = stable? translations[i18n.currentLang].memorize_action : translations[i18n.currentLang].memorize_action_info;
-                            dom.memorizeRing.style.cursor = stable? 'pointer':'not-allowed';
-                            dom.memorizeRing.dataset.enabled = stable? '1':'0';
-                        }
+                    if (tilt !== null) {
+                        dom.currentAngleDisplay.textContent = tilt;
+                        dom.sensorError.textContent = '';
+                        dom.memorizeRingBtn.disabled = false;
+                    }
+                    const heading = sensors.getHeadingFromEvent(event);
+                    if (heading !== null) {
+                        state.panelAzimuthLive = utils.normalizeAngle(heading);
+                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
                     }
                     calculations.calculateAndDisplayAll();
                 },
-                async start(){
-                    if(state.sensorsActive){ sensors.stop(); return; }
-                    dom.sensorError.textContent = 'Activation…';
-                    try{
+                start: async () => {
+                    if (state.sensorsActive) { 
+                        sensors.stop();
+                        return;
+                    }
+                    dom.memorizeRingBtn.disabled = true;
+                    dom.sensorError.textContent = translations[i18n.currentLang].sensors_activating;
+                    try {
+                        if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
+                            const permission = await DeviceOrientationEvent.requestPermission();
+                            if (permission !== 'granted') {
+                                dom.sensorError.textContent = 'Permission capteurs refusée.';
+                                ui.setEntryMode(null);
+                                return;
+                            }
+                        }
                         window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                        state.sensorsActive = true; dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors; dom.gotoEstimationButton.classList.remove('hidden');
-                    }catch(err){ dom.sensorError.textContent='Capteurs indisponibles.'; }
+                        state.sensorsActive = true;
+                        dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
+                        dom.gotoEstimationButton.classList.remove('hidden');
+                    } catch (err) {
+                        dom.sensorError.textContent = 'Erreur demande permission.';
+                        utils.log('DeviceOrientation permission error', err);
+                    }
                 },
-                stop(){
-                    if(!state.sensorsActive) return;
+                stop: () => {
+                    if (!state.sensorsActive) return;
                     window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                    state.sensorsActive=false; state.panelAzimuthLive=null; state.stabilityBuf.length=0; dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors; dom.currentAngleDisplay.textContent='--'; dom.currentCompassDisplay.textContent='--'; dom.memorizeRing.classList.add('paused'); dom.memorizeRing.classList.remove('ok'); dom.memorizeRingLabel.textContent = translations[i18n.currentLang].memorize_action; calculations.calculateAndDisplayAll();
+                    state.sensorsActive = false;
+                    state.panelAzimuthLive = null;
+                    dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
+                    dom.activateSensorsButton.classList.remove('btn-danger');
+                    dom.activateSensorsButton.classList.add('btn-primary');
+                    dom.currentAngleDisplay.textContent = '--';
+                    dom.currentCompassDisplay.textContent = '--';
+                    dom.sensorError.textContent = '';
+                    dom.memorizeRingBtn.disabled = true;
+                    calculations.calculateAndDisplayAll(); 
                 }
             };
-
+            
             const handlers = {
-                async memorizeSensorValues(){
-                    if(dom.memorizeRing.dataset.enabled!=='1'){ return; }
-                    const tilt = parseInt(dom.currentAngleDisplay.textContent,10);
-                    const az = state.panelAzimuthLive;
-                    if(!Number.isFinite(tilt) || !Number.isFinite(az)){
-                        dom.sensorError.textContent = translations[i18n.currentLang].invalid_measurements; return;
-                    }
-                    state.memorizedTilt = tilt; state.memorizedAzimuthValue = az; state.memorizedLongitude = state.currentLongitude;
-                    document.getElementById('ring-wave').classList.remove('run'); void dom.memorizeRing.offsetWidth; document.getElementById('ring-wave').classList.add('run');
-                    await vibrateFeedback(90);
-                    dom.memorizeRingLabel.textContent = translations[i18n.currentLang].memorized;
-                    setTimeout(()=>{ dom.memorizeRingLabel.textContent = translations[i18n.currentLang].memorize_action; }, 1600);
+                openExternalLink: (event) => {
+                    event.preventDefault();
+                    window.open(CONFIG.donateLink, '_blank', 'noopener,noreferrer');
                 },
-                prepareEstimationPage(){
-                    if(state.entryMode==='manual'){
+                openBugReport: (event) => {
+                    event.preventDefault();
+                    const subject = translations[i18n.currentLang].bug_report_subject;
+                    window.location.href = `mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`;
+                },
+                prepareEstimationPage: () => {
+                    if (state.entryMode === 'manual') {
                         dom.currentTiltInput.value = dom.manualTiltInput.value;
                         dom.currentAzimuthInput.value = dom.manualAzimuthInput.value;
-                    }else{
-                        dom.currentTiltInput.value = state.memorizedTilt ?? '';
-                        if(state.memorizedAzimuthValue!=null){ let dev = state.memorizedAzimuthValue-180; if(dev>180) dev-=360; if(dev<-180) dev+=360; dom.currentAzimuthInput.value = Math.round(dev); } else { dom.currentAzimuthInput.value=''; }
+                    } else { 
+                        dom.currentTiltInput.value = (state.memorizedTilt !== null) ? state.memorizedTilt : '';
+                        if (state.memorizedAzimuthValue !== null) {
+                             let deviation = state.memorizedAzimuthValue - 180;
+                            if (deviation > 180) deviation -= 360;
+                            if (deviation < -180) deviation += 360;
+                            dom.currentAzimuthInput.value = Math.round(deviation);
+                        } else {
+                            dom.currentAzimuthInput.value = '';
+                        }
                     }
                     dom.longitudeInput.value = state.currentLongitude;
                     ui.showPage('settings');
                 },
-                openBugReport(e){ e.preventDefault(); const subject = 'Suggestion / Bug pour Opti Solar'; window.location.href = `mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`; },
-                openDonate(e){ e.preventDefault(); window.open(CONFIG.donateLink,'_blank','noopener'); }
-            };
+                memorizeSensorValues: async () => {
+                    const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
+                    const az = state.panelAzimuthLive;
+                    if (!Number.isFinite(tilt) || !Number.isFinite(az)) {
+                        dom.sensorError.textContent = translations[i18n.currentLang].invalid_measurements;
+                        return;
+                    }
+                    
+                    try {
+                        const { Haptics, ImpactStyle } = Capacitor.Plugins;
+                        await Haptics.impact({ style: ImpactStyle.Medium });
+                    } catch(e) {
+                         utils.log("Haptics not available, fallback to vibrate", e);
+                         if (navigator.vibrate) navigator.vibrate(100);
+                    }
+                    
+                    dom.memorizeRingBtn.classList.add('shockwave');
+                    dom.memorizeBtnText.classList.add('hidden');
+                    dom.memorizeCheckmarkIcon.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        dom.memorizeRingBtn.classList.remove('shockwave');
+                        dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorized;
+                        setTimeout(() => {
+                            dom.memorizeCheckmarkIcon.classList.add('hidden');
+                            dom.memorizeBtnText.classList.remove('hidden');
+                            dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorize_action;
+                        }, 1500);
+                    }, 700);
 
-            const api = {
-                async fetchWithTimeout(resource, options={}){
-                    const controller = new AbortController();
-                    const t = setTimeout(()=>controller.abort(), options.timeout || 8000);
-                    try{ return await fetch(resource, { ...options, signal: controller.signal }); } finally { clearTimeout(t); }
+                    state.memorizedTilt = tilt;
+                    state.memorizedAzimuthValue = az;
+                    state.memorizedLongitude = state.currentLongitude;
                 },
-                async fetchPVGIS(lat, lon, peakpower, angle, aspect){
-                    const base = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
-                    const key = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
-                    try{ const cached = sessionStorage.getItem(key); if(cached){ return JSON.parse(cached); } }catch{}
-                    const strats = [
-                        async()=>{ const url=`https://api.allorigins.win/json?url=${encodeURIComponent(base)}`; const r=await api.fetchWithTimeout(url,{timeout:8000}); if(!r.ok) throw new Error('allorigins'); const j=await r.json(); return JSON.parse(j.contents); },
-                        async()=>{ const url=`https://corsproxy.io/?${encodeURIComponent(base)}`; const r=await api.fetchWithTimeout(url,{timeout:8000}); if(!r.ok) throw new Error('corsproxy'); return await r.json(); },
-                        async()=>{ const r=await api.fetchWithTimeout(base,{timeout:5000}); if(!r.ok) throw new Error('direct'); return await r.json(); }
-                    ];
-                    for(let i=0;i<strats.length;i++){ try{ const json = await strats[i](); if(json?.outputs?.totals?.fixed){ try{ sessionStorage.setItem(key, JSON.stringify(json)); }catch{} return json; } }catch(e){} }
-                    throw new Error('All PVGIS fetch strategies failed');
+                handleModalKeydown: (e) => {
+                    if (e.key === 'Escape') {
+                        const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+                        if (openModal) {
+                            openModal.classList.add('hidden');
+                        }
+                    }
                 },
-                async getProductionEstimate(){
-                    dom.pvgisError.textContent=''; dom.productionResults.classList.add('hidden'); dom.calculateLoader.classList.remove('hidden'); dom.calculateText.classList.add('hidden');
-                    const lat = utils.safeParseFloat(dom.latitudeInput.value);
-                    const lon = utils.safeParseFloat(dom.longitudeInput.value);
-                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value);
-                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value);
-                    const currentAz = utils.safeParseFloat(dom.currentAzimuthInput.value);
-                    if([lat,lon,peakPower,currentTilt,currentAz].some(v=>isNaN(v))){ dom.pvgisError.textContent = (translations[i18n.currentLang].invalid_measurements); dom.calculateLoader.classList.add('hidden'); dom.calculateText.classList.remove('hidden'); return; }
-                    try{
-                        const d = new Date(dom.dateInput.value); const N=utils.getDayOfYear(d); const decl=utils.getDeclination(N); const clipping=(decl>10)?CONFIG.clippingAdjustment:0; const trueOpt = Math.abs(lat - decl); const finalTilt = Math.round(trueOpt + clipping);
-                        const [cur,opt] = await Promise.all([
-                            api.fetchPVGIS(lat,lon,peakPower,currentTilt,currentAz),
-                            api.fetchPVGIS(lat,lon,peakPower,finalTilt,0)
-                        ]);
-                        let curD=Number(cur.outputs.totals.fixed.E_d)||0, optD=Number(opt.outputs.totals.fixed.E_d)||0; let curM=Number(cur.outputs.totals.fixed.E_m)||0, optM=Number(opt.outputs.totals.fixed.E_m)||0;
-                        if(optD<curD){ optD=curD; optM=curM; dom.pvgisError.textContent=''; }
-                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curD)} kWh`;
-                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optD)} kWh`;
-                        const gainD = optD-curD; dom.potentialGainDisplay.textContent = gainD<1? `~ ${Math.round(gainD*1000)} Wh` : `~ ${utils.formatNumber(gainD)} kWh`;
-                        const gainM = optM-curM; dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainM)} kWh`;
-                        dom.productionResults.classList.remove('hidden');
-                    }catch(e){ dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; }
-                    finally{ dom.calculateLoader.classList.add('hidden'); dom.calculateText.classList.remove('hidden'); }
+                replayTutorial: () => {
+                    dom.mainHelpModal.classList.add('hidden');
+                    onboarding.start();
                 },
-                exportPdf(){
-                    if(dom.productionResults.classList.contains('hidden')){ alert(translations[i18n.currentLang].export_error_no_data); return; }
-                    const node = dom.productionResults;
-                    const opt = { margin:10, filename:`OptiSolar_${Date.now()}.pdf`, image:{ type:'jpeg', quality:0.95 }, html2canvas:{ scale:2 }, jsPDF:{ unit:'pt', format:'a4', orientation:'portrait' } };
-                    html2pdf().from(node).set(opt).save();
+                calibrateTilt: () => {
+                    const once = (e) => {
+                        if (e.beta !== null) {
+                            state.tiltOffset = e.beta;
+                            localStorage.setItem('tiltOffset', state.tiltOffset.toString());
+                            const originalText = dom.calibrateTiltBtn.textContent;
+                            dom.calibrateTiltBtn.textContent = translations[i18n.currentLang].calibrate_tilt_success;
+                            setTimeout(() => { dom.calibrateTiltBtn.textContent = originalText; }, 2000);
+                        }
+                        window.removeEventListener(CONFIG.sensorEventName, once, true);
+                    };
+                    window.addEventListener(CONFIG.sensorEventName, once, true);
+                },
+                savePeakPower: () => {
+                    localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
+                },
+                exportToPDF: () => {
+                    if (!state.lastCurrentProd || !state.lastOptimalProd) {
+                        alert(translations[i18n.currentLang].export_error_no_data);
+                        return;
+                    }
+                    const btn = dom.exportPdfBtn;
+                    const originalText = btn.querySelector('span').textContent;
+                    btn.disabled = true;
+                    btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
+
+                    const now = new Date();
+                    const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
+                    
+                    const reportElement = document.createElement('div');
+                    const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
+                    const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
+                    
+                    reportElement.innerHTML = `
+                        <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+                            <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
+                            <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
+                            </table>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Annuelle Estimée</h2>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                                <thead>
+                                    <tr style="background-color: #1d4ed8; color: white; text-align: left;">
+                                        <th style="padding: 8px;">Configuration</th>
+                                        <th style="padding: 8px;">Inclinaison</th>
+                                        <th style="padding: 8px;">Orientation</th>
+                                        <th style="padding: 8px;">Prod. Journalière</th>
+                                        <th style="padding: 8px;">Prod. Mensuelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: #f1f5f9;">
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Optimale</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">0° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.optimalProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${optMonthlyProd} kWh</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                             <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
+                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Gain Mensuel</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                            </table>
+                        </div>
+                    `;
+
+                    const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
+                    html2pdf().from(reportElement).set({
+                        margin: 10,
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).save().then(() => {
+                        btn.disabled = false;
+                        btn.querySelector('span').textContent = originalText;
+                    });
                 }
             };
 
-            function init(){
-                try{ const savedLang = localStorage.getItem('userLang'); if(savedLang) i18n.setLanguage(savedLang); }catch{}
-                const today = new Date(); dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-                dom.latitudeInput.value = CONFIG.defaultLatitude; dom.longitudeInput.value = CONFIG.defaultLongitude;
-                try{ const loc = JSON.parse(localStorage.getItem('userLocation')||'null'); if(loc && loc.lat && loc.lon){ ui.updateLocationFields(loc.lat, loc.lon); } }catch{}
+            const onboarding = {
+                currentIndex: 0,
+                start: function() {
+                    dom.onboardingModal.classList.remove('hidden');
+                    this.showSlide(0);
+                },
+                showSlide: function(index) {
+                    this.currentIndex = index;
+                    dom.onboardingSlides.forEach((slide, i) => {
+                        slide.classList.toggle('hidden', i !== index);
+                    });
+                    dom.onboardingDots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
 
-                ['change','input'].forEach(evt=>{
+                    dom.onboardingPrevBtn.classList.toggle('invisible', index === 0);
+                    dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
+                    dom.onboardingFinishBtn.classList.toggle('hidden', index !== dom.onboardingSlides.length - 1);
+                },
+                next: function() {
+                    if (this.currentIndex < dom.onboardingSlides.length - 1) {
+                        this.showSlide(this.currentIndex + 1);
+                    }
+                },
+                finish: function() {
+                    dom.onboardingModal.classList.add('hidden');
+                    try {
+                        localStorage.setItem('onboardingComplete', 'true');
+                    } catch (e) {
+                        utils.log("Could not save to localStorage", e);
+                    }
+                }
+            };
+
+            const theme = {
+                apply: (themeName) => {
+                    document.body.classList.toggle('light-mode', themeName === 'light');
+                    dom.themeToggle.checked = (themeName === 'light');
+                },
+                toggle: () => {
+                    const newTheme = dom.themeToggle.checked ? 'light' : 'dark';
+                    theme.apply(newTheme);
+                    localStorage.setItem('userTheme', newTheme);
+                },
+                load: () => {
+                    const savedTheme = localStorage.getItem('userTheme') || 'dark';
+                    theme.apply(savedTheme);
+                }
+            };
+
+            const api = {
+                fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
+                    const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
+                    try {
+                        const cachedData = sessionStorage.getItem(cacheKey);
+                        if (cachedData) {
+                            utils.log('Returning cached PVGIS data.');
+                            return JSON.parse(cachedData);
+                        }
+                    } catch (e) {
+                        utils.log('Could not access sessionStorage', e);
+                    }
+
+                    const fetchWithTimeout = (resource, options = {}, timeout = 8000) => {
+                      return new Promise((resolve, reject) => {
+                        const controller = new AbortController();
+                        const id = setTimeout(() => {
+                            controller.abort();
+                            reject(new Error('Fetch timeout'));
+                        }, timeout);
+                        fetch(resource, { ...options, signal: controller.signal })
+                          .then(response => {
+                            clearTimeout(id);
+                            resolve(response);
+                          })
+                          .catch(error => {
+                            clearTimeout(id);
+                            reject(error);
+                          });
+                      });
+                    };
+
+                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
+                    
+                    const strategies = [
+                        async () => {
+                            const res = await fetchWithTimeout(pvgisUrl, {}, 5000);
+                            if (!res.ok) throw new Error('Direct call failed');
+                            return await res.json();
+                        },
+                        async () => {
+                             const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
+                             const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                             if (!res.ok) throw new Error('Proxy allorigins.win failed');
+                             const data = await res.json();
+                             return JSON.parse(data.contents);
+                        },
+                        async () => {
+                            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
+                            const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                            if (!res.ok) throw new Error('Proxy corsproxy.io failed');
+                            return await res.json();
+                        }
+                    ];
+
+                    for (let i = 0; i < strategies.length; i++) {
+                        try {
+                            utils.log(`Attempting PVGIS fetch with strategy #${i + 1}`);
+                            const json = await strategies[i]();
+                            if (json?.outputs?.totals?.fixed) {
+                                utils.log(`Strategy #${i + 1} succeeded.`);
+                                try {
+                                    sessionStorage.setItem(cacheKey, JSON.stringify(json));
+                                } catch (e) {
+                                    utils.log('Could not save to sessionStorage', e);
+                                }
+                                return json;
+                            }
+                        } catch (error) {
+                            utils.log(`Strategy #${i + 1} failed:`, error.message);
+                        }
+                    }
+
+                    throw new Error('All PVGIS fetch strategies failed.');
+                },
+                getProductionEstimate: async () => { 
+                    dom.exportContainer.classList.add('hidden');
+                    dom.pvgisError.textContent = ''; 
+                    dom.productionResults.classList.add('hidden');
+                    dom.donationMessage.classList.add('hidden');
+                    
+                    dom.calculateLoader.classList.remove('hidden');
+                    dom.calculateText.classList.add('hidden');
+
+                    const lat = utils.safeParseFloat(dom.latitudeInput.value); 
+                    const lon = utils.safeParseFloat(dom.longitudeInput.value); 
+                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); 
+                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); 
+                    const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); 
+                    
+                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v))) { 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].fill_all_fields_error;
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden'); 
+                        return; 
+                    } 
+                    
+                    try {
+                        const selectedDate = new Date(dom.dateInput.value);
+                        const dayOfYear = utils.getDayOfYear(selectedDate);
+                        const declination = utils.getDeclination(dayOfYear);
+                        
+                        const clipping = (dom.clippingCheckbox.checked && declination > 10) ? CONFIG.clippingAdjustment : 0;
+                        const dev = Math.abs(currentAzimuth);
+                        const penalty = Math.min(6, dev / 12);
+                        
+                        let trueOptimalTilt = 90 - (90 - Math.abs(lat - declination));
+                        const finalOptimalTilt = Math.round(trueOptimalTilt + clipping - penalty);
+
+                        const [currentProd, optimalProd] = await Promise.all([ 
+                            api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
+                            api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
+                        ]);
+
+                        state.lastCurrentProd = currentProd;
+                        state.lastOptimalProd = optimalProd;
+
+                        let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
+                        let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
+                        let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
+                        let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
+
+                        if (optDaily < curDaily) { 
+                            optDaily = curDaily; 
+                            optMonthly = curMonthly; 
+                            dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal; 
+                        } else { 
+                            dom.pvgisError.textContent = ''; 
+                        } 
+
+                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
+                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
+                        const gainDaily = optDaily - curDaily; 
+                        dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
+                        const gainMonthly = optMonthly - curMonthly; 
+                        dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
+                        
+                        dom.productionResults.classList.remove('hidden');
+                        dom.donationMessage.classList.remove('hidden');
+                        dom.exportContainer.classList.remove('hidden');
+
+                    } catch (err) { 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
+                        utils.log('PVGIS error', err); 
+                    } finally { 
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden');
+                    } 
+                }
+            };
+
+            function init() {
+                try {
+                    theme.load();
+                    const savedLang = localStorage.getItem('userLang') || 'fr';
+                    i18n.setLanguage(savedLang);
+
+                    const savedLocation = localStorage.getItem('userLocation');
+                    if (savedLocation) {
+                        const { lat, lon } = JSON.parse(savedLocation);
+                        dom.latitudeInput.value = lat;
+                        dom.longitudeInput.value = lon;
+                        dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
+                    } else {
+                        dom.latitudeInput.value = CONFIG.defaultLatitude;
+                        dom.longitudeInput.value = CONFIG.defaultLongitude;
+                    }
+                    
+                    state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
+                    
+                    const savedPeakPower = localStorage.getItem('userPeakPower');
+                    if (savedPeakPower) {
+                        dom.peakPowerInput.value = savedPeakPower;
+                    }
+
+                    if (!localStorage.getItem('onboardingComplete')) {
+                        onboarding.start();
+                    }
+                } catch (e) {
+                    utils.log("Could not access localStorage", e);
+                    i18n.setLanguage('fr');
+                    dom.latitudeInput.value = CONFIG.defaultLatitude;
+                    dom.longitudeInput.value = CONFIG.defaultLongitude;
+                }
+
+                ['change', 'input'].forEach(evt => {
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.clippingCheckbox.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.manualTiltInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                     dom.manualAzimuthInput.addEventListener(evt, calculations.calculateAndDisplayAll);
                 });
-
-                dom.activateSensorsButton.addEventListener('click', ()=>{ state.sensorsActive? sensors.stop(): ui.setEntryMode('sensors'); });
-                dom.manualEntryButton.addEventListener('click', ()=> ui.setEntryMode('manual'));
-                dom.memorizeRing.addEventListener('click', handlers.memorizeSensorValues);
-
-                dom.getLocationButton.addEventListener('click', ()=>{
-                    dom.locationError.textContent = 'Obtention…';
-                    if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=> ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err=> dom.locationError.textContent = 'Impossible d\'obtenir la position.'); } else { dom.locationError.textContent='Géolocalisation non supportée.'; }
+                
+                dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);
+                
+                dom.activateSensorsButton.addEventListener('click', () => {
+                    state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors');
                 });
+                dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
+
+                dom.getLocationButton.addEventListener('click', () => geolocation.get());
+                dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
+                dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
+                dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
+                dom.bugReportButton.addEventListener('click', handlers.openBugReport);
+				dom.donationMessage.addEventListener('click', handlers.openExternalLink);
 
                 dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
-                dom.backButton.addEventListener('click', ()=> ui.showPage('main'));
+                dom.backButton.addEventListener('click', () => ui.showPage('main'));
                 dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
-                dom.exportPdfBtn.addEventListener('click', api.exportPdf);
+                dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 
-                document.querySelectorAll('#lang-switcher [data-lang]').forEach(btn=> btn.addEventListener('click', e=> i18n.setLanguage(e.currentTarget.dataset.lang)));
+                const modals = [
+                    { btn: dom.settingsButton, modal: dom.settingsModal }, { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
+                    { btn: dom.mainHelpButton, modal: dom.mainHelpModal }, { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
+                ];
+                modals.forEach(item => item.btn.addEventListener('click', () => item.modal.classList.remove('hidden')));
+                
+                const closeButtons = document.querySelectorAll('.close-modal-btn');
+                closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden')));
+                
+                document.addEventListener('keydown', handlers.handleModalKeydown);
 
-                dom.bugReportButton.addEventListener('click', handlers.openBugReport);
-                dom.donateButtonFab.addEventListener('click', handlers.openDonate);
+                dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
+                dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
+                dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
+                dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
 
-                i18n.setLanguage('fr');
+                dom.themeToggle.addEventListener('change', theme.toggle);
+
+
+                document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => i18n.setLanguage(e.target.dataset.lang));
+                });
+
+                const today = new Date();
+                dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                
+                calculations.calculateAndDisplayAll();
+                utils.log('Application initialisée.');
             }
+            
+            const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
 
             window.addEventListener('load', init);
         })();

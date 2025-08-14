@@ -270,6 +270,115 @@
             50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
 
+    
+/* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v2.6.8) ====== */
+#memorize-ring-btn.btn-style-neon {
+  background: radial-gradient(100px 100px at 50% 50%, rgba(65,209,183,.15), rgba(65,209,183,0) 70%),
+              linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.2));
+  border: 2px solid rgba(65,209,183,.5);
+  box-shadow:
+    0 0 0 2px rgba(65,209,183,.12) inset,
+    0 10px 25px rgba(0,0,0,.35),
+    0 0 30px rgba(65,209,183,.35);
+  backdrop-filter: blur(2px);
+  position: relative;
+  overflow: hidden;
+}
+#memorize-ring-btn.btn-style-neon::before,
+#memorize-ring-btn.btn-style-neon::after{
+  content:"";
+  position:absolute; inset:-4px;
+  border-radius:50%;
+  pointer-events:none;
+}
+#memorize-ring-btn.btn-style-neon::before{
+  border: 2px solid transparent;
+  background: conic-gradient(from 0deg,
+     rgba(65,209,183,.0), rgba(65,209,183,.35), rgba(65,209,183,.0) 60%);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 64%, #000 66%);
+          mask: radial-gradient(circle at 50% 50%, transparent 64%, #000 66%);
+  animation: neonSweep 2.2s linear infinite;
+}
+#memorize-ring-btn.btn-style-neon::after{
+  box-shadow: 0 0 45px 8px rgba(65,209,183,.35);
+  opacity:.0; transition: opacity .35s ease;
+}
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-neon {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 2px rgba(65,209,183,.18) inset,
+    0 12px 30px rgba(0,0,0,.35),
+    0 0 60px rgba(65,209,183,.55);
+}
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-neon::before{ animation-play-state: paused; opacity:0; }
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-neon::after{ opacity:1; }
+@keyframes neonSweep { to { transform: rotate(360deg); } }
+
+/* ---------- Style B : Glass Orb ---------- */
+#memorize-ring-btn.btn-style-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.2) inset,
+    0 -8px 18px rgba(0,0,0,.45) inset,
+    0 10px 25px rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
+}
+#memorize-ring-btn.btn-style-glass::before{
+  content:""; position:absolute; inset:8px; border-radius:50%;
+  background: radial-gradient(60px 60px at 35% 30%, rgba(255,255,255,.5), rgba(255,255,255,0) 60%);
+  pointer-events:none; filter: blur(0.3px);
+}
+#memorize-ring-btn.btn-style-glass::after{
+  content:""; position:absolute; inset:-3px; border-radius:50%;
+  border: 2px solid rgba(255,255,255,.06);
+}
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-glass {
+  border-color: rgba(65,209,183,.7);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.25) inset,
+    0 -10px 24px rgba(65,209,183,.16) inset,
+    0 0 50px rgba(65,209,183,.45);
+}
+
+/* ---------- Style C : Radar Sweep ---------- */
+#memorize-ring-btn.btn-style-radar {
+  background: radial-gradient(75px 75px at 50% 50%, rgba(16,185,129,.12), rgba(16,185,129,0) 65%),
+              linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+  border: 2px solid rgba(16,185,129,.45);
+  position: relative;
+  overflow:hidden;
+}
+#memorize-ring-btn.btn-style-radar::before{
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background:
+    conic-gradient(from 0deg, rgba(16,185,129,0) 0deg, rgba(16,185,129,.35) 35deg, rgba(16,185,129,0) 70deg),
+    radial-gradient(2px 2px at 50% 50%, rgba(16,185,129,.8), rgba(16,185,129,0) 60%);
+  animation: radarSpin 2.4s linear infinite;
+  -webkit-mask: radial-gradient(circle at 50% 50%, #000 64%, transparent 66%);
+          mask: radial-gradient(circle at 50% 50%, #000 64%, transparent 66%);
+  opacity:.9;
+}
+#memorize-ring-btn.btn-style-radar::after{
+  content:""; position:absolute; inset:-6px; border-radius:50%;
+  box-shadow: 0 0 0 1px rgba(16,185,129,.2) inset, 0 0 32px rgba(16,185,129,.35);
+  opacity:.2; transition: opacity .35s ease;
+}
+@keyframes radarSpin { to { transform: rotate(360deg); } }
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-radar::before{
+  animation-play-state: paused; opacity:.15;
+}
+#stabilization-ring-container.stable + #memorize-ring-btn.btn-style-radar::after{
+  opacity:.65;
+}
+
+/* Mode clair (facultatif) */
+.light-mode #memorize-ring-btn.btn-style-neon,
+.light-mode #memorize-ring-btn.btn-style-radar { border-color: rgba(0,0,0,.08); }
+.light-mode #memorize-ring-btn.btn-style-glass { border-color: rgba(0,0,0,.12); }
+
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -492,7 +601,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.7</p>
+        <p class="text-xs text-gray-600">v2.6.8</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -529,7 +638,30 @@
                          </label>
                      </div>
                 </div>
-                 <div class="pt-4 border-t border-gray-800">
+                 
+                <!-- Choix du style du bouton Mémoriser -->
+                <div class="space-y-2">
+                    <label class="font-medium" data-i18n="button_style_label">Style du bouton "Mémoriser"</label>
+                    <fieldset class="space-y-2">
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_default">Classique (défaut)</span>
+                            <input type="radio" name="memorize-style" value="default" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_neon">Neon Pulse Pro</span>
+                            <input type="radio" name="memorize-style" value="neon" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_glass">Glass Orb</span>
+                            <input type="radio" name="memorize-style" value="glass" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_radar">Radar Sweep</span>
+                            <input type="radio" name="memorize-style" value="radar" class="memorize-style-radio">
+                        </label>
+                    </fieldset>
+                </div>
+<div class="pt-4 border-t border-gray-800">
                     <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
                 </div>
             </div>
@@ -802,7 +934,12 @@
                     pdf_disclaimer_text: "Les données de production et les mesures d'inclinaison/orientation fournies dans ce rapport sont des estimations. La précision des capteurs (boussole, accéléromètre) peut varier d'un téléphone à l'autre. De plus, la présence d'objets métalliques, et plus particulièrement l'utilisation de <strong>coques ou supports magnétiques</strong> pour téléphone, peut entraîner des erreurs d'orientation significatives. Il est fortement recommandé de retirer toute coque magnétique avant la mesure et de corroborer ces données avec des outils professionnels. Les créateurs de cette application ne sauraient être tenus responsables des écarts entre les estimations et la production réelle.",
                     sensors_activating: "Activation des capteurs...",
                     invalid_measurements: "Mesures invalides."
-                },
+                
+                    button_style_label: "Style du bouton \"M\u00e9moriser\"",
+                    button_style_default: "Classique (d\u00e9faut)",
+                    button_style_neon: "Neon Pulse Pro",
+                    button_style_glass: "Glass Orb",
+                    button_style_radar: "Radar Sweep",},
                 en: {
                     geoloc_error: "Geolocation error.",
                     geoloc_not_supported: "Geolocation not supported.",
@@ -891,7 +1028,12 @@
                     pdf_disclaimer_text: "The production data and tilt/orientation measurements in this report are estimates. Sensor accuracy (compass, accelerometer) can vary significantly between phone models. Furthermore, the presence of nearby metallic objects, and especially the use of <strong>magnetic cases or mounts</strong>, can cause significant orientation errors. It is strongly recommended to remove any magnetic case before measuring and to corroborate this data with professional measurement tools for any critical installation. The creators of this application cannot be held responsible for discrepancies between the estimates and actual production.",
                     sensors_activating: "Activating sensors...",
                     invalid_measurements: "Invalid measurements."
-                }
+                
+                    button_style_label: "\u201cMemorize\u201d button style",
+                    button_style_default: "Classic (default)",
+                    button_style_neon: "Neon Pulse Pro",
+                    button_style_glass: "Glass Orb",
+                    button_style_radar: "Radar Sweep",}
             };
 
             const i18n = {
@@ -1436,7 +1578,34 @@
                     });
 
                     dom.onboardingPrevBtn.classList.toggle('invisible', index === 0);
-                    dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
+                    
+            // ===== Button style selection (v2.6.8) =====
+            const BTN_STYLE_KEY = 'memorizeBtnStyle';
+            const applyMemorizeBtnStyle = (style) => {
+                const el = dom.memorizeRingBtn;
+                if (!el) return;
+                el.classList.remove('btn-style-neon','btn-style-glass','btn-style-radar');
+                switch (style) {
+                    case 'neon': el.classList.add('btn-style-neon'); break;
+                    case 'glass': el.classList.add('btn-style-glass'); break;
+                    case 'radar': el.classList.add('btn-style-radar'); break;
+                    default: break; // classic
+                }
+            };
+            // init radios
+            const styleRadios = document.querySelectorAll('input.memorize-style-radio[name="memorize-style"]');
+            const savedStyle = localStorage.getItem(BTN_STYLE_KEY) || 'default';
+            applyMemorizeBtnStyle(savedStyle);
+            styleRadios.forEach(r => {
+                r.checked = (r.value === savedStyle);
+                r.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        localStorage.setItem(BTN_STYLE_KEY, e.target.value);
+                        applyMemorizeBtnStyle(e.target.value);
+                    }
+                });
+            });
+dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
                     dom.onboardingFinishBtn.classList.toggle('hidden', index !== dom.onboardingSlides.length - 1);
                 },
                 next: function() {

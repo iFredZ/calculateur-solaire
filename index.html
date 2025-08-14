@@ -11,7 +11,1636 @@
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opti Solar</title>
+    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
+        :root {
+            --bg: #0b1220;
+            --card: #121a2b;
+            --muted: #7b8aa5;
+            --fg: #e9f0ff;
+            --accent: #41d1b7;
+            --accent-blue: #437eff;
+            --warn: #ffcc00;
+            --bad: #ff6b6b;
+            --btn-secondary-bg: #2a3957;
+            --input-bg: #0e1423;
+            --border-color: rgba(255, 255, 255, .06);
+            --border-color-input: rgba(255,255,255,.1);
+            --info-box-bg: rgba(123, 138, 165, 0.1);
+        }
+        .light-mode {
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --muted: #475569;
+            --fg: #0f172a;
+            --accent-blue: #1d4ed8;
+            --btn-secondary-bg: #e2e8f0;
+            --input-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --border-color-input: #cbd5e1;
+            --info-box-bg: #f1f5f9;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .card {
+            background-color: var(--card);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .light-mode .card {
+             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+        .page-title {
+            color: var(--accent-blue);
+        }
+        .header-title {
+            font-family: 'Exo 2', sans-serif;
+            color: var(--fg);
+            letter-spacing: 0.05em;
+        }
+        .btn-primary {
+            background-color: var(--accent);
+            color: #00110e;
+        }
+        .btn-primary:hover {
+            background-color: #52d9c3;
+        }
+        .btn-secondary {
+            background-color: var(--btn-secondary-bg);
+            color: var(--fg);
+        }
+        .light-mode .btn-secondary {
+             color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #3a4a6a;
+        }
+        .light-mode .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .btn-danger {
+             background-color: var(--bad);
+             color: #fff;
+        }
+        .btn-danger:hover {
+            background-color: #ff8a8a;
+        }
+        input, .bg-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color-input);
+            color: var(--fg);
+        }
+        input::placeholder {
+            color: var(--muted);
+        }
+        .loader {
+            border: 4px solid var(--btn-secondary-bg);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent);
+            width: 24px;
+            height: 24px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .lang-btn {
+            background-color: var(--card);
+            color: var(--muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lang-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--btn-secondary-bg);
+            color: var(--fg);
+        }
+        .lang-btn.active {
+            background-color: var(--accent);
+            color: #00110e;
+        }
+        .icon-btn {
+             background-color: var(--card);
+             width: 40px;
+             height: 40px;
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             transition: all 0.2s ease-in-out;
+        }
+        .icon-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--btn-secondary-bg);
+        }
+        .onboarding-dot.active {
+            background-color: var(--accent);
+            transform: scale(1.5);
+        }
+        #onboarding-modal {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 48px;
+        }
+        .theme-switch input {
+            display: none;
+        }
+        .slider {
+            background-color: #374151;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        .info-box {
+            background-color: var(--info-box-bg);
+        }
+        .light-mode .text-gray-400 { color: var(--muted); }
+        .light-mode .text-teal-300 { color: var(--accent-blue); }
+        .light-mode .text-teal-400 { color: var(--accent); }
+        .light-mode #seasonal-container .text-sky-400 { color: #0369a1; }
+        .light-mode #seasonal-container .text-amber-400 { color: #b45309; }
+        .light-mode #seasonal-container .text-red-400 { color: #991b1b; }
+        .light-mode #production-results .text-green-300 { color: #065f46; }
+        .light-mode #production-results .text-blue-300 { color: #1e40af; }
+        .light-mode #production-results .font-bold { color: var(--fg); }
+        
+        #memorize-ring-btn {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background-color: var(--btn-secondary-bg);
+            border: 2px solid var(--border-color);
+            color: var(--fg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #memorize-ring-btn:not(:disabled):active {
+            transform: scale(0.95);
+        }
+        #memorize-ring-btn:disabled {
+            background-color: transparent;
+            border-color: var(--muted);
+            opacity: 0.5;
+            box-shadow: none;
+        }
+        #memorize-ring-btn.shockwave {
+            animation: shockwave-animation 0.7s ease-out;
+        }
+        @keyframes shockwave-animation {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(65, 209, 183, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 0 40px rgba(65, 209, 183, 0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
+        <div class="flex-1 flex justify-start">
+            <div id="lang-switcher" class="flex gap-2">
+                <button data-lang="fr" class="lang-btn">FR</button>
+                <button data-lang="en" class="lang-btn">EN</button>
+            </div>
+        </div>
+        <div class="flex-1 flex justify-center">
+             <h1 class="text-2xl font-bold header-title">Opti Solar</h1>
+        </div>
+        <div class="flex-1 flex justify-end">
+            <div class="flex gap-2 items-center">
+                <button type="button" id="main-help-button" class="icon-btn">
+                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                 <button type="button" id="settings-help-button" class="icon-btn hidden">
+                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                <button id="settings-button" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow overflow-y-auto px-4">
+        <div id="app-container" class="w-full max-w-lg card rounded-2xl p-6 md:p-8 space-y-6 relative mx-auto">
+            
+            <div id="main-page">
+                <div class="text-center space-y-4">
+                    <div class="max-w-xs mx-auto space-y-4">
+                        <div>
+                            <label for="latitude-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="location"></label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-right pr-2" aria-label="Latitude" data-i18n-placeholder="latitude_placeholder">
+                                <button type="button" id="get-location" title="Utiliser ma position actuelle" class="p-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors" aria-label="Obtenir la géolocalisation">
+                                    <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                </button>
+                            </div>
+                            <p id="location-subtitle" class="text-sm text-gray-400 mt-2 h-4" aria-live="polite"></p>
+                            <p id="location-error" class="text-xs text-red-400 h-4 mt-1" role="alert"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-gray-900/50 p-6 mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-2 px-4 rounded-lg" data-i18n="activate_sensors"></button>
+                        <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="manual_entry"></button>
+                    </div>
+
+                    <div id="sensors-display" class="hidden space-y-2 pt-4 mt-4 border-t border-gray-800">
+                         <div class="grid grid-cols-2 gap-4 text-center">
+                            <div>
+                                <p class="text-lg text-gray-400" data-i18n="current_angle"></p>
+                                <p class="text-4xl font-bold my-1"><span id="current-angle">--</span>°</p>
+                            </div>
+                             <div>
+                                <p class="text-lg text-gray-400" data-i18n="orientation"></p>
+                                <p class="text-xl font-bold my-1"><span id="current-compass">--</span></p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center pt-4 space-y-2">
+                           <button type="button" id="memorize-ring-btn" disabled>
+                                <span id="memorize-btn-text" class="font-bold text-lg" data-i18n="memorize_action"></span>
+                                <svg id="memorize-checkmark-icon" class="h-10 w-10 text-teal-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                           </button>
+                           <p class="text-xs text-gray-400" data-i18n="memorize_action_info"></p>
+                        </div>
+                        <p id="sensor-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
+                    </div>
+
+                    <div id="manual-entry-display" class="hidden space-y-4 pt-4 mt-4 border-t border-gray-800">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="manual-tilt-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="tilt"></label>
+                                <input type="number" id="manual-tilt-input" class="bg-input w-full p-2 rounded-md text-center" data-i18n-placeholder="tilt_placeholder">
+                            </div>
+                            <div>
+                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="orientation_short"></label>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2 text-center" data-i18n="orientation_helper"></p>
+                                <input type="number" id="manual-azimuth-input" class="bg-input w-full p-2 rounded-md text-center" data-i18n-placeholder="orientation_placeholder">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="result-container" class="text-center mt-4 hidden">
+                    <p class="text-lg text-teal-300" data-i18n="recommended_angle"></p>
+                    <p id="result" class="text-5xl md:text-6xl font-bold text-teal-400 my-1" aria-live="polite">--°</p>
+                </div>
+
+                <button type="button" id="goto-estimation-button" class="hidden mt-4 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-all text-lg flex items-center justify-center">
+                    <span data-i18n="calculate_gain"></span>
+                    <svg class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                </button>
+                
+                <div class="mt-4">
+                     <label for="date-input" class="block text-md font-medium text-teal-300 mb-2" data-i18n="target_date"></label>
+                     <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-input" aria-label="Date cible">
+                </div>
+                
+                <div id="seasonal-container" class="mt-4 hidden">
+                    <h2 class="text-xl font-bold text-center mb-4 page-title" data-i18n="seasonal_settings"></h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div class="info-box rounded-lg p-4">
+                            <p class="font-bold text-lg" data-i18n="winter"></p>
+                            <p id="winter-angle" class="text-3xl font-bold text-sky-400">--°</p>
+                            <p class="text-xs text-gray-400" data-i18n="winter_date"></p>
+                        </div>
+                        <div class="info-box rounded-lg p-4">
+                            <p class="font-bold text-lg" data-i18n="mid_season"></p>
+                            <p id="spring-fall-angle" class="text-3xl font-bold text-amber-400">--°</p>
+                            <p class="text-xs text-gray-400" data-i18n="mid_season_date"></p>
+                        </div>
+                        <div class="info-box rounded-lg p-4">
+                            <p class="font-bold text-lg" data-i18n="summer"></p>
+                            <p id="summer-angle" class="text-3xl font-bold text-red-400">--°</p>
+                            <p class="text-xs text-gray-400" data-i18n="summer_date"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-page" class="hidden">
+                 <button type="button" id="back-button" class="absolute top-4 left-4 icon-btn btn-secondary" aria-label="Retour à la page principale">
+                     <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                 </button>
+                <h2 class="text-2xl md:text-3xl font-bold text-center pt-8 page-title" data-i18n="estimation_title"></h2>
+                
+                <div class="space-y-4 mt-6">
+                    <div class="bg-teal-900/20 p-4 rounded-lg border-2 border-teal-500">
+                        <label for="peak-power" class="block text-sm font-medium text-teal-300" data-i18n="peak_power"></label>
+                        <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                    
+                    <div class="border-t border-gray-800 my-4"></div>
+
+                     <div>
+                        <label for="longitude-input" class="block text-sm font-medium text-gray-400" data-i18n="longitude"></label>
+                        <input type="number" id="longitude-input" value="4.028" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="current-tilt-input" class="block text-sm font-medium text-gray-400" data-i18n="current_tilt"></label>
+                        <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm" data-i18n-placeholder="tilt_placeholder">
+                    </div>
+                     <div>
+                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth"></label>
+                        <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm" data-i18n-placeholder="azimuth_placeholder">
+                    </div>
+                </div>
+
+                <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <span id="calculate-text" data-i18n="calculate_gain_long"></span>
+                    <div id="calculate-loader" class="loader hidden ml-3"></div>
+                </button>
+
+                <div id="production-results" class="mt-6 space-y-4 hidden">
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-400" data-i18n="prod_current_settings"></p>
+                        <p id="current-production" class="text-2xl font-bold">-- kWh</p>
+                    </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-green-300" data-i18n="prod_optimal_settings"></p>
+                        <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
+                    </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300" data-i18n="daily_gain"></p>
+                        <p id="potential-gain" class="text-3xl font-bold text-blue-300">~ -- Wh</p>
+                    </div>
+                     <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300" data-i18n="monthly_gain"></p>
+                        <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
+                    </div>
+                </div>
+                
+                <div id="export-container" class="mt-6 text-center hidden">
+                    <button type="button" id="export-pdf-btn" class="btn-secondary font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center w-full">
+                        <svg class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                        </svg>
+                        <span data-i18n="export_pdf"></span>
+                    </button>
+                </div>
+                 
+                 <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
+                
+                 <div class="text-center pt-4 border-t border-gray-700 mt-6 space-y-4">
+                    <p id="donation-message" class="text-sm text-gray-400 hidden cursor-pointer hover:underline" data-i18n="donation_message"></p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+    <footer class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
+        <a id="bug-report-button" href="#" class="icon-btn text-yellow-400 relative group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
+        </a>
+
+        <p class="text-xs text-gray-600">v2.6.2</p>
+
+        <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 18.828l-8.485-8.485a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg>
+             <span class="absolute bottom-full mb-2 right-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="donate_title"></span>
+        </a>
+    </footer>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md card">
+            <div class="flex justify-between items-center">
+                <h3 id="settings-modal-title" class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="settings_title"></h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 p-4 space-y-6">
+                 <div class="flex items-center justify-between">
+                    <label for="clipping-checkbox" class="font-medium flex items-center">
+                        <span data-i18n="clipping_label"></span>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700" aria-label="Aide sur l'optimisation pour l'écrêtage">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </label>
+                    <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
+                </div>
+                <div class="flex items-center justify-between">
+                     <label for="theme-toggle" class="font-medium" data-i18n="light_theme_label"></label>
+                     <div class="theme-switch-wrapper">
+                         <label class="theme-switch" for="theme-toggle">
+                             <input type="checkbox" id="theme-toggle" />
+                             <div class="slider"></div>
+                         </label>
+                     </div>
+                </div>
+                 <div class="pt-4 border-t border-gray-800">
+                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="clipping-modal-title">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md card">
+            <div class="flex justify-between items-center">
+                <h3 id="clipping-modal-title" class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="clipping_title"></h3>
+                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-4">
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                       <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="clipping_problem_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="clipping_problem_desc"></p>
+                    </div>
+                </div>
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                       <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="clipping_solution_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="clipping_solution_desc"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center px-4 pt-3">
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
+            </div>
+        </div>
+    </div>
+    
+     <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
+            <div class="flex justify-between items-center">
+                <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="main_guide_title"></h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="guide_step1_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step1_desc"></p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="guide_step2_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step2_desc_sensors"></p>
+                        <p class="text-sm text-gray-400" data-i18n="guide_step2_desc_manual"></p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                         <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="guide_step3_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step3_desc"></p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="guide_step4_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step4_desc"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center px-4 pt-3 flex gap-4">
+                <button type="button" id="replay-tutorial-btn" class="px-4 py-2 btn-primary rounded-md w-full" data-i18n="replay_tutorial"></button>
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md card">
+            <div class="flex justify-between items-center">
+                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="estimation_guide_title"></h3>
+                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 px-2 py-3 space-y-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="estimation_guide_step1_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="estimation_guide_step1_desc"></p>
+                    </div>
+                </div>
+                 <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg" data-i18n="estimation_guide_step2_title"></h4>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="estimation_guide_step2_desc"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center px-4 pt-3">
+                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
+        <div class="card w-full max-w-sm rounded-2xl p-6 text-center flex flex-col shadow-2xl">
+            
+            <div class="flex-grow">
+                <div class="onboarding-slide">
+                    <img src="etape1_calibrage.png" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 1 : Calibrer</h3>
+                    <p class="text-gray-400">Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 2 : Activer</h3>
+                    <p class="text-gray-400">Appuyez sur le bouton "Utiliser Capteurs" pour démarrer la réception des données.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="etape3_placement.png" alt="Illustration placement" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 3 : Placer</h3>
+                    <p class="text-gray-400">Maintenant, posez votre téléphone bien à plat sur votre panneau solaire.</p>
+                </div>
+                <div class="onboarding-slide hidden">
+                    <img src="etape4_memorisation.png" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 4 : Mémoriser</h3>
+                    <p class="text-gray-400">Une fois les valeurs d'angle et d'orientation stables, appuyez sur "Mémoriser ces mesures" !</p>
+                </div>
+            </div>
+
+            <div id="onboarding-dots" class="flex justify-center gap-2 my-4">
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <button id="onboarding-prev-btn" class="btn-secondary px-4 py-2 rounded-lg invisible">Précédent</button>
+                <button id="onboarding-next-btn" class="btn-primary px-4 py-2 rounded-lg">Suivant</button>
+                <button id="onboarding-finish-btn" class="btn-primary px-4 py-2 rounded-lg hidden">Terminer</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        (function() {
+            'use strict';
+
+            const DEBUG = false;
+            const CONFIG = {
+                donateLink: 'https://paypal.me/iFredZ',
+                reportEmail: 'finjalrac@gmail.com',
+                defaultLatitude: 44.21446,
+                defaultLongitude: 4.028,
+                clippingAdjustment: 10,
+                sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
+            };
+            
+            const translations = {
+                fr: {
+                    geoloc_error: "Erreur géoloc.",
+                    geoloc_not_supported: "Géolocalisation non supportée.",
+                    location_unavailable: "Impossible d’obtenir la position.",
+                    location_getting: "Obtention de la position...",
+                    activate_sensors: "Utiliser Capteurs",
+                    stop_sensors: "Arrêter Capteurs",
+                    manual_entry: "Saisie Manuelle",
+                    location: "Localisation",
+                    latitude_placeholder: "Latitude requise",
+                    target_date: "Date Cible",
+                    current_angle: "Angle Actuel",
+                    orientation: "Orientation",
+                    memorize_action: "Mémoriser",
+                    memorize_action_info: "Quand les valeurs sont stables",
+                    memorized: "Mémorisé !",
+                    calibrate_tilt: "Calibrer à plat",
+                    calibrate_tilt_success: "Calibration effectuée !",
+                    light_theme_label: "Mode Clair",
+                    tilt: "Inclinaison (°)",
+                    tilt_placeholder: "ex: 35",
+                    orientation_short: "Orientation (°)",
+                    orientation_helper: "EST (-) | SUD (0) | OUEST (+)",
+                    orientation_placeholder: "0",
+                    recommended_angle: "Angle Recommandé",
+                    waiting_for_sensor: "Orientez votre appareil...",
+                    calculate_gain: "Estimez votre production",
+                    seasonal_settings: "Réglages Saisonniers",
+                    winter: "Hiver",
+                    winter_date: "~21 Déc.",
+                    mid_season: "Mi-saison",
+                    mid_season_date: "~20 Mars & ~22 Sep.",
+                    summer: "Été",
+                    summer_date: "~21 Juin",
+                    donation_message: "Si cette estimation vous a été utile, pensez à soutenir ce projet en m'offrant un petit café ! ☕",
+                    estimation_title: "Estimation de Production",
+                    peak_power: "Puissance crête de votre installation (kWc)",
+                    longitude: "Longitude",
+                    current_tilt: "Inclinaison actuelle (°)",
+                    current_azimuth: "Orientation actuelle (Déviation / Sud)",
+                    azimuth_placeholder: "ex: -10 (10° Est)",
+                    calculate_gain_long: "Calculer le gain potentiel",
+                    prod_current_settings: "Production estimée (réglage actuel)",
+                    prod_optimal_settings: "Production estimée (réglage optimal)",
+                    daily_gain: "Gain potentiel journalier",
+                    monthly_gain: "Gain potentiel mensuel",
+                    settings_title: "Réglages",
+                    clipping_label: "Optimiser pour l'écrêtage",
+                    clipping_title: "Optimisation pour l'Écrêtage",
+                    clipping_problem_title: "Le Problème",
+                    clipping_problem_desc: "En été, votre production solaire peut dépasser la puissance maximale de votre onduleur. Cette énergie excédentaire est perdue : c'est l'écrêtage (ou \"clipping\").",
+                    clipping_solution_title: "La Solution",
+                    clipping_solution_desc: "Cocher cette case augmente volontairement l'angle de vos panneaux. Cela réduit le pic de production à midi (évitant la saturation) et augmente la production le matin et le soir, pour un gain global sur la journée.",
+                    got_it: "Compris",
+                    replay_tutorial: "Revoir le guide",
+                    main_guide_title: "Guide d'Utilisation",
+                    guide_step1_title: "Étape 1 : Localisation & Date",
+                    guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
+                    guide_step2_title: "Étape 2 : Choix du Mode",
+                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.",
+                    guide_step2_desc_manual: "<strong class='text-gray-200'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation de votre installation.",
+                    guide_step3_title: "Étape 3 : Lecture du Résultat",
+                    guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel. Les réglages saisonniers apparaissent également pour information.",
+                    guide_step4_title: "Étape 4 : Estimation du Gain",
+                    guide_step4_desc: "Cliquez sur \"Estimez votre production\". Vos données seront automatiquement reportées sur la page suivante pour une simulation précise.",
+                    estimation_guide_title: "Guide de l'Estimation",
+                    estimation_guide_step1_title: "Vérifiez vos Données",
+                    estimation_guide_step1_desc: "Les champs sont pré-remplis à partir de la page précédente. Vous pouvez les modifier pour simuler d'autres configurations.",
+                    estimation_guide_step2_title: "Lancez le Calcul",
+                    estimation_guide_step2_desc: "Cliquez sur \"Calculer\" pour comparer la production annuelle estimée de votre réglage actuel avec celle du réglage optimal recommandé.",
+                    compass_south: "Plein Sud",
+                    compass_east: "Est",
+                    compass_west: "Ouest",
+                    fill_all_fields_error: "Veuillez remplir tous les champs valides.",
+                    settings_already_optimal: "Vos réglages actuels sont déjà optimaux.",
+                    pvgis_error: "Erreur communication PVGIS.",
+                    bug_report_title: "Signaler un bug ou une suggestion",
+                    donate_title: "Soutenir le projet",
+                    bug_report_subject: "Suggestion / Bug pour Opti Solar",
+                    export_pdf: "Exporter en PDF",
+                    exporting_pdf: "Génération...",
+                    export_error_no_data: "Faites\ d’abord\ un\ calcul\ de\ production\.",
+                    sensors_activating: "Activation des capteurs...",
+                    invalid_measurements: "Mesures invalides."
+                },
+                en: {
+                    geoloc_error: "Geolocation error.",
+                    geoloc_not_supported: "Geolocation not supported.",
+                    location_unavailable: "Unable to get location.",
+                    location_getting: "Getting location...",
+                    activate_sensors: "Use Sensors",
+                    stop_sensors: "Stop Sensors",
+                    manual_entry: "Manual Input",
+                    location: "Location",
+                    latitude_placeholder: "Latitude required",
+                    target_date: "Target Date",
+                    current_angle: "Current Angle",
+                    orientation: "Orientation",
+                    memorize_action: "Memorize",
+                    memorize_action_info: "When values are stable",
+                    memorized: "Saved!",
+                    calibrate_tilt: "Calibrate Flat",
+                    calibrate_tilt_success: "Calibrated!",
+                    light_theme_label: "Light Mode",
+                    tilt: "Tilt (°)",
+                    tilt_placeholder: "e.g. 35",
+                    orientation_short: "Orientation (°)",
+                    orientation_helper: "EAST (-) | SOUTH (0) | WEST (+)",
+                    orientation_placeholder: "0",
+                    recommended_angle: "Recommended Angle",
+                    waiting_for_sensor: "Point your device...",
+                    calculate_gain: "Estimate your production",
+                    seasonal_settings: "Seasonal Settings",
+                    winter: "Winter",
+                    winter_date: "~Dec 21",
+                    mid_season: "Mid-Season",
+                    mid_season_date: "~Mar 20 & ~Sep 22",
+                    summer: "Summer",
+                    summer_date: "~Jun 21",
+                    donation_message: "If this estimate was helpful, consider supporting this project by buying me a small coffee! ☕",
+                    estimation_title: "Production Estimate",
+                    peak_power: "Your installation's peak power (kWp)",
+                    longitude: "Longitude",
+                    current_tilt: "Current Tilt (°)",
+                    current_azimuth: "Current Azimuth (Deviation / South)",
+                    azimuth_placeholder: "e.g. -10 (10° East)",
+                    calculate_gain_long: "Calculate potential gain",
+                    prod_current_settings: "Estimated production (current settings)",
+                    prod_optimal_settings: "Estimated production (optimal settings)",
+                    daily_gain: "Potential Daily Gain",
+                    monthly_gain: "Potential Monthly Gain",
+                    settings_title: "Settings",
+                    clipping_label: "Optimize for clipping",
+                    clipping_title: "Clipping Optimization",
+                    clipping_problem_title: "The Problem",
+                    clipping_problem_desc: "In summer, your solar production might exceed your inverter's maximum power. This excess energy is lost: this is clipping.",
+                    clipping_solution_title: "The Solution",
+                    clipping_solution_desc: "Checking this box intentionally increases the panel angle. This slightly reduces the production peak at noon (avoiding saturation) and increases morning and evening production, for an overall daily gain.",
+                    got_it: "Got it",
+                    replay_tutorial: "Replay Guide",
+                    main_guide_title: "User Guide",
+                    guide_step1_title: "Step 1: Location & Date",
+                    guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
+                    guide_step2_title: "Step 2: Choose Mode",
+                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.",
+                    guide_step2_desc_manual: "<strong class='text-gray-200'>Manual:</strong> For a simulation, enter your installation's tilt and orientation.",
+                    guide_step3_title: "Step 3: Read the Result",
+                    guide_step3_desc: "The recommended angle appears and adjusts in real-time. Seasonal settings are also shown for reference.",
+                    guide_step4_title: "Step 4: Estimate Gain",
+                    guide_step4_desc: "Click \"Estimate your production\". Your data will be automatically carried over to the next page for an accurate simulation.",
+                    estimation_guide_title: "Estimation Guide",
+                    estimation_guide_step1_title: "Check Your Data",
+                    estimation_guide_step1_desc: "The fields are pre-filled from the previous page. You can edit them to simulate other configurations.",
+                    estimation_guide_step2_title: "Run the Calculation",
+                    estimation_guide_step2_desc: "Click \"Calculate\" to compare the estimated annual production of your current setup with the recommended optimal setup.",
+                    compass_south: "Due South",
+                    compass_east: "East",
+                    compass_west: "West",
+                    fill_all_fields_error: "Please fill in all valid fields.",
+                    settings_already_optimal: "Your current settings are already optimal.",
+                    pvgis_error: "PVGIS communication error.",
+                    bug_report_title: "Report a bug or suggestion",
+                    donate_title: "Support the project",
+                    bug_report_subject: "Suggestion / Bug for Opti Solar",
+                    export_pdf: "Export to PDF",
+                    exporting_pdf: "Generating...",
+                    export_error_no_data: "Please\ run\ a\ production\ estimate\ first\.",
+                    sensors_activating: "Activating sensors...",
+                    invalid_measurements: "Invalid measurements."
+                }
+            };
+
+            const i18n = {
+                currentLang: 'fr',
+                setLanguage: function(lang) {
+                    if (!translations[lang]) return;
+                    this.currentLang = lang;
+                    document.documentElement.lang = lang;
+                    localStorage.setItem('userLang', lang);
+                    document.querySelectorAll('[data-i18n]').forEach(el => {
+                        const key = el.dataset.i18n;
+                        if (translations[lang][key]) el.innerHTML = translations[lang][key];
+                    });
+                    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                        const key = el.dataset.i18nPlaceholder;
+                        if (translations[lang][key]) el.placeholder = translations[lang][key];
+                    });
+                    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+                    if(state.sensorsActive) {
+                       dom.activateSensorsButton.textContent = translations[lang].stop_sensors;
+                    } else {
+                       dom.activateSensorsButton.textContent = translations[lang].activate_sensors;
+                    }
+                    dom.bugReportButton.querySelector('span').textContent = translations[lang].bug_report_title;
+                    dom.donateButtonFab.querySelector('span').textContent = translations[lang].donate_title;
+                    calculations.calculateAndDisplayAll();
+                }
+            };
+
+            const state = {
+                entryMode: null, 
+                currentLongitude: CONFIG.defaultLongitude,
+                sensorsActive: false,
+                memorizedTilt: null,
+                memorizedAzimuthValue: null,
+                memorizedLongitude: null,
+                lastRecommendedTilt: null,
+                panelAzimuthLive: null,
+                tiltOffset: 0,
+                lastCurrentProd: null,
+                lastOptimalProd: null
+            };
+
+            const dom = {
+                mainPage: document.getElementById('main-page'),
+                settingsPage: document.getElementById('settings-page'),
+                latitudeInput: document.getElementById('latitude-input'),
+                dateInput: document.getElementById('date-input'),
+                getLocationButton: document.getElementById('get-location'),
+                locationSubtitle: document.getElementById('location-subtitle'),
+                locationError: document.getElementById('location-error'),
+                activateSensorsButton: document.getElementById('activate-sensors-button'),
+                manualEntryButton: document.getElementById('manual-entry-button'),
+                sensorsDisplay: document.getElementById('sensors-display'),
+                currentAngleDisplay: document.getElementById('current-angle'),
+                currentCompassDisplay: document.getElementById('current-compass'),
+                memorizeRingBtn: document.getElementById('memorize-ring-btn'),
+                memorizeBtnText: document.getElementById('memorize-btn-text'),
+                memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
+                calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
+                sensorError: document.getElementById('sensor-error'),
+                manualEntryDisplay: document.getElementById('manual-entry-display'),
+                manualTiltInput: document.getElementById('manual-tilt-input'),
+                manualAzimuthInput: document.getElementById('manual-azimuth-input'),
+                resultContainer: document.getElementById('result-container'),
+                resultDisplay: document.getElementById('result'),
+                seasonalContainer: document.getElementById('seasonal-container'),
+                winterAngleDisplay: document.getElementById('winter-angle'),
+                springFallAngleDisplay: document.getElementById('spring-fall-angle'),
+                summerAngleDisplay: document.getElementById('summer-angle'),
+                gotoEstimationButton: document.getElementById('goto-estimation-button'),
+                clippingCheckbox: document.getElementById('clipping-checkbox'),
+                themeToggle: document.getElementById('theme-toggle'),
+                backButton: document.getElementById('back-button'),
+                peakPowerInput: document.getElementById('peak-power'),
+                longitudeInput: document.getElementById('longitude-input'),
+                currentTiltInput: document.getElementById('current-tilt-input'),
+                currentAzimuthInput: document.getElementById('current-azimuth-input'),
+                calculateProductionButton: document.getElementById('calculate-production'),
+                productionResults: document.getElementById('production-results'),
+                exportContainer: document.getElementById('export-container'),
+                exportPdfBtn: document.getElementById('export-pdf-btn'),
+                currentProductionDisplay: document.getElementById('current-production'),
+                optimalProductionDisplay: document.getElementById('optimal-production'),
+                potentialGainDisplay: document.getElementById('potential-gain'),
+                potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
+                pvgisError: document.getElementById('pvgis-error'),
+                calculateText: document.getElementById('calculate-text'),
+                calculateLoader: document.getElementById('calculate-loader'),
+                donationMessage: document.getElementById('donation-message'),
+                settingsButton: document.getElementById('settings-button'),
+                bugReportButton: document.getElementById('bug-report-button'),
+                donateButtonFab: document.getElementById('donate-button-fab'),
+                mainHelpButton: document.getElementById('main-help-button'),
+                settingsHelpButton: document.getElementById('settings-help-button'),
+                clippingHelpButton: document.getElementById('clipping-help-button'),
+                settingsModal: document.getElementById('settings-modal'),
+                clippingHelpModal: document.getElementById('clipping-help-modal'),
+                mainHelpModal: document.getElementById('main-help-modal'),
+                settingsHelpModal: document.getElementById('settings-help-modal'),
+                onboardingModal: document.getElementById('onboarding-modal'),
+                onboardingSlides: document.querySelectorAll('.onboarding-slide'),
+                onboardingDots: document.querySelectorAll('.onboarding-dot'),
+                onboardingPrevBtn: document.getElementById('onboarding-prev-btn'),
+                onboardingNextBtn: document.getElementById('onboarding-next-btn'),
+                onboardingFinishBtn: document.getElementById('onboarding-finish-btn'),
+                replayTutorialBtn: document.getElementById('replay-tutorial-btn')
+            };
+
+            const utils = {
+                log: (...args) => { if (DEBUG) console.log('[OptimAngle]', ...args); },
+                toRadians: (deg) => deg * Math.PI / 180,
+                toDegrees: (rad) => rad * 180 / Math.PI,
+                getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
+                getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
+                formatNumber: (n, dec = 2) =>
+                  Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US',
+                    { minimumFractionDigits: dec, maximumFractionDigits: dec }),
+                safeParseFloat: (v, fallback = NaN) => {
+                    if (v === null || v === undefined || v === '') return fallback;
+                    const s = String(v).replace(',', '.').trim();
+                    const n = parseFloat(s);
+                    return Number.isFinite(n) ? n : fallback;
+                },
+                clamp: (x, min, max) => Math.min(Math.max(x, min), max),
+                normalizeAngle: (a) => (a % 360 + 360) % 360
+            };
+
+            const ui = {
+                showPage: (page) => {
+                    dom.mainPage.classList.toggle('hidden', page !== 'main');
+                    dom.settingsPage.classList.toggle('hidden', page !== 'settings');
+                    dom.mainHelpButton.classList.toggle('hidden', page !== 'main');
+                    dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
+                },
+                updateLocationFields: (lat, lon) => {
+                    dom.latitudeInput.value = lat;
+                    state.currentLongitude = lon;
+                    dom.longitudeInput.value = lon;
+                    dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
+                    dom.locationError.textContent = '';
+                    try { localStorage.setItem('userLocation', JSON.stringify({lat, lon})); } catch(e) {}
+                    calculations.calculateAndDisplayAll();
+                },
+                setEntryMode: (mode) => {
+                    state.entryMode = mode;
+                    if (mode === 'sensors') {
+                        dom.sensorsDisplay.classList.remove('hidden');
+                        dom.manualEntryDisplay.classList.add('hidden');
+                        dom.activateSensorsButton.classList.add('btn-danger');
+                        dom.activateSensorsButton.classList.remove('btn-primary');
+                        dom.manualEntryButton.classList.add('btn-secondary');
+                        dom.manualEntryButton.classList.remove('btn-danger');
+                        
+                        dom.resultContainer.classList.remove('hidden');
+                        dom.resultDisplay.textContent = translations[i18n.currentLang].waiting_for_sensor;
+                        dom.seasonalContainer.classList.add('hidden');
+
+                        sensors.start();
+                    } else if (mode === 'manual') {
+                        if(state.sensorsActive) sensors.stop();
+                        dom.sensorsDisplay.classList.add('hidden');
+                        dom.manualEntryDisplay.classList.remove('hidden');
+                        dom.manualEntryButton.classList.add('btn-danger');
+                        dom.manualEntryButton.classList.remove('btn-secondary');
+                        dom.activateSensorsButton.classList.add('btn-primary');
+                        dom.activateSensorsButton.classList.remove('btn-danger');
+                        dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
+                        dom.gotoEstimationButton.classList.remove('hidden');
+                    }
+                    calculations.calculateAndDisplayAll();
+                }
+            };
+
+            const calculations = {
+                calculateAndDisplayAll: () => {
+                    const dateValue = dom.dateInput.value;
+                    const latValueStr = dom.latitudeInput.value;
+                    const lat = utils.safeParseFloat(latValueStr);
+
+                    let panelAzimuthDeviation = NaN;
+
+                    if (state.entryMode === 'manual') {
+                        panelAzimuthDeviation = utils.safeParseFloat(dom.manualAzimuthInput.value);
+                    } else if (state.entryMode === 'sensors' && state.sensorsActive && state.panelAzimuthLive !== null) {
+                        let deviation = state.panelAzimuthLive - 180;
+                        if (deviation > 180) deviation -= 360;
+                        if (deviation < -180) deviation += 360;
+                        panelAzimuthDeviation = deviation;
+                    }
+
+                    if (!dateValue || isNaN(lat) || isNaN(panelAzimuthDeviation)) {
+                        if (state.entryMode !== 'sensors') {
+                           dom.resultContainer.classList.add('hidden');
+                        }
+                        dom.seasonalContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    dom.resultContainer.classList.remove('hidden');
+                    dom.seasonalContainer.classList.remove('hidden');
+                    
+                    const selectedDate = new Date(dateValue);
+                    if (isNaN(selectedDate.getTime())) return;
+                    
+                    const dayOfYear = utils.getDayOfYear(selectedDate);
+                    const declination = utils.getDeclination(dayOfYear);
+                    
+                    const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
+                    const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+                    
+                    const dev = Math.abs(panelAzimuthDeviation);
+                    const penalty = Math.min(6, dev / 12);
+                    
+                    const solarNoonAltitude = 90 - Math.abs(lat - declination);
+                    let optimalTilt = 90 - solarNoonAltitude;
+                    optimalTilt += clipping;
+                    optimalTilt -= penalty;
+                    
+                    optimalTilt = utils.clamp(optimalTilt, 0, 90);
+                    
+                    state.lastRecommendedTilt = optimalTilt;
+                    dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
+
+                    const f = Math.round((Math.abs(declination) / 23.44) * 15);
+                    const absLat = Math.abs(lat);
+                    dom.winterAngleDisplay.textContent = `${Math.round(utils.clamp(absLat + f - penalty, 0, 90))}°`;
+                    dom.springFallAngleDisplay.textContent = `${Math.round(utils.clamp(absLat - penalty, 0, 90))}°`;
+                    dom.summerAngleDisplay.textContent = `${Math.round(utils.clamp(absLat - f + clipping - penalty, 0, 90))}°`;
+                }
+            };
+
+            const sensors = {
+                lastUpdate: 0,
+                getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta - state.tiltOffset)), 0, 90),
+                getHeadingFromEvent: (e) => {
+                    if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
+                    if (typeof e.alpha !== 'number') return null;
+                    const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
+                    let heading = (360 - e.alpha + screenAngle) % 360;
+                    return heading < 0 ? heading + 360 : heading;
+                },
+                formatAzimuthForDisplay: (azimuth) => {
+                    let deviation = azimuth - 180;
+                    if (deviation > 180) deviation -= 360;
+                    if (deviation < -180) deviation += 360;
+                    const lang = i18n.currentLang;
+                    if (Math.abs(deviation) < 5) return translations[lang].compass_south;
+                    const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
+                    return `${Math.round(Math.abs(deviation))}° ${direction}`;
+                },
+                handleOrientation: (event) => {
+                    const now = performance.now();
+                    if (now - sensors.lastUpdate < 100) return;
+                    sensors.lastUpdate = now;
+                    
+                    const tilt = sensors.getTiltFromEvent(event);
+                    if (tilt !== null) {
+                        dom.currentAngleDisplay.textContent = tilt;
+                        dom.sensorError.textContent = '';
+                        dom.memorizeRingBtn.disabled = false;
+                    }
+                    const heading = sensors.getHeadingFromEvent(event);
+                    if (heading !== null) {
+                        state.panelAzimuthLive = utils.normalizeAngle(heading);
+                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
+                    }
+                    calculations.calculateAndDisplayAll();
+                },
+                start: async () => {
+                    if (state.sensorsActive) { 
+                        sensors.stop();
+                        return;
+                    }
+                    dom.memorizeRingBtn.disabled = true;
+                    dom.sensorError.textContent = translations[i18n.currentLang].sensors_activating;
+                    try {
+                        if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
+                            const permission = await DeviceOrientationEvent.requestPermission();
+                            if (permission !== 'granted') {
+                                dom.sensorError.textContent = 'Permission capteurs refusée.';
+                                ui.setEntryMode(null);
+                                return;
+                            }
+                        }
+                        window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                        state.sensorsActive = true;
+                        dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
+                        dom.gotoEstimationButton.classList.remove('hidden');
+                    } catch (err) {
+                        dom.sensorError.textContent = 'Erreur demande permission.';
+                        utils.log('DeviceOrientation permission error', err);
+                    }
+                },
+                stop: () => {
+                    if (!state.sensorsActive) return;
+                    window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                    state.sensorsActive = false;
+                    state.panelAzimuthLive = null;
+                    dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
+                    dom.activateSensorsButton.classList.remove('btn-danger');
+                    dom.activateSensorsButton.classList.add('btn-primary');
+                    dom.currentAngleDisplay.textContent = '--';
+                    dom.currentCompassDisplay.textContent = '--';
+                    dom.sensorError.textContent = '';
+                    dom.memorizeRingBtn.disabled = true;
+                    calculations.calculateAndDisplayAll(); 
+                }
+            };
+            
+            const handlers = {
+                openExternalLink: (event) => {
+                    event.preventDefault();
+                    window.open(CONFIG.donateLink, '_blank', 'noopener,noreferrer');
+                },
+                openBugReport: (event) => {
+                    event.preventDefault();
+                    const subject = translations[i18n.currentLang].bug_report_subject;
+                    window.location.href = `mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`;
+                },
+                prepareEstimationPage: () => {
+                    if (state.entryMode === 'manual') {
+                        dom.currentTiltInput.value = dom.manualTiltInput.value;
+                        dom.currentAzimuthInput.value = dom.manualAzimuthInput.value;
+                    } else { 
+                        dom.currentTiltInput.value = (state.memorizedTilt !== null) ? state.memorizedTilt : '';
+                        if (state.memorizedAzimuthValue !== null) {
+                             let deviation = state.memorizedAzimuthValue - 180;
+                            if (deviation > 180) deviation -= 360;
+                            if (deviation < -180) deviation += 360;
+                            dom.currentAzimuthInput.value = Math.round(deviation);
+                        } else {
+                            dom.currentAzimuthInput.value = '';
+                        }
+                    }
+                    dom.longitudeInput.value = state.currentLongitude;
+                    ui.showPage('settings');
+                },
+                memorizeSensorValues: async () => {
+                    const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
+                    const az = state.panelAzimuthLive;
+                    if (!Number.isFinite(tilt) || !Number.isFinite(az)) {
+                        dom.sensorError.textContent = translations[i18n.currentLang].invalid_measurements;
+                        return;
+                    }
+                    
+                    try {
+                        const { Haptics, ImpactStyle } = Capacitor.Plugins;
+                        await Haptics.impact({ style: ImpactStyle.Medium });
+                    } catch(e) {
+                         utils.log("Haptics not available, fallback to vibrate", e);
+                         if (navigator.vibrate) navigator.vibrate(100);
+                    }
+                    
+                    dom.memorizeRingBtn.classList.add('shockwave');
+                    dom.memorizeBtnText.classList.add('hidden');
+                    dom.memorizeCheckmarkIcon.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        dom.memorizeRingBtn.classList.remove('shockwave');
+                        dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorized;
+                        setTimeout(() => {
+                            dom.memorizeCheckmarkIcon.classList.add('hidden');
+                            dom.memorizeBtnText.classList.remove('hidden');
+                            dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorize_action;
+                        }, 1500);
+                    }, 700);
+
+                    state.memorizedTilt = tilt;
+                    state.memorizedAzimuthValue = az;
+                    state.memorizedLongitude = state.currentLongitude;
+                },
+                handleModalKeydown: (e) => {
+                    if (e.key === 'Escape') {
+                        const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+                        if (openModal) {
+                            openModal.classList.add('hidden');
+                        }
+                    }
+                },
+                replayTutorial: () => {
+                    dom.mainHelpModal.classList.add('hidden');
+                    onboarding.start();
+                },
+                calibrateTilt: () => {
+                    const once = (e) => {
+                        if (e.beta !== null) {
+                            state.tiltOffset = e.beta;
+                            localStorage.setItem('tiltOffset', state.tiltOffset.toString());
+                            const originalText = dom.calibrateTiltBtn.textContent;
+                            dom.calibrateTiltBtn.textContent = translations[i18n.currentLang].calibrate_tilt_success;
+                            setTimeout(() => { dom.calibrateTiltBtn.textContent = originalText; }, 2000);
+                        }
+                        window.removeEventListener(CONFIG.sensorEventName, once, true);
+                    };
+                    window.addEventListener(CONFIG.sensorEventName, once, true);
+                },
+                savePeakPower: () => {
+                    localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
+                },
+                exportToPDF: () => {
+                    if (!state.lastCurrentProd || !state.lastOptimalProd) {
+                        alert(translations[i18n.currentLang].export_error_no_data);
+                        return;
+                    }
+                    const btn = dom.exportPdfBtn;
+                    const originalText = btn.querySelector('span').textContent;
+                    btn.disabled = true;
+                    btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
+
+                    const now = new Date();
+                    const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
+                    
+                    const reportElement = document.createElement('div');
+                    const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
+                    const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
+                    
+                    reportElement.innerHTML = `
+                        <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+                            <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
+                            <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
+                            </table>
+                            
+                            <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Annuelle Estimée</h2>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                                <thead>
+                                    <tr style="background-color: #1d4ed8; color: white; text-align: left;">
+                                        <th style="padding: 8px;">Configuration</th>
+                                        <th style="padding: 8px;">Inclinaison</th>
+                                        <th style="padding: 8px;">Orientation</th>
+                                        <th style="padding: 8px;">Prod. Journalière</th>
+                                        <th style="padding: 8px;">Prod. Mensuelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: #f1f5f9;">
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Optimale</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">0° / Sud</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${dom.optimalProductionDisplay.textContent}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${optMonthlyProd} kWh</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                             <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
+                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                                <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Gain Journalier</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainDisplay.textContent}</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #ddd;">Gain Mensuel</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                            </table>
+                        </div>
+                    `;
+
+                    const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
+                    html2pdf().from(reportElement).set({
+                        margin: 10,
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).save().then(() => {
+                        btn.disabled = false;
+                        btn.querySelector('span').textContent = originalText;
+                    });
+                }
+            };
+
+            const onboarding = {
+                currentIndex: 0,
+                start: function() {
+                    dom.onboardingModal.classList.remove('hidden');
+                    this.showSlide(0);
+                },
+                showSlide: function(index) {
+                    this.currentIndex = index;
+                    dom.onboardingSlides.forEach((slide, i) => {
+                        slide.classList.toggle('hidden', i !== index);
+                    });
+                    dom.onboardingDots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+
+                    dom.onboardingPrevBtn.classList.toggle('invisible', index === 0);
+                    dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
+                    dom.onboardingFinishBtn.classList.toggle('hidden', index !== dom.onboardingSlides.length - 1);
+                },
+                next: function() {
+                    if (this.currentIndex < dom.onboardingSlides.length - 1) {
+                        this.showSlide(this.currentIndex + 1);
+                    }
+                },
+                finish: function() {
+                    dom.onboardingModal.classList.add('hidden');
+                    try {
+                        localStorage.setItem('onboardingComplete', 'true');
+                    } catch (e) {
+                        utils.log("Could not save to localStorage", e);
+                    }
+                }
+            };
+
+            const theme = {
+                apply: (themeName) => {
+                    document.body.classList.toggle('light-mode', themeName === 'light');
+                    dom.themeToggle.checked = (themeName === 'light');
+                },
+                toggle: () => {
+                    const newTheme = dom.themeToggle.checked ? 'light' : 'dark';
+                    theme.apply(newTheme);
+                    localStorage.setItem('userTheme', newTheme);
+                },
+                load: () => {
+                    const savedTheme = localStorage.getItem('userTheme') || 'dark';
+                    theme.apply(savedTheme);
+                }
+            };
+
+            const api = {
+                fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
+                    const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
+                    try {
+                        const cachedData = sessionStorage.getItem(cacheKey);
+                        if (cachedData) {
+                            utils.log('Returning cached PVGIS data.');
+                            return JSON.parse(cachedData);
+                        }
+                    } catch (e) {
+                        utils.log('Could not access sessionStorage', e);
+                    }
+
+                    const fetchWithTimeout = (resource, options = {}, timeout = 8000) => {
+                      return new Promise((resolve, reject) => {
+                        const controller = new AbortController();
+                        const id = setTimeout(() => {
+                            controller.abort();
+                            reject(new Error('Fetch timeout'));
+                        }, timeout);
+                        fetch(resource, { ...options, signal: controller.signal })
+                          .then(response => {
+                            clearTimeout(id);
+                            resolve(response);
+                          })
+                          .catch(error => {
+                            clearTimeout(id);
+                            reject(error);
+                          });
+                      });
+                    };
+
+                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
+                    
+                    const strategies = [
+                        async () => {
+                            const res = await fetchWithTimeout(pvgisUrl, {}, 5000);
+                            if (!res.ok) throw new Error('Direct call failed');
+                            return await res.json();
+                        },
+                        async () => {
+                             const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
+                             const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                             if (!res.ok) throw new Error('Proxy allorigins.win failed');
+                             const data = await res.json();
+                             return JSON.parse(data.contents);
+                        },
+                        async () => {
+                            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
+                            const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                            if (!res.ok) throw new Error('Proxy corsproxy.io failed');
+                            return await res.json();
+                        }
+                    ];
+
+
+                    for (let i = 0; i < strategies.length; i++) {
+                        try {
+                            utils.log(`Attempting PVGIS fetch with strategy #${i + 1}`);
+                            const json = await strategies[i]();
+                            if (json?.outputs?.totals?.fixed) {
+                                utils.log(`Strategy #${i + 1} succeeded.`);
+                                try {
+                                    sessionStorage.setItem(cacheKey, JSON.stringify(json));
+                                } catch (e) {
+                                    utils.log('Could not save to sessionStorage', e);
+                                }
+                                return json;
+                            }
+                        } catch (error) {
+                            utils.log(`Strategy #${i + 1} failed:`, error.message);
+                        }
+                    }
+
+                    throw new Error('All PVGIS fetch strategies failed.');
+                },
+                getProductionEstimate: async () => { 
+                    dom.exportContainer.classList.add('hidden');
+                    dom.pvgisError.textContent = ''; 
+                    dom.productionResults.classList.add('hidden');
+                    dom.donationMessage.classList.add('hidden');
+                    
+                    dom.calculateLoader.classList.remove('hidden');
+                    dom.calculateText.classList.add('hidden');
+
+                    const lat = utils.safeParseFloat(dom.latitudeInput.value); 
+                    const lon = utils.safeParseFloat(dom.longitudeInput.value); 
+                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); 
+                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); 
+                    const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value); 
+                    
+                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(v => isNaN(v))) { 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].fill_all_fields_error;
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden'); 
+                        return; 
+                    } 
+                    
+                    try {
+                        const selectedDate = new Date(dom.dateInput.value);
+                        const dayOfYear = utils.getDayOfYear(selectedDate);
+                        const declination = utils.getDeclination(dayOfYear);
+                        
+                        const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
+                    const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+                        const dev = Math.abs(currentAzimuth);
+                        const penalty = Math.min(6, dev / 12);
+                        
+                        let trueOptimalTilt = 90 - (90 - Math.abs(lat - declination));
+                        let finalOptimalTilt = Math.round(trueOptimalTilt + clipping - penalty);
+                        finalOptimalTilt = utils.clamp(finalOptimalTilt, 0, 90);
+
+                        const [currentProd, optimalProd] = await Promise.all([ 
+                            api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
+                            api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, 0) 
+                        ]);
+
+                        state.lastCurrentProd = currentProd;
+                        state.lastOptimalProd = optimalProd;
+
+                        let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
+                        let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0; 
+                        let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
+                        let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
+
+                        if (optDaily < curDaily) { 
+                            optDaily = curDaily; 
+                            optMonthly = curMonthly; 
+                            dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal; 
+                        } else { 
+                            dom.pvgisError.textContent = ''; 
+                        } 
+
+                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
+                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
+                        const gainDaily = optDaily - curDaily; 
+                        dom.potentialGainDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
+                        const gainMonthly = optMonthly - curMonthly; 
+                        dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
+                        
+                        dom.productionResults.classList.remove('hidden');
+                        dom.donationMessage.classList.remove('hidden');
+                        dom.exportContainer.classList.remove('hidden');
+
+                    } catch (err) { 
+                        dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
+                        utils.log('PVGIS error', err); 
+                    } finally { 
+                        dom.calculateText.classList.remove('hidden'); 
+                        dom.calculateLoader.classList.add('hidden');
+                    } 
+                }
+            };
+
+            function init() {
+                try {
+                    theme.load();
+                    const savedLang = localStorage.getItem('userLang') || 'fr';
+                    i18n.setLanguage(savedLang);
+
+                    const savedLocation = localStorage.getItem('userLocation');
+                    if (savedLocation) {
+                        const { lat, lon } = JSON.parse(savedLocation);
+                        dom.latitudeInput.value = lat;
+                        dom.longitudeInput.value = lon;
+                        dom.locationSubtitle.textContent = `Lat ${utils.formatNumber(lat, 4)} Lon ${utils.formatNumber(lon, 4)}`;
+                    } else {
+                        dom.latitudeInput.value = CONFIG.defaultLatitude;
+                        dom.longitudeInput.value = CONFIG.defaultLongitude;
+                    }
+                    
+                    state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
+                    
+                    const savedPeakPower = localStorage.getItem('userPeakPower');
+                    if (savedPeakPower) {
+                        dom.peakPowerInput.value = savedPeakPower;
+                    }
+
+                    if (!localStorage.getItem('onboardingComplete')) {
+                        onboarding.start();
+                    }
+                } catch (e) {
+                    utils.log("Could not access localStorage", e);
+                    i18n.setLanguage('fr');
+                    dom.latitudeInput.value = CONFIG.defaultLatitude;
+                    dom.longitudeInput.value = CONFIG.defaultLongitude;
+                }
+
+                ['change', 'input'].forEach(evt => {
+                    dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.dateInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.clippingCheckbox.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.manualTiltInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                    dom.manualAzimuthInput.addEventListener(evt, calculations.calculateAndDisplayAll);
+                });
+                
+                dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);
+                
+                dom.activateSensorsButton.addEventListener('click', () => {
+                    state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors');
+                });
+                dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
+
+                dom.getLocationButton.addEventListener('click', () => geolocation.get());
+                dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
+                dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
+                dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
+                dom.bugReportButton.addEventListener('click', handlers.openBugReport);
+				dom.donationMessage.addEventListener('click', handlers.openExternalLink);
+
+                dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
+                dom.backButton.addEventListener('click', () => ui.showPage('main'));
+                dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
+                dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
+
+                const modals = [
+                    { btn: dom.settingsButton, modal: dom.settingsModal }, { btn: dom.clippingHelpButton, modal: dom.clippingHelpModal },
+                    { btn: dom.mainHelpButton, modal: dom.mainHelpModal }, { btn: dom.settingsHelpButton, modal: dom.settingsHelpModal }
+                ];
+                modals.forEach(item => item.btn.addEventListener('click', () => item.modal.classList.remove('hidden')));
+                
+                const closeButtons = document.querySelectorAll('.close-modal-btn');
+                closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden')));
+                
+                document.addEventListener('keydown', handlers.handleModalKeydown);
+
+                dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
+                dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
+                dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
+                dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
+
+                dom.themeToggle.addEventListener('change', theme.toggle);
+
+
+                document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => i18n.setLanguage(e.target.dataset.lang));
+                });
+
+                const today = new Date();
+                dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                
+                calculations.calculateAndDisplayAll();
+                utils.log('Application initialisée.');
+            }
+            
+            const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };
+
+            window.addEventListener('load', init);
+        })();
+    </script>
+</body>
+</html>
         :root {
             --bg: #0b1220;
             --card: #121a2b;
@@ -1628,3 +3257,4 @@
     </script>
 </body>
 </html>
+

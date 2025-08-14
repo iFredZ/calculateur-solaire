@@ -271,7 +271,7 @@
         }
 
     
-/* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v2.6.8) ====== */
+/* ====== STYLES HI-TECH POUR LE BOUTON MÉMORISER (v3.0.0) ====== */
 #memorize-ring-btn.btn-style-neon {
   background: radial-gradient(100px 100px at 50% 50%, rgba(65,209,183,.15), rgba(65,209,183,0) 70%),
               linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.2));
@@ -601,7 +601,7 @@
             <span class="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bug_report_title"></span>
         </a>
 
-        <p class="text-xs text-gray-600">v2.6.8</p>
+        <p class="text-xs text-gray-600">v3.0.0</p>
 
         <a id="donate-button-fab" href="#" class="icon-btn text-red-400 relative group">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
@@ -639,29 +639,28 @@
                      </div>
                 </div>
                  
-                <!-- Choix du style du bouton Mémoriser -->
                 <div class="space-y-2">
-                    <label class="font-medium" data-i18n="button_style_label">Style du bouton "Mémoriser"</label>
+                    <label class="font-medium" data-i18n="button_style_label"></label>
                     <fieldset class="space-y-2">
                         <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_default">Classique (défaut)</span>
+                            <span data-i18n="button_style_default"></span>
                             <input type="radio" name="memorize-style" value="default" class="memorize-style-radio">
                         </label>
                         <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_neon">Neon Pulse Pro</span>
+                            <span data-i18n="button_style_neon"></span>
                             <input type="radio" name="memorize-style" value="neon" class="memorize-style-radio">
                         </label>
                         <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_glass">Glass Orb</span>
+                            <span data-i18n="button_style_glass"></span>
                             <input type="radio" name="memorize-style" value="glass" class="memorize-style-radio">
                         </label>
                         <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_radar">Radar Sweep</span>
+                            <span data-i18n="button_style_radar"></span>
                             <input type="radio" name="memorize-style" value="radar" class="memorize-style-radio">
                         </label>
                     </fieldset>
                 </div>
-<div class="pt-4 border-t border-gray-800">
+                <div class="pt-4 border-t border-gray-800">
                     <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg transition-colors" data-i18n="calibrate_tilt"></button>
                 </div>
             </div>
@@ -726,7 +725,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-lg" data-i18n="guide_step2_title"></h4>
-                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step2_desc_sensors"></p>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="guide_step2_desc"></p>
                     </div>
                 </div>
                 <div class="flex items-start space-x-4">
@@ -795,23 +794,23 @@
             <div class="flex-grow">
                 <div class="onboarding-slide">
                     <img src="etape1_calibrage.png" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 1 : Calibrer</h3>
-                    <p class="text-gray-400">Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.</p>
+                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step1_title"></h3>
+                    <p class="text-gray-400" data-i18n="onboarding_step1_desc"></p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 2 : Activer</h3>
-                    <p class="text-gray-400">Appuyez sur "Utiliser Capteurs" pour démarrer la réception des données.</p>
+                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step2_title"></h3>
+                    <p class="text-gray-400" data-i18n="onboarding_step2_desc"></p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape3_placement.png" alt="Illustration placement" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 3 : Placer</h3>
-                    <p class="text-gray-400">Maintenant, posez votre téléphone (sans coque magnétique) bien à plat sur votre panneau solaire.</p>
+                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step3_title"></h3>
+                    <p class="text-gray-400" data-i18n="onboarding_step3_desc"></p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape4_memorisation.png" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Étape 4 : Mémoriser</h3>
-                    <p class="text-gray-400">Une fois les valeurs d'angle et d'orientation stables, appuyez sur "Mémoriser ces mesures" !</p>
+                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step4_title"></h3>
+                    <p class="text-gray-400" data-i18n="onboarding_step4_desc"></p>
                 </div>
             </div>
 
@@ -823,9 +822,9 @@
             </div>
 
             <div class="flex justify-between items-center mt-4">
-                <button id="onboarding-prev-btn" class="btn-secondary px-4 py-2 rounded-lg invisible">Précédent</button>
-                <button id="onboarding-next-btn" class="btn-primary px-4 py-2 rounded-lg">Suivant</button>
-                <button id="onboarding-finish-btn" class="btn-primary px-4 py-2 rounded-lg hidden">Terminer</button>
+                <button id="onboarding-prev-btn" class="btn-secondary px-4 py-2 rounded-lg invisible" data-i18n="onboarding_prev"></button>
+                <button id="onboarding-next-btn" class="btn-primary px-4 py-2 rounded-lg" data-i18n="onboarding_next"></button>
+                <button id="onboarding-finish-btn" class="btn-primary px-4 py-2 rounded-lg hidden" data-i18n="onboarding_finish"></button>
             </div>
         </div>
     </div>
@@ -905,8 +904,7 @@
                     guide_step1_title: "Étape 1 : Localisation & Date",
                     guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
                     guide_step2_title: "Étape 2 : Choix du Mode",
-                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong class='text-yellow-400'>Attention : retirez toute coque magnétique pour éviter de fausser la mesure d'orientation.</strong>",
-                    guide_step2_desc_manual: "<strong class='text-gray-200'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation de votre installation.",
+                    guide_step2_desc: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong class='text-yellow-400'>Attention : retirez toute coque magnétique pour éviter de fausser la mesure d'orientation.</strong><br><br><strong class='text-gray-200'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation manuellement.",
                     guide_step3_title: "Étape 3 : Lecture du Résultat",
                     guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel. Les réglages saisonniers apparaissent également pour information.",
                     guide_step4_title: "Étape 4 : Estimation du Gain",
@@ -916,6 +914,17 @@
                     estimation_guide_step1_desc: "Les champs sont pré-remplis à partir de la page précédente. Vous pouvez les modifier pour simuler d'autres configurations.",
                     estimation_guide_step2_title: "Lancez le Calcul",
                     estimation_guide_step2_desc: "Cliquez sur \"Calculer\" pour comparer la production annuelle estimée de votre réglage actuel avec celle du réglage optimal recommandé.",
+                    onboarding_step1_title: "Étape 1 : Calibrer",
+                    onboarding_step1_desc: "Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.",
+                    onboarding_step2_title: "Étape 2 : Activer",
+                    onboarding_step2_desc: "Appuyez sur \"Utiliser Capteurs\" pour démarrer la réception des données.",
+                    onboarding_step3_title: "Étape 3 : Placer",
+                    onboarding_step3_desc: "Maintenant, posez votre téléphone (sans coque magnétique) bien à plat sur votre panneau solaire.",
+                    onboarding_step4_title: "Étape 4 : Mémoriser",
+                    onboarding_step4_desc: "Une fois les valeurs d'angle et d'orientation stables, appuyez sur le grand bouton rond !",
+                    onboarding_prev: "Précédent",
+                    onboarding_next: "Suivant",
+                    onboarding_finish: "Terminer",
                     compass_south: "Plein Sud",
                     compass_east: "Est",
                     compass_west: "Ouest",
@@ -933,13 +942,13 @@
                     pdf_disclaimer_title: "Avertissement Important Concernant la Précision",
                     pdf_disclaimer_text: "Les données de production et les mesures d'inclinaison/orientation fournies dans ce rapport sont des estimations. La précision des capteurs (boussole, accéléromètre) peut varier d'un téléphone à l'autre. De plus, la présence d'objets métalliques, et plus particulièrement l'utilisation de <strong>coques ou supports magnétiques</strong> pour téléphone, peut entraîner des erreurs d'orientation significatives. Il est fortement recommandé de retirer toute coque magnétique avant la mesure et de corroborer ces données avec des outils professionnels. Les créateurs de cette application ne sauraient être tenus responsables des écarts entre les estimations et la production réelle.",
                     sensors_activating: "Activation des capteurs...",
-                    invalid_measurements: "Mesures invalides."
-                
-                    button_style_label: "Style du bouton \"M\u00e9moriser\"",
-                    button_style_default: "Classique (d\u00e9faut)",
+                    invalid_measurements: "Mesures invalides.",
+                    button_style_label: "Style du bouton \"Mémoriser\"",
+                    button_style_default: "Classique (défaut)",
                     button_style_neon: "Neon Pulse Pro",
                     button_style_glass: "Glass Orb",
-                    button_style_radar: "Radar Sweep",},
+                    button_style_radar: "Radar Sweep",
+                },
                 en: {
                     geoloc_error: "Geolocation error.",
                     geoloc_not_supported: "Geolocation not supported.",
@@ -999,8 +1008,7 @@
                     guide_step1_title: "Step 1: Location & Date",
                     guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
                     guide_step2_title: "Step 2: Choose Mode",
-                    guide_step2_desc_sensors: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case to avoid incorrect orientation readings.</strong>",
-                    guide_step2_desc_manual: "<strong class='text-gray-200'>Manual:</strong> For a simulation, enter your installation's tilt and orientation.",
+                    guide_step2_desc: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case to avoid incorrect orientation readings.</strong><br><br><strong class='text-gray-200'>Manual:</strong> For a simulation, enter the tilt and orientation manually.",
                     guide_step3_title: "Step 3: Read the Result",
                     guide_step3_desc: "The recommended angle appears and adjusts in real-time. Seasonal settings are also shown for reference.",
                     guide_step4_title: "Step 4: Estimate Gain",
@@ -1010,6 +1018,17 @@
                     estimation_guide_step1_desc: "The fields are pre-filled from the previous page. You can edit them to simulate other configurations.",
                     estimation_guide_step2_title: "Run the Calculation",
                     estimation_guide_step2_desc: "Click \"Calculate\" to compare the estimated annual production of your current setup with the recommended optimal setup.",
+                    onboarding_step1_title: "Step 1: Calibrate",
+                    onboarding_step1_desc: "For an accurate measurement, calibrate your compass by making a 'figure 8' motion with your phone.",
+                    onboarding_step2_title: "Step 2: Activate",
+                    onboarding_step2_desc: "Press \"Use Sensors\" to start receiving data.",
+                    onboarding_step3_title: "Step 3: Place",
+                    onboarding_step3_desc: "Now, lay your phone (without a magnetic case) flat on your solar panel.",
+                    onboarding_step4_title: "Step 4: Memorize",
+                    onboarding_step4_desc: "Once the angle and orientation values are stable, press the large round button!",
+                    onboarding_prev: "Previous",
+                    onboarding_next: "Next",
+                    onboarding_finish: "Finish",
                     compass_south: "Due South",
                     compass_east: "East",
                     compass_west: "West",
@@ -1027,13 +1046,13 @@
                     pdf_disclaimer_title: "Important Disclaimer Regarding Accuracy",
                     pdf_disclaimer_text: "The production data and tilt/orientation measurements in this report are estimates. Sensor accuracy (compass, accelerometer) can vary significantly between phone models. Furthermore, the presence of nearby metallic objects, and especially the use of <strong>magnetic cases or mounts</strong>, can cause significant orientation errors. It is strongly recommended to remove any magnetic case before measuring and to corroborate this data with professional measurement tools for any critical installation. The creators of this application cannot be held responsible for discrepancies between the estimates and actual production.",
                     sensors_activating: "Activating sensors...",
-                    invalid_measurements: "Invalid measurements."
-                
-                    button_style_label: "\u201cMemorize\u201d button style",
+                    invalid_measurements: "Invalid measurements.",
+                    button_style_label: "\"Memorize\" button style",
                     button_style_default: "Classic (default)",
                     button_style_neon: "Neon Pulse Pro",
                     button_style_glass: "Glass Orb",
-                    button_style_radar: "Radar Sweep",}
+                    button_style_radar: "Radar Sweep",
+                }
             };
 
             const i18n = {
@@ -1152,7 +1171,7 @@
             };
 
             const utils = {
-                log: (...args) => { if (DEBUG) console.log('[OptimAngle]', ...args); },
+                log: (...args) => { if (DEBUG) console.log('[OptiSolar]', ...args); },
                 toRadians: (deg) => deg * Math.PI / 180,
                 toDegrees: (rad) => rad * 180 / Math.PI,
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
@@ -1167,7 +1186,35 @@
                     return Number.isFinite(n) ? n : fallback;
                 },
                 clamp: (x, min, max) => Math.min(Math.max(x, min), max),
-                normalizeAngle: (a) => (a % 360 + 360) % 360
+                normalizeAngle: (a) => (a % 360 + 360) % 360,
+                playSuccessNotification: async () => {
+                    try {
+                        const { Haptics, ImpactStyle } = Capacitor.Plugins;
+                        await Haptics.impact({ style: ImpactStyle.Light });
+                    } catch(e) {
+                         utils.log("Haptics not available, fallback to vibrate", e);
+                         if (navigator.vibrate) navigator.vibrate(50);
+                    }
+
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.15);
+                    } catch (e) {
+                        utils.log("Web Audio API not supported or failed", e);
+                    }
+                }
             };
 
             const ui = {
@@ -1336,21 +1383,13 @@
                     dom.memorizeRingBtn.disabled = true;
                     dom.sensorError.textContent = translations[i18n.currentLang].sensors_activating;
                     try {
-                        if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
-                            const permission = await DeviceOrientationEvent.requestPermission();
-                            if (permission !== 'granted') {
-                                dom.sensorError.textContent = 'Permission capteurs refusée.';
-                                ui.setEntryMode(null);
-                                return;
-                            }
-                        }
                         window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
                         state.sensorsActive = true;
                         dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
                         dom.gotoEstimationButton.classList.remove('hidden');
                     } catch (err) {
-                        dom.sensorError.textContent = 'Erreur demande permission.';
-                        utils.log('DeviceOrientation permission error', err);
+                        dom.sensorError.textContent = 'Erreur capteurs.';
+                        utils.log('DeviceOrientation error', err);
                     }
                 },
                 stop: () => {
@@ -1576,36 +1615,8 @@
                     dom.onboardingDots.forEach((dot, i) => {
                         dot.classList.toggle('active', i === index);
                     });
-
                     dom.onboardingPrevBtn.classList.toggle('invisible', index === 0);
-                    
-            // ===== Button style selection (v2.6.8) =====
-            const BTN_STYLE_KEY = 'memorizeBtnStyle';
-            const applyMemorizeBtnStyle = (style) => {
-                const el = dom.memorizeRingBtn;
-                if (!el) return;
-                el.classList.remove('btn-style-neon','btn-style-glass','btn-style-radar');
-                switch (style) {
-                    case 'neon': el.classList.add('btn-style-neon'); break;
-                    case 'glass': el.classList.add('btn-style-glass'); break;
-                    case 'radar': el.classList.add('btn-style-radar'); break;
-                    default: break; // classic
-                }
-            };
-            // init radios
-            const styleRadios = document.querySelectorAll('input.memorize-style-radio[name="memorize-style"]');
-            const savedStyle = localStorage.getItem(BTN_STYLE_KEY) || 'default';
-            applyMemorizeBtnStyle(savedStyle);
-            styleRadios.forEach(r => {
-                r.checked = (r.value === savedStyle);
-                r.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        localStorage.setItem(BTN_STYLE_KEY, e.target.value);
-                        applyMemorizeBtnStyle(e.target.value);
-                    }
-                });
-            });
-dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
+                    dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.length - 1);
                     dom.onboardingFinishBtn.classList.toggle('hidden', index !== dom.onboardingSlides.length - 1);
                 },
                 next: function() {
@@ -1787,6 +1798,7 @@ dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.
                         dom.productionResults.classList.remove('hidden');
                         dom.donationMessage.classList.remove('hidden');
                         dom.exportContainer.classList.remove('hidden');
+                        utils.playSuccessNotification();
 
                     } catch (err) { 
                         dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
@@ -1831,6 +1843,32 @@ dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.
                     dom.latitudeInput.value = CONFIG.defaultLatitude;
                     dom.longitudeInput.value = CONFIG.defaultLongitude;
                 }
+
+                // ===== Button style selection (v3.0.0) =====
+                const BTN_STYLE_KEY = 'memorizeBtnStyle';
+                const applyMemorizeBtnStyle = (style) => {
+                    const el = dom.memorizeRingBtn;
+                    if (!el) return;
+                    el.classList.remove('btn-style-neon', 'btn-style-glass', 'btn-style-radar');
+                    switch (style) {
+                        case 'neon':  el.classList.add('btn-style-neon'); break;
+                        case 'glass': el.classList.add('btn-style-glass'); break;
+                        case 'radar': el.classList.add('btn-style-radar'); break;
+                        default: break; // classic
+                    }
+                };
+                const styleRadios = document.querySelectorAll('input.memorize-style-radio[name="memorize-style"]');
+                const savedStyle = localStorage.getItem(BTN_STYLE_KEY) || 'default';
+                applyMemorizeBtnStyle(savedStyle);
+                styleRadios.forEach(r => {
+                    r.checked = (r.value === savedStyle);
+                    r.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            localStorage.setItem(BTN_STYLE_KEY, e.target.value);
+                            applyMemorizeBtnStyle(e.target.value);
+                        }
+                    });
+                });
 
                 ['change', 'input'].forEach(evt => {
                     dom.latitudeInput.addEventListener(evt, calculations.calculateAndDisplayAll);
@@ -1886,7 +1924,7 @@ dom.onboardingNextBtn.classList.toggle('hidden', index === dom.onboardingSlides.
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
                 calculations.calculateAndDisplayAll();
-                utils.log('Application initialisée.');
+                utils.log('Application initialisée v3.0.0.');
             }
             
             const geolocation = { get: async () => { dom.locationError.textContent = 'Obtention de la position...'; try { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition( p => ui.updateLocationFields(p.coords.latitude, p.coords.longitude), err => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } catch (err) { dom.locationError.textContent = 'Erreur géoloc.'; } } };

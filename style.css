@@ -198,3 +198,14 @@ input, .bg-input {
 #settings-modal, #clipping-help-modal, #main-help-modal, #settings-help-modal, #onboarding-modal {
   z-index: 100;
 }
+
+
+/* UX: agrandit la zone de clic du bouton GPS */
+#get-location {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  margin-left: 4px;
+}
+/* Empêche les overlaps involontaires avec les champs voisins */
+#date-input, #latitude-input { touch-action: manipulation; }

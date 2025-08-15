@@ -62,123 +62,165 @@
             pvgis_error: "Erreur communication PVGIS.",
             sensors_activating: "Activation des capteurs...",
         },
-    };
+    ,
+en: {
+                    geoloc_error: "Geolocation error.",
+                    geoloc_not_supported: "Geolocation not supported.",
+                    location_unavailable: "Unable to get location.",
+                    location_getting: "Getting location...",
+                    activate_sensors: "Use Sensors",
+                    stop_sensors: "Stop Sensors",
+                    manual_entry: "Manual Input",
+                    location: "Location",
+                    latitude_placeholder: "Latitude required",
+                    target_date: "Target Date",
+                    current_angle: "Current Angle",
+                    orientation: "Orientation",
+                    memorize_action: "Memorize",
+                    memorized: "Saved!",
+                    calibrate_tilt: "Calibrate Flat",
+                    calibrate_tilt_success: "Calibrated!",
+                    light_theme_label: "Light Mode",
+                    tilt: "Tilt (°)",
+                    tilt_placeholder: "e.g. 35",
+                    orientation_short: "Orientation (°)",
+                    orientation_helper: "EAST (-) | SOUTH (0) | WEST (+)",
+                    orientation_placeholder: "0",
+                    recommended_angle: "Recommended Angle",
+                    waiting_for_sensor: "Point your device...",
+                    calculate_gain: "Estimate your production",
+                    seasonal_settings: "Seasonal Settings",
+                    winter: "Winter",
+                    winter_date: "~Dec 21",
+                    mid_season: "Mid-Season",
+                    mid_season_date: "~Mar 20 & ~Sep 22",
+                    summer: "Summer",
+                    summer_date: "~Jun 21",
+                    donation_message: "If this estimate was helpful, consider supporting this project by buying me a small coffee! ☕",
+                    estimation_title: "Production Estimate",
+                    peak_power: "Your installation's peak power (kWp)",
+                    longitude: "Longitude",
+                    current_tilt: "Current Tilt (°)",
+                    current_azimuth: "Current Azimuth (Deviation / South)",
+                    azimuth_placeholder: "e.g. -10 (10° East)",
+                    calculate_gain_long: "Calculate potential gain",
+                    prod_current_settings: "Production (your current tilt)",
+                    prod_optimal_settings: "Production (optimal tilt for YOUR orientation)",
+                    prod_truly_optimal_settings: "IDEAL Production (if South-facing)",
+                    daily_gain: "Potential Daily Gain (by adjusting tilt only)",
+                    monthly_gain: "Potential Monthly Gain",
+                    settings_title: "Settings",
+                    clipping_label: "Optimize for clipping",
+                    clipping_title: "Clipping Optimization",
+                    clipping_problem_title: "The Problem",
+                    clipping_problem_desc: "In summer, your solar production might exceed your inverter's maximum power. This excess energy is lost: this is clipping.",
+                    clipping_solution_title: "The Solution",
+                    clipping_solution_desc: "Checking this box intentionally increases the panel angle. This slightly reduces the production peak at noon (avoiding saturation) and increases morning and evening production, for an overall daily gain.",
+                    got_it: "Got it",
+                    replay_tutorial: "Replay Guide",
+                    main_guide_title: "User Guide",
+                    guide_step1_title: "Step 1: Location & Date",
+                    guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
+                    guide_step2_title: "Step 2: Choose Mode",
+                    guide_step2_desc: "<strong class='text-gray-200'>Sensors:</strong> For a real measurement, place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case to avoid incorrect orientation readings.</strong><br><br><strong class='text-gray-200'>Manual:</strong> For a simulation, enter the tilt and orientation manually.",
+                    guide_step3_title: "Step 3: Read the Result",
+                    guide_step3_desc: "The recommended angle appears and adjusts in real-time. Seasonal settings are also shown for reference.",
+                    guide_step4_title: "Step 4: Estimate Gain",
+                    guide_step4_desc: "Click \"Estimate your production\". Your data will be automatically carried over to the next page for an accurate simulation.",
+                    estimation_guide_title: "Estimation Guide",
+                    estimation_guide_step1_title: "Check Your Data",
+                    estimation_guide_step1_desc: "The fields are pre-filled from the previous page. You can edit them to simulate other configurations.",
+                    estimation_guide_step2_title: "Run the Calculation",
+                    estimation_guide_step2_desc: "Click \"Calculate\" to compare the estimated annual production of your current setup with the recommended optimal setup.",
+                    onboarding_step1_title: "Step 1: Calibrate",
+                    onboarding_step1_desc: "For an accurate measurement, calibrate your compass by making a 'figure 8' motion with your phone.",
+                    onboarding_step2_title: "Step 2: Activate",
+                    onboarding_step2_desc: "Press \"Use Sensors\" to start receiving data.",
+                    onboarding_step3_title: "Step 3: Place",
+                    onboarding_step3_desc: "Now, lay your phone (without a magnetic case) flat on your solar panel.",
+                    onboarding_step4_title: "Step 4: Memorize",
+                    onboarding_step4_desc: "Once the angle and orientation values are stable, press the large round button!",
+                    onboarding_prev: "Previous",
+                    onboarding_next: "Next",
+                    onboarding_finish: "Finish",
+                    compass_south: "Due South",
+                    compass_east: "East",
+                    compass_west: "West",
+                    fill_all_fields_error: "Please fill in all valid fields.",
+                    settings_already_optimal: "Your current settings are already optimal.",
+                    pvgis_error: "PVGIS communication error.",
+                    bug_report_title: "Report a bug or suggestion",
+                    donate_title: "Support the project",
+                    bug_report_subject: "Suggestion / Bug for Opti Solar",
+                    export_pdf: "Export to PDF",
+                    exporting_pdf: "Generating...",
+                    export_error_no_data: "Please\ run\ a\ production\ estimate\ first\.",
+                    pdf_explanation_title: "About the Estimates",
+                    pdf_explanation_text: "The 'Optimal Production' compares your current tilt to the best possible tilt for YOUR orientation. The 'Ideal Production' is a reference value showing the potential if your installation were perfectly South-facing with an optimal tilt.",
+                    pdf_disclaimer_title: "Important Disclaimer Regarding Accuracy",
+                    pdf_disclaimer_text: "The production data and tilt/orientation measurements in this report are estimates. Sensor accuracy (compass, accelerometer) can vary significantly between phone models. Furthermore, the presence of nearby metallic objects, and especially the use of <strong>magnetic cases or mounts</strong>, can cause significant orientation errors. It is strongly recommended to remove any magnetic case before measuring and to corroborate this data with professional measurement tools for any critical installation. The creators of this application cannot be held responsible for discrepancies between the estimates and actual production.",
+                    sensors_activating: "Activating sensors...",
+                    invalid_measurements: "Invalid measurements.",
+                    button_style_label: "\"Memorize\" button style",
+                    button_style_default: "Classic HD",
+                    button_style_neon: "Neon Reactor",
+                    button_style_glass: "Glass Core",
+                    button_style_radar: "Radar Lock-On",
+                }
+
+};
 
     const i18n = {
         currentLang: 'fr',
         setLanguage: function(lang) {
             if (!translations[lang]) return;
-            this.currentLang = lang;
+            i18n.currentLang = lang;
+            try { localStorage.setItem('lang', lang); } catch(e) {}
+            document.documentElement.setAttribute('lang', lang);
+            // Update texts
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
                 if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
                 }
             });
+            // Update placeholders
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
                 if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
             });
-            if(state.sensorsActive) {
-               dom.activateSensorsButton.textContent = translations[lang].stop_sensors;
-            } else {
-               dom.activateSensorsButton.textContent = translations[lang].activate_sensors;
+            // Toggle active state on lang buttons
+            if (dom.langSwitcher) {
+                dom.langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
             }
-        }
-    };
-
-    const state = {
-        entryMode: null,
-        sensorsActive: false,
-        memorizedTilt: null,
-        memorizedAzimuthValue: null,
-        panelAzimuthLive: null,
-        tiltOffset: 0,
-        isStable: false,
-        lastReadings: [],
-        stabilityThreshold: 0.5,
-        stabilityBuffer: 5
-    };
-
-    const dom = {
-        mainPage: document.getElementById('main-page'),
-        settingsPage: document.getElementById('settings-page'),
-        latitudeInput: document.getElementById('latitude-input'),
-        dateInput: document.getElementById('date-input'),
-        dateDisplay: document.getElementById('date-display'),
-        getLocationButton: document.getElementById('get-location'),
-        locationError: document.getElementById('location-error'),
-        activateSensorsButton: document.getElementById('activate-sensors-button'),
-        manualEntryButton: document.getElementById('manual-entry-button'),
-        resultDisplay: document.getElementById('result'),
-        sensorsReadout: document.getElementById('sensors-readout'),
-        currentAngleDisplay: document.getElementById('current-angle'),
-        currentCompassDisplay: document.getElementById('current-compass'),
-        manualEntryDisplay: document.getElementById('manual-entry-display'),
-        manualTiltInput: document.getElementById('manual-tilt-input'),
-        manualAzimuthInput: document.getElementById('manual-azimuth-input'),
-        memorizeContainer: document.getElementById('memorize-container'),
-        memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'),
-        memorizeRingBtn: document.getElementById('memorize-ring-btn'),
-        memorizeBtnText: document.getElementById('memorize-btn-text'),
-        memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
-        sensorError: document.getElementById('sensor-error'),
-        gotoEstimationButton: document.getElementById('goto-estimation-button'),
-        backButton: document.getElementById('back-button'),
-        settingsButton: document.getElementById('settings-button'),
-        mainHelpButton: document.getElementById('main-help-button'),
-        compassRoseContainer: document.getElementById('compass-rose-container'),
-        inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
-        peakPowerInput: document.getElementById('peak-power'),
-        longitudeInput: document.getElementById('longitude-input'),
-        currentTiltInput: document.getElementById('current-tilt-input'),
-        currentAzimuthInput: document.getElementById('current-azimuth-input'),
-        calculateProductionButton: document.getElementById('calculate-production'),
-        calculateText: document.getElementById('calculate-text'),
-        calculateLoader: document.getElementById('calculate-loader'),
-        productionResults: document.getElementById('production-results'),
-        currentProductionDisplay: document.getElementById('current-production'),
-        optimalProductionDisplay: document.getElementById('optimal-production'),
-        potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
-        pvgisError: document.getElementById('pvgis-error'),
-        exportContainer: document.getElementById('export-container'),
-        exportPdfBtn: document.getElementById('export-pdf-btn'),
-        trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
-        donationMessage: document.getElementById('donation-message'),
-        bugReportButton: document.getElementById('bug-report-button'),
-        donateButtonFab: document.getElementById('donate-button-fab'),
-        settingsModal: document.getElementById('settings-modal'),
-        mainHelpModal: document.getElementById('main-help-modal'),
-        clippingCheckbox: document.getElementById('clipping-checkbox'),
-        calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
-        clippingHelpButton: document.getElementById('clipping-help-button'),
-        settingsHelpButton: document.getElementById('settings-help-button'),
-    };
-
-    const utils = {
-        toRadians: (deg) => deg * Math.PI / 180,
-        getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
-        getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-        safeParseFloat: (v, fallback = NaN) => {
-            if (v === null || v === undefined || v === '') return fallback;
-            const s = String(v).replace(',', '.').trim();
-            const n = parseFloat(s);
-            return Number.isFinite(n) ? n : fallback;
+            // Refresh any dynamic labels
+            if(state.sensorsActive) {
+                if (dom.activateSensorsButton) dom.activateSensorsButton.textContent = translations[lang].stop_sensors || 'Stop';
+            } else {
+                if (dom.activateSensorsButton) dom.activateSensorsButton.textContent = translations[lang].activate_sensors || 'Start';
+            }
+        
         },
         clamp: (x, min, max) => Math.min(Math.max(x, min), max),
         normalizeAngle: (a) => (a % 360 + 360) % 360,
-        formatNumber: (n) => Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 2 }),
+        formatNumber: (n) => Number(n).toLocaleString(i18n.currentLang==='fr'?'fr-FR':'en-US', { maximumFractionDigits: 2 }),
     };
 
     const ui = {
         updateDateDisplay: () => {
             const date = new Date(dom.dateInput.value);
             if (!isNaN(date.getTime())) {
-                dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+                dom.dateDisplay.textContent = date.toLocaleDateString(i18n.currentLang==='fr'?'fr-FR':'en-US', { day: 'numeric', month: 'long' });
             }
         },
-        updateLocationFields: (lat) => {
-            dom.latitudeInput.value = lat.toFixed(5);
+        updateLocationFields: (pos) => {
+            if(!pos) return;
+            if (typeof pos === 'number') { if (dom.latitudeInput) dom.latitudeInput.value = pos.toFixed(5); return; }
+            const { latitude, longitude } = pos.coords || {};
+            if (typeof latitude === 'number') dom.latitudeInput.value = latitude.toFixed(5);
+            if (typeof longitude === 'number' && dom.longitudeInput) dom.longitudeInput.value = longitude.toFixed(5);
             dom.locationError.textContent = '';
             calculations.calculateAndDisplayAll();
         },
@@ -392,19 +434,17 @@
         }
     };
 
-    const geolocation = {
-        get: () => {
-            dom.locationError.textContent = 'Obtention de la position...';
+    const geolocation = { get: () => {
+            dom.locationError.textContent = (translations[i18n.currentLang]?.location_getting || 'Obtention de la position...');
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    p => ui.updateLocationFields(p.coords.latitude),
-                    () => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }
+                    p => ui.updateLocationFields(p),
+                    () => { dom.locationError.textContent = (translations[i18n.currentLang]?.location_unavailable || 'Position indisponible.'); }
                 );
             } else {
-                dom.locationError.textContent = 'Géolocalisation non supportée.';
+                dom.locationError.textContent = (translations[i18n.currentLang]?.geoloc_not_supported || 'Géolocalisation non supportée.');
             }
-        }
-    };
+        }};
 
     const api = {
         fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
@@ -565,6 +605,9 @@
 
         if(dom.settingsButton) dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
         if(dom.mainHelpButton) dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));
+        if(dom.settingsHelpButton && dom.settingsHelpModal){ dom.settingsHelpButton.addEventListener('click', ()=> dom.settingsHelpModal.classList.remove('hidden')); }
+        if(dom.clippingHelpButton && dom.clippingHelpModal){ dom.clippingHelpButton.addEventListener('click', ()=> dom.clippingHelpModal.classList.remove('hidden')); }
+
         document.querySelectorAll('.close-modal-btn').forEach(btn => 
             btn.addEventListener('click', (e) => e.target.closest('.fixed').classList.add('hidden'))
         );
@@ -572,4 +615,19 @@
     }
     
     window.addEventListener('load', init);
+})();
+
+/* v4.1.0 language init */
+(function(){
+    try {
+        const saved = (localStorage.getItem('lang') || document.documentElement.getAttribute('lang') || 'fr');
+        if (typeof i18n !== 'undefined' && i18n.setLanguage) i18n.setLanguage(saved);
+        const sw = document.getElementById('lang-switcher');
+        if (sw) {
+            sw.addEventListener('click', function(e){
+                const b = e.target.closest('.lang-btn'); if(!b) return;
+                if (typeof i18n !== 'undefined' && i18n.setLanguage) i18n.setLanguage(b.dataset.lang);
+            });
+        }
+    } catch(e){}
 })();

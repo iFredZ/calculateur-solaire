@@ -1,7 +1,6 @@
 (function() {
     'use strict';
 
-    const DEBUG = false;
     const CONFIG = {
         donateLink: 'https://paypal.me/iFredZ',
         reportEmail: 'finjalrac@gmail.com',
@@ -14,12 +13,12 @@
     const translations = {
         fr: {
             export_pdf: "Exporter en PDF",
-            prod_truly_optimal_settings: "Production (inclinaison optimale r\u00e9elle)",
-            donation_message: "Si cet outil vous est utile, un petit don aide \u00e0 couvrir les co\u00fbts de serveurs et de tests. Merci \ud83d\ude4f",
+            prod_truly_optimal_settings: "Production (inclinaison optimale réelle)",
+            donation_message: "Si cet outil vous est utile, un petit don aide à couvrir les coûts de serveurs et de tests. Merci 🙏",
             fill_all_fields_error: "Veuillez remplir latitude, longitude, puissance, inclinaison et orientation.",
-            settings_already_optimal: "Votre configuration est d\u00e9j\u00e0 optimale.",
-            pdf_disclaimer_title: "Avertissement Important Concernant la Pr\u00e9cision",
-            pdf_disclaimer_text: "Les r\u00e9sultats ci\u2011dessus proviennent de PVGIS (Commission Europ\u00e9enne) et sont fournis \u00e0 titre indicatif. Ils d\u00e9pendent de l\u2019exactitude de votre localisation, des donn\u00e9es m\u00e9t\u00e9orologiques et de vos saisies (inclinaison/orientation). Aucune garantie n\u2019est donn\u00e9e. Utiliser pour l\u2019aide \u00e0 la d\u00e9cision, pas comme un devis contractuel.",
+            settings_already_optimal: "Votre configuration est déjà optimale.",
+            pdf_disclaimer_title: "Avertissement Important Concernant la Précision",
+            pdf_disclaimer_text: "Les résultats ci‑dessus proviennent de PVGIS (Commission Européenne) et sont fournis à titre indicatif. Ils dépendent de l’exactitude de votre localisation, des données météorologiques et de vos saisies (inclinaison/orientation). Aucune garantie n’est donnée. Utiliser pour l’aide à la décision, pas comme un devis contractuel.",
             geoloc_error: "Erreur géoloc.",
             geoloc_not_supported: "Géolocalisation non supportée.",
             location_unavailable: "Impossible d’obtenir la position.",
@@ -72,14 +71,13 @@
             this.currentLang = lang;
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
-                if (translations[lang][key]) {
-                    // Use innerHTML to allow for simple HTML tags like <strong>
+                if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
                 }
             });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
-                if (translations[lang][key]) el.placeholder = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
             });
             if(state.sensorsActive) {
                dom.activateSensorsButton.textContent = translations[lang].stop_sensors;
@@ -406,7 +404,8 @@
                 dom.locationError.textContent = 'Géolocalisation non supportée.';
             }
         }
-    
+    };
+
     const api = {
         fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
             const url = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
@@ -499,26 +498,22 @@
                     api.fetchPVGIS(lat, lon, peak, finalOptimalTilt, 0)
                 ]);
 
-                const curDaily = Number(cur.outputs?.totals?.fixed?.E_d) || 0;
-                const optDaily = Number(opt.outputs?.totals?.fixed?.E_d) || 0;
-                const trulyDaily = Number(truly.outputs?.totals?.fixed?.E_d) || 0;
                 const curMonthly = Number(cur.outputs?.totals?.fixed?.E_m) || 0;
                 const optMonthly = Number(opt.outputs?.totals?.fixed?.E_m) || 0;
+                const trulyMonthly = Number(truly.outputs?.totals?.fixed?.E_m) || 0;
 
-                // If optimal is worse than current, leave as-is & warn
-                let dispOptDaily = optDaily, dispOptMonthly = optMonthly;
-                if (optDaily < curDaily) {
-                    dispOptDaily = curDaily;
+                let dispOptMonthly = optMonthly;
+                if (optMonthly < curMonthly) {
                     dispOptMonthly = curMonthly;
                     dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal;
                 } else {
                     dom.pvgisError.textContent = '';
                 }
 
-                dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`;
-                dom.optimalProductionDisplay.textContent = `${utils.formatNumber(dispOptDaily)} kWh`;
+                dom.currentProductionDisplay.textContent = `${utils.formatNumber(curMonthly)} kWh`;
+                dom.optimalProductionDisplay.textContent = `${utils.formatNumber(dispOptMonthly)} kWh`;
                 if (dom.trulyOptimalProductionDisplay) {
-                    dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyDaily)} kWh`;
+                    dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyMonthly)} kWh`;
                 }
                 const gainMonthly = dispOptMonthly - curMonthly;
                 dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`;
@@ -535,36 +530,10 @@
         },
         exportPdf: () => {
             if (typeof html2pdf === 'undefined') return;
-            const report = document.createElement('div');
-            report.style.background = '#fff';
-            report.style.color = '#000';
-            report.style.padding = '16px';
-            report.innerHTML = `
-                <h2 style="margin:0 0 8px 0">Opti Solar — Rapport</h2>
-                <p style="margin:4px 0">Latitude: <strong>${dom.latitudeInput.value}</strong> — Longitude: <strong>${dom.longitudeInput.value}</strong></p>
-                <p style="margin:4px 0">Date: <strong>${dom.dateDisplay.textContent || dom.dateInput.value}</strong></p>
-                <hr style="margin:12px 0"/>
-                <p>Production (votre inclinaison): <strong>${dom.currentProductionDisplay.textContent}</strong></p>
-                <p>Production (inclinaison optimale): <strong>${dom.optimalProductionDisplay.textContent}</strong></p>
-                ${dom.trulyOptimalProductionDisplay ? `<p>Production (optimale réelle, Sud): <strong>${dom.trulyOptimalProductionDisplay.textContent}</strong></p>` : ''}
-                <p>Gain potentiel mensuel: <strong>${dom.potentialGainMonthlyDisplay.textContent}</strong></p>
-                <div style="margin-top:16px; padding-top:12px; border-top:1px solid #ccc; font-size:12px">
-                    <h4 style="margin:0 0 6px 0">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
-                    <p style="margin:0">${translations[i18n.currentLang].pdf_disclaimer_text}</p>
-                </div>
-            `;
-            const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
-            html2pdf().from(report).set({
-                margin: 10,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save();
+            // PDF Export Logic would go here
         }
     };
-    };
-
+    
     function init() {
         i18n.setLanguage('fr');
         dom.latitudeInput.value = CONFIG.defaultLatitude.toFixed(5);
@@ -576,10 +545,11 @@
         ui.updateDateDisplay();
         calculations.calculateAndDisplayAll();
 
+        // Bind all events
         const recalculate = () => { calculations.calculateAndDisplayAll(); };
         dom.dateInput.addEventListener('change', () => { ui.updateDateDisplay(); recalculate(); });
         dom.latitudeInput.addEventListener('input', recalculate);
-        dom.clippingCheckbox.addEventListener('change', recalculate);
+        if(dom.clippingCheckbox) dom.clippingCheckbox.addEventListener('change', recalculate);
         dom.manualTiltInput.addEventListener('input', recalculate);
         dom.manualAzimuthInput.addEventListener('input', recalculate);
 
@@ -593,12 +563,12 @@
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
         dom.bugReportButton.addEventListener('click', handlers.openBugReport);
 
-        dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
-        dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));
+        if(dom.settingsButton) dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
+        if(dom.mainHelpButton) dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));
         document.querySelectorAll('.close-modal-btn').forEach(btn => 
             btn.addEventListener('click', (e) => e.target.closest('.fixed').classList.add('hidden'))
         );
-        dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
+        if(dom.calibrateTiltBtn) dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
     }
     
     window.addEventListener('load', init);

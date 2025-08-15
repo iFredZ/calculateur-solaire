@@ -11,7 +11,7 @@
     };
     
     const translations = {
-        fr: {
+fr: {
             export_pdf: "Exporter en PDF",
             prod_truly_optimal_settings: "Production (inclinaison optimale réelle)",
             donation_message: "Si cet outil vous est utile, un petit don aide à couvrir les coûts de serveurs et de tests. Merci 🙏",
@@ -62,62 +62,6 @@
             pvgis_error: "Erreur communication PVGIS.",
             sensors_activating: "Activation des capteurs...",
         },
-
-const dom = {
-        mainPage: document.getElementById('main-page'),
-        settingsPage: document.getElementById('settings-page'),
-        latitudeInput: document.getElementById('latitude-input'),
-        dateInput: document.getElementById('date-input'),
-        dateDisplay: document.getElementById('date-display'),
-        getLocationButton: document.getElementById('get-location'),
-        locationError: document.getElementById('location-error'),
-        activateSensorsButton: document.getElementById('activate-sensors-button'),
-        manualEntryButton: document.getElementById('manual-entry-button'),
-        resultDisplay: document.getElementById('result'),
-        sensorsReadout: document.getElementById('sensors-readout'),
-        currentAngleDisplay: document.getElementById('current-angle'),
-        currentCompassDisplay: document.getElementById('current-compass'),
-        manualEntryDisplay: document.getElementById('manual-entry-display'),
-        manualTiltInput: document.getElementById('manual-tilt-input'),
-        manualAzimuthInput: document.getElementById('manual-azimuth-input'),
-        memorizeContainer: document.getElementById('memorize-container'),
-        memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'),
-        memorizeRingBtn: document.getElementById('memorize-ring-btn'),
-        memorizeBtnText: document.getElementById('memorize-btn-text'),
-        memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
-        sensorError: document.getElementById('sensor-error'),
-        gotoEstimationButton: document.getElementById('goto-estimation-button'),
-        backButton: document.getElementById('back-button'),
-        settingsButton: document.getElementById('settings-button'),
-        mainHelpButton: document.getElementById('main-help-button'),
-        compassRoseContainer: document.getElementById('compass-rose-container'),
-        inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
-        peakPowerInput: document.getElementById('peak-power'),
-        longitudeInput: document.getElementById('longitude-input'),
-        currentTiltInput: document.getElementById('current-tilt-input'),
-        currentAzimuthInput: document.getElementById('current-azimuth-input'),
-        calculateProductionButton: document.getElementById('calculate-production'),
-        calculateText: document.getElementById('calculate-text'),
-        calculateLoader: document.getElementById('calculate-loader'),
-        productionResults: document.getElementById('production-results'),
-        currentProductionDisplay: document.getElementById('current-production'),
-        optimalProductionDisplay: document.getElementById('optimal-production'),
-        potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
-        pvgisError: document.getElementById('pvgis-error'),
-        exportContainer: document.getElementById('export-container'),
-        exportPdfBtn: document.getElementById('export-pdf-btn'),
-        trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
-        donationMessage: document.getElementById('donation-message'),
-        bugReportButton: document.getElementById('bug-report-button'),
-        donateButtonFab: document.getElementById('donate-button-fab'),
-        settingsModal: document.getElementById('settings-modal'),
-        mainHelpModal: document.getElementById('main-help-modal'),
-        clippingCheckbox: document.getElementById('clipping-checkbox'),
-        calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
-        clippingHelpButton: document.getElementById('clipping-help-button'),
-        settingsHelpButton: document.getElementById('settings-help-button'),
-    };
-    ,
 en: {
                     geoloc_error: "Geolocation error.",
                     geoloc_not_supported: "Geolocation not supported.",
@@ -222,8 +166,65 @@ en: {
                     button_style_glass: "Glass Core",
                     button_style_radar: "Radar Lock-On",
                 }
+}
 
-};
+const dom = {
+        mainPage: document.getElementById('main-page'),
+        settingsPage: document.getElementById('settings-page'),
+        latitudeInput: document.getElementById('latitude-input'),
+        dateInput: document.getElementById('date-input'),
+        dateDisplay: document.getElementById('date-display'),
+        getLocationButton: document.getElementById('get-location'),
+        locationError: document.getElementById('location-error'),
+        activateSensorsButton: document.getElementById('activate-sensors-button'),
+        manualEntryButton: document.getElementById('manual-entry-button'),
+        resultDisplay: document.getElementById('result'),
+        sensorsReadout: document.getElementById('sensors-readout'),
+        currentAngleDisplay: document.getElementById('current-angle'),
+        currentCompassDisplay: document.getElementById('current-compass'),
+        manualEntryDisplay: document.getElementById('manual-entry-display'),
+        manualTiltInput: document.getElementById('manual-tilt-input'),
+        manualAzimuthInput: document.getElementById('manual-azimuth-input'),
+        memorizeContainer: document.getElementById('memorize-container'),
+        memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'),
+        memorizeRingBtn: document.getElementById('memorize-ring-btn'),
+        memorizeBtnText: document.getElementById('memorize-btn-text'),
+        memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
+        sensorError: document.getElementById('sensor-error'),
+        gotoEstimationButton: document.getElementById('goto-estimation-button'),
+        backButton: document.getElementById('back-button'),
+        settingsButton: document.getElementById('settings-button'),
+        mainHelpButton: document.getElementById('main-help-button'),
+        compassRoseContainer: document.getElementById('compass-rose-container'),
+        inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
+        peakPowerInput: document.getElementById('peak-power'),
+        longitudeInput: document.getElementById('longitude-input'),
+        currentTiltInput: document.getElementById('current-tilt-input'),
+        currentAzimuthInput: document.getElementById('current-azimuth-input'),
+        calculateProductionButton: document.getElementById('calculate-production'),
+        calculateText: document.getElementById('calculate-text'),
+        calculateLoader: document.getElementById('calculate-loader'),
+        productionResults: document.getElementById('production-results'),
+        currentProductionDisplay: document.getElementById('current-production'),
+        optimalProductionDisplay: document.getElementById('optimal-production'),
+        potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
+        pvgisError: document.getElementById('pvgis-error'),
+        exportContainer: document.getElementById('export-container'),
+        exportPdfBtn: document.getElementById('export-pdf-btn'),
+        trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
+        donationMessage: document.getElementById('donation-message'),
+        bugReportButton: document.getElementById('bug-report-button'),
+        donateButtonFab: document.getElementById('donate-button-fab'),
+        settingsModal: document.getElementById('settings-modal'),
+        mainHelpModal: document.getElementById('main-help-modal'),
+        clippingCheckbox: document.getElementById('clipping-checkbox'),
+        calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
+        clippingHelpButton: document.getElementById('clipping-help-button'),
+        settingsHelpButton: document.getElementById('settings-help-button'),
+        langSwitcher: document.getElementById('lang-switcher'),
+    };
+
+;;
 
     const i18n = {
         currentLang: 'fr',
@@ -298,10 +299,10 @@ en: {
             calculations.calculateAndDisplayAll();
         },
         showPage: (page) => {
-            dom.mainPage.classList.toggle('hidden', page !== 'main');
-            dom.settingsPage.classList.toggle('hidden', page !== 'settings');
-            dom.mainHelpButton.classList.toggle('hidden', page !== 'main');
-            dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
+            if(dom.mainPage) dom.mainPage.classList.toggle('hidden', page !== 'main');
+            if(dom.settingsPage) dom.settingsPage.classList.toggle('hidden', page !== 'settings');
+            if(dom.mainHelpButton) dom.mainHelpButton.classList.toggle('hidden', page !== 'main');
+            if(dom.settingsHelpButton) dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
         
             toggleHelpIcons();
         }
@@ -643,7 +644,8 @@ const calculations = {
     };
     
     function init() {
-        ui.showPage('main'); toggleHelpIcons(); i18n.setLanguage('fr');
+        ui.showPage('main'); toggleHelpIcons(); const _savedLang = (localStorage.getItem('lang') || document.documentElement.getAttribute('lang') || 'fr');
+        i18n.setLanguage(_savedLang);
         dom.latitudeInput.value = CONFIG.defaultLatitude.toFixed(5);
         state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
         
@@ -654,22 +656,27 @@ const calculations = {
         calculations.calculateAndDisplayAll();
 
         // Bind all events
+        if (dom.langSwitcher) {
+            dom.langSwitcher.addEventListener('click', (e) => {
+                const b = e.target.closest('.lang-btn'); if(!b) return;
+                i18n.setLanguage(b.dataset.lang);
+            });
+        }
         const recalculate = () => { calculations.calculateAndDisplayAll(); };
-        dom.dateInput.addEventListener('change', () => { ui.updateDateDisplay(); recalculate(); });
-        dom.latitudeInput.addEventListener('input', recalculate);
+if (dom.dateInput) dom.dateInput.addEventListener('change', () => { ui.updateDateDisplay(); recalculate(); });
+if (dom.latitudeInput) dom.latitudeInput.addEventListener('input', recalculate);
         if(dom.clippingCheckbox) dom.clippingCheckbox.addEventListener('change', recalculate);
-        dom.manualTiltInput.addEventListener('input', recalculate);
-        dom.manualAzimuthInput.addEventListener('input', recalculate);
-
-        dom.getLocationButton.addEventListener('click', geolocation.get);
-        dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
-        dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
-        dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
-        dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
+if (dom.manualTiltInput) dom.manualTiltInput.addEventListener('input', recalculate);
+if (dom.manualAzimuthInput) dom.manualAzimuthInput.addEventListener('input', recalculate);
+if (dom.getLocationButton) dom.getLocationButton.addEventListener('click', geolocation.get);
+if (dom.activateSensorsButton) dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
+if (dom.manualEntryButton) dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
+if (dom.memorizeRingBtn) dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
+if (dom.gotoEstimationButton) dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
         if (dom.calculateProductionButton) dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
         if (dom.exportPdfBtn) dom.exportPdfBtn.addEventListener('click', api.exportPdf);
-        dom.backButton.addEventListener('click', () => ui.showPage('main'));
-        dom.bugReportButton.addEventListener('click', handlers.openBugReport);
+if (dom.backButton) dom.backButton.addEventListener('click', () => ui.showPage('main'));
+if (dom.bugReportButton) dom.bugReportButton.addEventListener('click', handlers.openBugReport);
 
         if(dom.settingsButton) dom.settingsButton.addEventListener('click', () => { dom.settingsModal.classList.remove('hidden'); toggleHelpIcons(); });
         if(dom.mainHelpButton) dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));

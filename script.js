@@ -11,6 +11,7 @@
         sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
     };
     
+    // FIX: Restauration des textes exacts de la v3.1.1
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -70,7 +71,9 @@
             guide_step4_desc: "Cliquez sur \"Estimer la Production\" pour une simulation précise.",
             estimation_guide_title: "Guide de l'Estimation",
             estimation_guide_step1_title: "Vérifiez vos Données",
-            estimation_guide_step1_desc: "Les champs sont pré-remplis. Vous pouvez les modifier pour simuler d'autres configurations.",
+            estimation_guide_step1_desc: "Les champs sont pré-remplis à partir de la page précédente. Vous pouvez les modifier pour simuler d'autres configurations.",
+            estimation_guide_step2_title: "Lancez le Calcul",
+            estimation_guide_step2_desc: "Cliquez sur \"Calculer\" pour comparer la production annuelle estimée de votre réglage actuel avec celle du réglage optimal recommandé.",
             onboarding_step1_title: "Étape 1 : Calibrer",
             onboarding_step1_desc: "Pour une mesure précise, calibrez votre boussole en décrivant un '8' avec votre téléphone.",
             onboarding_step2_title: "Étape 2 : Activer",
@@ -82,18 +85,20 @@
             onboarding_prev: "Précédent",
             onboarding_next: "Suivant",
             onboarding_finish: "Terminer",
-            compass_north: "Nord",
-            compass_south: "Sud",
-            compass_east: "Est",
-            compass_west: "Ouest",
+            compass_north: "N",
+            compass_south: "SUD",
+            compass_east: "E",
+            compass_west: "O",
             fill_all_fields_error: "Veuillez remplir tous les champs.",
             settings_already_optimal: "Vos réglages actuels sont déjà optimaux.",
             pvgis_error: "Erreur communication PVGIS.",
             export_pdf: "Exporter en PDF",
             exporting_pdf: "Génération...",
             export_error_no_data: "Faites d’abord un calcul de production.",
-            pdf_disclaimer_title: "Avertissement Important",
-            pdf_disclaimer_text: "Les données de production et les mesures des capteurs sont des estimations. La précision peut varier. Ne pas utiliser pour des décisions contractuelles.",
+            pdf_disclaimer_title: "Avertissement Important Concernant la Précision",
+            pdf_disclaimer_text: "Les données de production et les mesures d'inclinaison/orientation fournies dans ce rapport sont des estimations. La précision des capteurs (boussole, accéléromètre) peut varier d'un téléphone à l'autre. De plus, la présence d'objets métalliques, et plus particulièrement l'utilisation de <strong>coques ou supports magnétiques</strong> pour téléphone, peut entraîner des erreurs d'orientation significatives. Il est fortement recommandé de retirer toute coque magnétique avant la mesure. Les créateurs de cette application ne sauraient être tenus responsables des écarts entre les estimations et la production réelle.",
+            pdf_explanation_title: "Explication des estimations",
+            pdf_explanation_text: "La 'Production Optimale' compare votre inclinaison actuelle à la meilleure inclinaison possible pour VOTRE orientation. La 'Production Idéale' est une valeur de référence qui montre le potentiel si votre installation était parfaitement orientée plein Sud avec une inclinaison optimale.",
             sensors_activating: "Activation des capteurs...",
             invalid_measurements: "Mesures invalides.",
             button_style_label: "Style du bouton \"Mémoriser\"",
@@ -148,6 +153,7 @@
         resultDisplay: document.getElementById('result'),
         gotoEstimationButton: document.getElementById('goto-estimation-button'),
         backButton: document.getElementById('back-button'),
+        closeSettingsBtn: document.getElementById('close-settings-btn'),
         peakPowerInput: document.getElementById('peak-power'),
         longitudeInput: document.getElementById('longitude-input'),
         currentTiltInput: document.getElementById('current-tilt-input'),
@@ -201,7 +207,6 @@
         },
         clamp: (x, min, max) => Math.min(Math.max(x, min), max),
         normalizeAngle: (a) => (a % 360 + 360) % 360,
-        // FIX: Restauration du retour haptique et sonore
         playSuccessNotification: async () => {
             try {
                 const { Haptics, ImpactStyle } = Capacitor.Plugins;
@@ -246,7 +251,7 @@
                 if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
             });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
-            dom.activateSensorsButton.textContent = translations[lang][state.sensorsActive ? 'stop_sensors' : 'activate_sensors'];
+            // FIX: La traduction du bouton est gérée par le data-i18n et la logique dans sensors.start/stop
             calculations.calculateAndDisplayAll();
         }
     };
@@ -348,15 +353,20 @@
             const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
             return (360 - e.alpha + screenAngle + 360) % 360;
         },
-        // FIX: Amélioration de la logique de la boussole
+        // FIX: Logique d'affichage de l'orientation pour les panneaux solaires
         formatAzimuthForDisplay: (azimuth) => {
             const lang = i18n.currentLang;
             const tolerance = 5;
+
             if (azimuth >= (360 - tolerance) || azimuth <= tolerance) return translations[lang].compass_north;
-            if (Math.abs(azimuth - 90) <= tolerance) return translations[lang].compass_east;
             if (Math.abs(azimuth - 180) <= tolerance) return translations[lang].compass_south;
-            if (Math.abs(azimuth - 270) <= tolerance) return translations[lang].compass_west;
-            return `${Math.round(azimuth)}°`;
+            
+            let deviation = azimuth - 180;
+            if (deviation > 180) deviation -= 360;
+            if (deviation < -180) deviation += 360;
+            
+            const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
+            return `${Math.round(deviation)}°${direction}`;
         },
         handleOrientation: (event) => {
             const now = performance.now();
@@ -390,6 +400,7 @@
                 window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
                 state.sensorsActive = true;
                 dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
+                dom.activateSensorsButton.setAttribute('data-i18n', 'stop_sensors');
                 dom.sensorError.textContent = '';
             } catch (err) {
                 dom.sensorError.textContent = 'Erreur capteurs.';
@@ -403,6 +414,7 @@
             sensors.setStable(false);
             state.lastReadings = [];
             dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
+            dom.activateSensorsButton.setAttribute('data-i18n', 'activate_sensors');
             dom.currentAngleDisplay.textContent = '--';
             dom.currentCompassDisplay.textContent = '--';
         }
@@ -473,7 +485,6 @@
         savePeakPower: () => {
             localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
         },
-        // FIX: Restauration complète de la logique d'export PDF
         exportToPDF: () => {
             if (!state.lastCurrentProd || !state.lastOptimalProd) {
                 alert(translations[i18n.currentLang].export_error_no_data);
@@ -539,8 +550,13 @@
                      <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
                         <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
                     </table>
+                    
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
+                        <h3 style="color: #1d4ed8; margin-top: 0;">${translations[i18n.currentLang].pdf_explanation_title}</h3>
+                        <p>${translations[i18n.currentLang].pdf_explanation_text}</p>
+                    </div>
 
-                    <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
                         <h4 style="color: #333; margin-top: 0; font-size: 12px;">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
                         <p>${translations[i18n.currentLang].pdf_disclaimer_text}</p>
                     </div>
@@ -611,6 +627,7 @@
                 const res = await fetch(proxyUrl);
                 if (!res.ok) throw new Error('Proxy failed');
                 const data = await res.json();
+                if(!data.contents) throw new Error('Proxy returned empty content');
                 return JSON.parse(data.contents);
             } catch (e) {
                 const fallbackProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
@@ -724,7 +741,7 @@
         const applyMemorizeBtnStyle = (style) => {
             const el = dom.memorizeRingBtn;
             if(!el) return;
-            el.classList.remove('btn-style-default', 'btn-style-neon', 'btn-style-glass', 'btn-style-radar');
+            el.className = 'font-bold'; // Reset classes
             el.classList.add(`btn-style-${style || 'default'}`);
         };
         const styleRadios = document.querySelectorAll('input.memorize-style-radio');
@@ -764,6 +781,7 @@
 		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); window.open(CONFIG.donateLink, '_blank'); });
         dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
+        dom.closeSettingsBtn.addEventListener('click', () => ui.showPage('main'));
         dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
         dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 

@@ -1,0 +1,48 @@
+/*
+ * style2.css - THÈME HUD / COCKPIT
+ */
+
+/* On définit la classe qui sera appliquée sur le body.
+   Le nom '.style2-mode' ne change pas pour que le JavaScript continue de fonctionner. */
+.style2-mode {
+    /* Palette de couleurs futuriste */
+    --bg: #030712; /* Bleu nuit très sombre, presque noir */
+    --card: #0a0f21; /* Une nuance de bleu encore plus sombre */
+    --border-color: rgba(56, 189, 248, 0.2); /* Bordures cyan semi-transparentes */
+    --accent: #0ea5e9; /* La couleur principale : un cyan lumineux */
+    --accent-blue: #38bdf8; /* Un bleu un peu plus clair pour la variété */
+    --fg: #e5e7eb; /* Texte principal : un blanc cassé pour ne pas être trop agressif */
+    --muted: #6b7280; /* Texte secondaire : un gris bleuté */
+    --input-bg: #111827; /* Fond des champs de saisie */
+    --btn-secondary-bg: #1f2937; /* Fond des boutons secondaires */
+    --info-box-bg: rgba(56, 189, 248, 0.05); /* Fond des boîtes d'info, presque transparent */
+}
+
+/* On change la police du titre et on lui donne un effet de lueur "néon" */
+.style2-mode .header-title {
+    font-family: 'Exo 2', sans-serif; /* Police déjà chargée dans votre HTML, elle a un style "tech" */
+    text-shadow: 0 0 8px var(--accent);
+    color: var(--accent);
+}
+
+/* On transforme l'affichage principal en un véritable écran de cockpit */
+.style2-mode .cockpit-display {
+    border-color: var(--accent);
+    /* Une lueur intérieure et extérieure pour donner l'impression d'un écran allumé */
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.2) inset, 0 0 30px rgba(56, 189, 248, 0.2);
+}
+
+/* Les boîtes d'info deviennent des panneaux semi-transparents avec une bordure lumineuse */
+.style2-mode .info-box {
+    background-color: var(--info-box-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* On fait aussi briller le bouton "Estimer la production" */
+.style2-mode #goto-estimation-button {
+    background-color: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+/* Le bouton rotatif des réglages prendra automatiquement les nouvelles couleurs grâce aux variables ! */

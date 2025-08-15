@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Opti Solar v4.2.0</title>
+    <title>Opti Solar v4.1.7</title>
     
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,9 @@
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <link rel="stylesheet" href="style.css?v=4.2.0">
+    <link rel="stylesheet" href="style.css?v=4.1.7">
+	<link rel="stylesheet" href="style2.css?v=4.1.7">
+    <link rel="stylesheet" href="style-solar.css?v=4.1.7">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -196,7 +198,7 @@
         <a id="bug-report-button" href="#" class="icon-btn text-yellow-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
         </a>
-         <p class="text-xs text-gray-600">v4.2.0</p>
+         <p class="text-xs text-gray-600">v4.1.7</p>
          <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </a>
@@ -220,35 +222,22 @@
                     </label>
                     <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-input border-border-color-input text-accent focus:ring-accent">
                 </div>
-                 <div class="flex items-center justify-between">
-                     <label for="theme-toggle" class="font-medium" data-i18n="light_theme_label">Mode Clair</label>
-                     <div class="theme-switch-wrapper">
-                         <label class="theme-switch" for="theme-toggle">
-                             <input type="checkbox" id="theme-toggle" />
-                             <div class="slider"></div>
-                         </label>
-                     </div>
-                </div>
-                <div class="space-y-2">
-                    <label class="font-medium" data-i18n="button_style_label">Style du bouton "Mémoriser"</label>
-                    <fieldset class="space-y-2">
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_default">Défaut</span>
-                            <input type="radio" name="memorize-style" value="default" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_neon">Néon</span>
-                            <input type="radio" name="memorize-style" value="neon" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_glass">Verre</span>
-                            <input type="radio" name="memorize-style" value="glass" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_radar">Radar</span>
-                            <input type="radio" name="memorize-style" value="radar" class="memorize-style-radio">
-                        </label>
-                    </fieldset>
+                <div class="grid grid-cols-2 gap-6 text-center">
+                    <div class="space-y-2">
+                        <label class="font-medium" data-i18n="light_theme_label">Thème</label>
+                        <div id="theme-knob" class="knob mx-auto">
+                            <div class="knob-indicator"></div>
+                        </div>
+                        <p id="theme-knob-label" class="text-sm text-muted"></p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="font-medium" data-i18n="button_style_label">Style Bouton</label>
+                        <div id="style-knob" class="knob mx-auto">
+                            <div class="knob-indicator"></div>
+                        </div>
+                        <p id="style-knob-label" class="text-sm text-muted"></p>
+                    </div>
                 </div>
                  <div class="pt-4 border-t border-border-color">
                     <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="calibrate_tilt">Calibrer à plat</button>
@@ -359,6 +348,26 @@
         </div>
     </div>
     
-    <script src="script.js?v=4.2.0" defer></script>
+    <script src="script.js?v=4.1.7" defer></script>
+
+    <!-- Splash "Photon Grid" - overlay non intrusif -->
+    <div id="pg-splash" class="splash-pg" aria-hidden="true" role="presentation">
+      <div class="pg-wrap">
+        <div class="pg-logo">
+          <div class="pg-orbit"></div>
+          <div class="pg-flare"></div>
+          <span class="pg-title">Solar Setup</span>
+        </div>
+        <div class="pg-dial">
+          <div class="pg-needle" id="pg-needle"></div>
+          <div class="pg-center">°</div>
+        </div>
+        <button class="pg-cta" id="pg-calibrate" type="button" aria-label="Calibrer avec ma position">
+          Calibrer avec ma position
+        </button>
+        <div class="pg-tip" id="pg-tip">+3 à +12% d’énergie / an selon le réglage</div>
+      </div>
+    </div>
+    
 </body>
 </html>

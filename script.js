@@ -29,7 +29,7 @@
             memorized: "Mémorisé !",
             calibrate_tilt: "Calibrer à plat",
             calibrate_tilt_success: "Calibration effectuée !",
-            light_theme_label: "Mode Clair",
+            light_theme_label: "Thème",
             tilt: "Inclinaison",
             tilt_placeholder: "ex: 35",
             orientation_short: "Orientation",
@@ -100,7 +100,7 @@
             pdf_explanation_text: "La 'Production Optimale' compare votre inclinaison actuelle à la meilleure inclinaison possible pour VOTRE orientation. La 'Production Idéale' est une valeur de référence qui montre le potentiel si votre installation était parfaitement orientée plein Sud avec une inclinaison optimale.",
             sensors_activating: "Activation des capteurs...",
             invalid_measurements: "Mesures invalides.",
-            button_style_label: "Style du bouton \"Mémoriser\"",
+            button_style_label: "Style Bouton",
             button_style_default: "Défaut",
             button_style_neon: "Néon",
             button_style_glass: "Verre",
@@ -123,7 +123,7 @@
             memorized: "Saved!",
             calibrate_tilt: "Calibrate Flat",
             calibrate_tilt_success: "Calibrated!",
-            light_theme_label: "Light Mode",
+            light_theme_label: "Theme",
             tilt: "Tilt",
             tilt_placeholder: "e.g. 35",
             orientation_short: "Azimuth",
@@ -281,7 +281,6 @@
         onboardingFinishBtn: document.getElementById('onboarding-finish-btn'),
         replayTutorialBtn: document.getElementById('replay-tutorial-btn'),
         clippingCheckbox: document.getElementById('clipping-checkbox'),
-        themeToggle: document.getElementById('theme-toggle'),
         calibrateTiltBtn: document.getElementById('calibrate-tilt-btn')
     };
 
@@ -345,7 +344,6 @@
             });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
             
-            // FIX: Rétablissement de la logique v3 pour le bouton des capteurs
             const buttonKey = state.sensorsActive ? 'stop_sensors' : 'activate_sensors';
             dom.activateSensorsButton.textContent = translations[lang][buttonKey];
 
@@ -591,71 +589,51 @@
             btn.disabled = true;
             btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
 
+            const gainDailyNum = state.lastOptimalProd.outputs.totals.fixed.E_d - state.lastCurrentProd.outputs.totals.fixed.E_d;
+            const gainMonthlyNum = gainDailyNum * 30.4;
+            const gainDailyText = gainDailyNum < 1 ? `~ ${Math.round(gainDailyNum * 1000)} Wh` : `~ ${utils.formatNumber(gainDailyNum)} kWh`;
+            const gainMonthlyText = `~ ${utils.formatNumber(gainMonthlyNum)} kWh`;
+
             const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
-            
-            const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
-            const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
-            const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
+            const curDailyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_d);
+            const optDailyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_d);
+            const trulyOptDailyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_d);
             const currentTilt = dom.currentTiltInput.value || '--';
             const currentAzimuth = dom.currentAzimuthInput.value || '--';
             const recommendedTilt = state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--';
-            const gainMonthly = dom.potentialGainMonthlyDisplay.textContent || '~ -- kWh';
-
+            const idealOptimalTilt = state.lastIdealOptimalTilt ? Math.round(state.lastIdealOptimalTilt) : recommendedTilt;
+            
             const reportElement = document.createElement('div');
             reportElement.innerHTML = `
                 <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
                     <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
                     <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
-                    
                     <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
                     <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                         <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
                         <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
                         <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
                     </table>
-                    
-                    <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Mensuelle Estimée</h2>
+                    <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Journalière Estimée</h2>
                     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
                         <thead>
-                            <tr style="background-color: #1d4ed8; color: white; text-align: left;">
-                                <th style="padding: 8px;">Configuration</th>
-                                <th style="padding: 8px;">Inclinaison</th>
-                                <th style="padding: 8px;">Orientation</th>
-                                <th style="padding: 8px;">Production Mensuelle</th>
-                            </tr>
+                            <tr style="background-color: #1d4ed8; color: white; text-align: left;"><th style="padding: 8px;">Configuration</th><th style="padding: 8px;">Inclinaison</th><th style="padding: 8px;">Orientation</th><th style="padding: 8px;">Production Journalière</th></tr>
                         </thead>
                         <tbody>
-                            <tr style="background-color: #f1f5f9;">
-                                <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${currentTilt}°</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${recommendedTilt}°</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #065f46;">${optMonthlyProd} kWh</td>
-                            </tr>
-                             <tr style="background-color: #f1f5f9;">
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${idealOptimalTilt}°</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptMonthlyProd} kWh</td>
-                            </tr>
+                            <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td><td style="padding: 8px; border: 1px solid #ddd;">${currentTilt}°</td><td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td><td style="padding: 8px; border: 1px solid #ddd;">${curDailyProd} kWh</td></tr>
+                            <tr><td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td><td style="padding: 8px; border: 1px solid #ddd;">${recommendedTilt}°</td><td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #065f46;">${optDailyProd} kWh</td></tr>
+                            <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${idealOptimalTilt}°</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptDailyProd} kWh</td></tr>
                         </tbody>
                     </table>
-
                      <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
                      <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainMonthly}</td></tr>
+                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].daily_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainDailyText}</td></tr>
+                        <tr><td style="padding: 8px; border: 1px solid #ddd;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainMonthlyText}</td></tr>
                     </table>
-                    
                     <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
                         <h3 style="color: #1d4ed8; margin-top: 0;">${translations[i18n.currentLang].pdf_explanation_title}</h3>
                         <p>${translations[i18n.currentLang].pdf_explanation_text}</p>
                     </div>
-
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
                         <h4 style="color: #333; margin-top: 0; font-size: 12px;">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
                         <p>${translations[i18n.currentLang].pdf_disclaimer_text}</p>
@@ -703,23 +681,6 @@
         }
     };
 
-    const theme = {
-        apply: (themeName) => {
-            document.body.classList.toggle('light-mode', themeName === 'light');
-            dom.themeToggle.checked = (themeName === 'light');
-        },
-        toggle: () => {
-            const newTheme = dom.themeToggle.checked ? 'light' : 'dark';
-            theme.apply(newTheme);
-            localStorage.setItem('userTheme', newTheme);
-        },
-        load: () => {
-            const savedTheme = localStorage.getItem('userTheme') || 'dark';
-            theme.apply(savedTheme);
-        }
-    };
-
-    // FIX: Restauration de la fonction réseau de la v3.1.1 (plus robuste)
     const api = {
         fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
             const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
@@ -791,7 +752,6 @@
 
             throw new Error('All PVGIS fetch strategies failed.');
         },
-        // FIX: Uniformisation des unités en kWh/jour
         getProductionEstimate: async () => { 
             dom.exportContainer.classList.add('hidden');
             dom.pvgisError.textContent = ''; 
@@ -885,31 +845,95 @@
         
         state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
         dom.peakPowerInput.value = localStorage.getItem('userPeakPower') || '3.72';
-        theme.load();
+
+        // =================================================================
+        // CODE POUR LES BOUTONS ROTATIFS
+        // =================================================================
+
+        // --- 1. Gestion du style du bouton "Mémoriser" ---
+        const styleKnob = document.getElementById('style-knob');
+        const styleKnobLabel = document.getElementById('style-knob-label');
+        const memorizeRingBtn = dom.memorizeRingBtn;
+
+        const styleOptions = [
+            { id: 'default', label: translations[i18n.currentLang].button_style_default },
+            { id: 'neon',    label: translations[i18n.currentLang].button_style_neon },
+            { id: 'glass',   label: translations[i18n.currentLang].button_style_glass },
+            { id: 'radar',   label: translations[i18n.currentLang].button_style_radar }
+        ];
+        let currentStyleIndex = 0;
+
+        const applyMemorizeBtnStyle = (styleId) => {
+            if (!memorizeRingBtn) return;
+            memorizeRingBtn.className = 'font-bold'; 
+            memorizeRingBtn.classList.add(`btn-style-${styleId}`);
+        };
+
+        const updateStyleKnob = () => {
+            const selectedStyle = styleOptions[currentStyleIndex];
+            const angle = currentStyleIndex * (360 / styleOptions.length);
+            styleKnob.querySelector('.knob-indicator').style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            styleKnobLabel.textContent = selectedStyle.label;
+            applyMemorizeBtnStyle(selectedStyle.id);
+            localStorage.setItem('memorizeBtnStyle', selectedStyle.id);
+        };
+
+        styleKnob.addEventListener('click', () => {
+            currentStyleIndex = (currentStyleIndex + 1) % styleOptions.length;
+            updateStyleKnob();
+        });
+
+        const savedStyleId = localStorage.getItem('memorizeBtnStyle') || 'default';
+        currentStyleIndex = styleOptions.findIndex(opt => opt.id === savedStyleId);
+        if (currentStyleIndex === -1) currentStyleIndex = 0;
+        updateStyleKnob();
+
+        // --- 2. Gestion du Thème de l'application ---
+        const themeKnob = document.getElementById('theme-knob');
+        const themeKnobLabel = document.getElementById('theme-knob-label');
+
+        const themeOptions = [
+            { id: 'dark',   label: 'Sombre', className: '' },
+            { id: 'light',  label: 'Clair',  className: 'light-mode' },
+            { id: 'style2', label: 'HUD',   className: 'style2-mode' },
+            { id: 'solar',  label: 'Solaire', className: 'solar-mode' }
+        ];
+        let currentThemeIndex = 0;
+
+        const applyTheme = (theme) => {
+            // Préserve les classes existantes du <body>
+            document.body.classList.remove('light-mode','style2-mode','solar-mode');
+            if (theme.className) {
+                document.body.classList.add(theme.className);
+            }
+            localStorage.setItem('userTheme', theme.id);
+        };
+
+        const updateThemeKnob = () => {
+            const selectedTheme = themeOptions[currentThemeIndex];
+            const angle = currentThemeIndex * (360 / themeOptions.length);
+            themeKnob.querySelector('.knob-indicator').style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            themeKnobLabel.textContent = selectedTheme.label;
+            applyTheme(selectedTheme);
+        };
+
+        themeKnob.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themeOptions.length;
+            updateThemeKnob();
+        });
+
+        const savedThemeId = localStorage.getItem('userTheme') || 'dark';
+        currentThemeIndex = themeOptions.findIndex(opt => opt.id === savedThemeId);
+        if (currentThemeIndex === -1) currentThemeIndex = 0;
+        updateThemeKnob();
+
+        // =================================================================
+        // FIN DU CODE POUR LES BOUTONS ROTATIFS
+        // =================================================================
 
         if (!localStorage.getItem('onboardingComplete')) {
             onboarding.start();
         }
-
-        const applyMemorizeBtnStyle = (style) => {
-            const el = dom.memorizeRingBtn;
-            if(!el) return;
-            el.className = '';
-            el.classList.add('font-bold');
-            el.classList.add(`btn-style-${style || 'default'}`);
-        };
-        const styleRadios = document.querySelectorAll('input.memorize-style-radio');
-        const savedStyle = localStorage.getItem('memorizeBtnStyle') || 'default';
-        applyMemorizeBtnStyle(savedStyle);
-        styleRadios.forEach(r => {
-            r.checked = (r.value === savedStyle);
-            r.addEventListener('change', (e) => {
-                if(e.target.checked) {
-                    localStorage.setItem('memorizeBtnStyle', e.target.value);
-                    applyMemorizeBtnStyle(e.target.value);
-                }
-            });
-        });
 
         ['change', 'input'].forEach(evt => {
             [dom.latitudeInput, dom.dateInput, dom.clippingCheckbox, dom.manualTiltInput, dom.manualAzimuthInput].forEach(el => {
@@ -955,7 +979,6 @@
         dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
         dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
         
-        dom.themeToggle.addEventListener('change', theme.toggle);
         document.getElementById('lang-switcher').addEventListener('click', (e) => {
             if (e.target.matches('.lang-btn')) {
                 i18n.setLanguage(e.target.dataset.lang);
@@ -969,4 +992,60 @@
     }
     
     window.addEventListener('load', init);
+})();
+
+// === Photon Grid Splash (non intrusif) ===
+(function(){
+  if (typeof window === 'undefined') return;
+  if (sessionStorage.getItem('pg_splash_seen')) return;
+  sessionStorage.setItem('pg_splash_seen','1');
+  const splash = document.getElementById('pg-splash');
+  if (!splash) return;
+  const needle = document.getElementById('pg-needle');
+  function setAngle(a){
+    const clamped = Math.max(0, Math.min(90, a || 0));
+    needle.style.transform = `translate(-50%,-100%) rotate(${clamped-90}deg)`;
+  }
+  // Angle plausible basé sur lat stockée si dispo
+  const lastLat = parseFloat(localStorage.getItem('lastLat') || localStorage.getItem('latitude') || '44.13');
+  const approx = Math.max(0, Math.min(90, Math.round(Math.abs(lastLat)*0.8)));
+  // 0-2s : logo
+  // 2-4s : on anime l'aiguille vers angle plausible
+  setTimeout(()=> setAngle(approx), 1200);
+  // 7-10s : indication "Mémoriser" -> pulse sur bouton si on le trouve
+  const pulseMemorize = () => {
+    const candidates = Array.from(document.querySelectorAll('button, [role="button"]'));
+    const target = candidates.find(el => /m[ée]moriser/i.test(el.textContent||''));
+    if (target){ target.classList.add('pg-pulse'); setTimeout(()=>target.classList.remove('pg-pulse'), 3000); }
+  };
+  function closeSplash(){
+    splash.classList.add('pg-hide');
+    setTimeout(()=>{ splash.remove(); pulseMemorize(); }, 620);
+  }
+  document.getElementById('pg-calibrate')?.addEventListener('click', async ()=>{
+    try{
+      // haptique
+      if (window.Capacitor?.Plugins?.Haptics) { await window.Capacitor.Plugins.Haptics.vibrate(); }
+      else if (navigator.vibrate) { navigator.vibrate(10); }
+    }catch(_){}
+    let done = false;
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        const lat = pos.coords.latitude, lon = pos.coords.longitude;
+        localStorage.setItem('lastLat', String(lat));
+        localStorage.setItem('lastLon', String(lon));
+        window.dispatchEvent(new CustomEvent('photon:geo', {detail:{lat,lon}}));
+        // Appeler gracieusement des hooks si l'app les expose
+        ['onGeoUpdate','updateLocation','applyGeo','handleGPS','calibrateWithPosition'].forEach(fn=>{
+          if (typeof window[fn] === 'function'){ try{ window[fn](lat,lon); done=true; }catch(e){} }
+        });
+        // feedback visuel : needle vers une nouvelle valeur approximée
+        setAngle(Math.max(0, Math.min(90, Math.round(Math.abs(lat)*0.9))));
+        setTimeout(closeSplash, 800);
+      }, closeSplash, {timeout:2500, maximumAge:60000});
+    }
+    if (!done){ setTimeout(closeSplash, 1200); }
+  });
+  // Auto close en douceur au bout de 4.8s si l’utilisateur ne clique pas
+  setTimeout(closeSplash, 4800);
 })();

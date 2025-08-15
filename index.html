@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Opti Solar v4.0.3</title>
+    <title>Opti Solar v4.0.4</title>
     
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,12 +123,116 @@
             </div>
             
             <div id="settings-page" class="hidden">
+                 <button type="button" id="back-button" class="absolute top-4 left-4 icon-btn btn-secondary">
+                     <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
+                 </button>
+                <h2 class="text-2xl font-bold text-center pt-8 text-accent-blue" data-i18n="estimation_title">Estimation de Production</h2>
+                <div class="space-y-4 mt-6">
+                    <div>
+                        <label for="peak-power" class="block text-sm font-medium text-gray-400" data-i18n="peak_power">Puissance crête (kWc)</label>
+                        <input type="number" id="peak-power" class="mt-1 block w-full p-2 bg-input rounded-md">
+                    </div>
+                    <div class="border-t border-border-color"></div>
+                     <div>
+                        <label for="longitude-input" class="block text-sm font-medium text-gray-400" data-i18n="longitude">Longitude</label>
+                        <input type="number" id="longitude-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+                    </div>
+                    <div>
+                        <label for="current-tilt-input" class="block text-sm font-medium text-gray-400" data-i18n="current_tilt">Inclinaison actuelle (°)</label>
+                        <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+                    </div>
+                     <div>
+                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth">Orientation actuelle (°/Sud)</label>
+                        <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+                    </div>
                 </div>
+                <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg flex items-center justify-center">
+                    <span id="calculate-text" data-i18n="calculate_gain_long">Calculer le gain</span>
+                    <div id="calculate-loader" class="loader hidden ml-3"></div>
+                </button>
+                 <div id="production-results" class="mt-6 space-y-4 hidden">
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-400" data-i18n="prod_current_settings">Production (votre inclinaison)</p>
+                        <p id="current-production" class="text-2xl font-bold">-- kWh</p>
+                    </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-green-300" data-i18n="prod_optimal_settings">Production (inclinaison optimale)</p>
+                        <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
+                    </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300" data-i18n="monthly_gain">Gain potentiel mensuel</p>
+                        <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
+                    </div>
+                </div>
+                 <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
+            </div>
         </div>
     </main>
     
     <footer class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
-        </footer>
+        <a id="bug-report-button" href="#" class="icon-btn text-yellow-400">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+        </a>
+         <p class="text-xs text-gray-600">v4.0.4</p>
+         <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </a>
+    </footer>
+    
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
+        <div class="w-full max-w-sm card rounded-lg shadow-lg">
+            <div class="flex justify-between items-center p-4 border-b border-border-color">
+                <h3 class="text-lg font-bold text-accent" data-i18n="settings_title">Réglages</h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-4 space-y-6">
+                 <div class="flex items-center justify-between">
+                    <label for="clipping-checkbox" class="font-medium flex items-center">
+                        <span data-i18n="clipping_label">Optimiser pour l'écrêtage</span>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-input hover:bg-btn-secondary-bg">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.07-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </label>
+                    <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-input border-border-color-input text-accent focus:ring-accent">
+                </div>
+                 <div class="flex items-center justify-between">
+                     <label for="theme-toggle" class="font-medium" data-i18n="light_theme_label"></label>
+                     <div class="theme-switch-wrapper">
+                         <label class="theme-switch" for="theme-toggle">
+                             <input type="checkbox" id="theme-toggle" />
+                             <div class="slider"></div>
+                         </label>
+                     </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-medium" data-i18n="button_style_label"></label>
+                    <fieldset class="space-y-2">
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_default"></span>
+                            <input type="radio" name="memorize-style" value="default" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_neon"></span>
+                            <input type="radio" name="memorize-style" value="neon" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_glass"></span>
+                            <input type="radio" name="memorize-style" value="glass" class="memorize-style-radio">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
+                            <span data-i18n="button_style_radar"></span>
+                            <input type="radio" name="memorize-style" value="radar" class="memorize-style-radio">
+                        </label>
+                    </fieldset>
+                </div>
+                 <div class="pt-4 border-t border-border-color">
+                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="calibrate_tilt">Calibrer à plat</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4">
         <div class="card w-full max-w-lg p-5">
@@ -182,7 +286,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="card w-full max-w-sm rounded-2xl p-6 text-center flex flex-col shadow-2xl">
             <div class="flex-grow">

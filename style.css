@@ -49,6 +49,9 @@ body {
 .btn-danger { background-color: var(--bad); color: #fff; }
 .btn-danger:hover { background-color: #ff8a8a; }
 
+/* FIX: Ajout de la classe pour le bouton bleu */
+.bg-accent-blue { background-color: var(--accent-blue); }
+
 input, .bg-input {
     background-color: var(--input-bg);
     border: 1px solid var(--border-color-input);
@@ -82,9 +85,11 @@ input::placeholder { color: var(--muted); }
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* FIX: Réduction de la taille de la bulle */
 .cockpit-display {
-    width: 220px;
-    height: 220px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(65, 209, 183, 0.05) 90%);
     border: 2px solid var(--border-color);
@@ -95,6 +100,7 @@ input::placeholder { color: var(--muted); }
     justify-content: center;
     box-shadow: 0 0 40px rgba(65, 209, 183, 0.05) inset, 0 5px 15px rgba(0,0,0,0.2);
 }
+
 #memorize-ring-btn {
     width: 150px;
     height: 150px;
@@ -157,7 +163,6 @@ input:checked + .slider:before { transform: translateX(24px); }
 #onboarding-modal { animation: fadeIn 0.3s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* STYLES BOUTON MÉMORISER */
 @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 10px rgba(65, 209, 183, 0.2), 0 0 20px rgba(65, 209, 183, 0.2); }
     50% { box-shadow: 0 0 20px rgba(65, 209, 183, 0.5), 0 0 40px rgba(65, 209, 183, 0.5); }
@@ -233,10 +238,10 @@ input:checked + .slider:before { transform: translateX(24px); }
 #memorize-btn-wrapper.stable .btn-style-radar::before { animation-play-state: paused; opacity: 0.2; }
 @keyframes radarSpin { to { transform: rotate(360deg); } }
 
-/* Light mode overrides */
 .light-mode .text-gray-400 { color: var(--muted); }
 .light-mode .text-teal-300 { color: var(--accent-blue); }
 .light-mode .text-teal-400 { color: var(--accent); }
 .light-mode #production-results .text-green-300 { color: #065f46; }
 .light-mode #production-results .text-blue-300 { color: #1e40af; }
 .light-mode #production-results .font-bold { color: var(--fg); }
+.light-mode #production-results .text-amber-300 { color: #b45309; }

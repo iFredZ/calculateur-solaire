@@ -35,10 +35,16 @@ body {
     background-color: var(--card);
     border: 1px solid var(--border-color);
 }
+/* FIX: Restauration de la police et de l'effet néon du titre */
 .header-title {
     font-family: 'Exo 2', sans-serif;
+    font-size: 1.75rem;
     color: var(--fg);
     letter-spacing: 0.05em;
+    text-shadow: 0 0 5px rgba(255,255,255,0.1), 0 0 15px var(--accent), 0 0 25px var(--accent);
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 .btn-primary { background-color: var(--accent); color: #00110e; }
 .btn-primary:hover { background-color: #52d9c3; }
@@ -49,7 +55,6 @@ body {
 .btn-danger { background-color: var(--bad); color: #fff; }
 .btn-danger:hover { background-color: #ff8a8a; }
 
-/* FIX: Ajout de la classe pour le bouton bleu */
 .bg-accent-blue { background-color: var(--accent-blue); }
 
 input, .bg-input {
@@ -86,7 +91,6 @@ input::placeholder { color: var(--muted); }
     100% { transform: rotate(360deg); }
 }
 
-/* FIX: Réduction de la taille de la bulle */
 .cockpit-display {
     width: 180px;
     height: 180px;

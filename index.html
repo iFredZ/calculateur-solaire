@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Opti Solar v5.0.0</title>
+    <title>Opti Solar v4.0.0</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,21 +16,18 @@
             --bg: #0b1220; --card: #121a2b; --muted: #7b8aa5; --fg: #e9f0ff; --accent: #41d1b7;
             --accent-blue: #437eff; --warn: #ffcc00; --bad: #ff6b6b; --btn-secondary-bg: #2a3957;
             --input-bg: #0e1423; --border-color: rgba(255, 255, 255, .06); --border-color-input: rgba(255,255,255,.1);
-            --info-box-bg: rgba(123, 138, 165, 0.1); --cockpit-glow: rgba(65, 209, 183, 0.1);
+            --info-box-bg: rgba(123, 138, 165, 0.1);
         }
         .light-mode {
             --bg: #f1f5f9; --card: #ffffff; --muted: #475569; --fg: #0f172a; --accent-blue: #1d4ed8;
             --btn-secondary-bg: #e2e8f0; --input-bg: #f8fafc; --border-color: #e2e8f0; --border-color-input: #cbd5e1;
-            --info-box-bg: #f1f5f9; --cockpit-glow: rgba(29, 78, 216, 0.08);
+            --info-box-bg: #f1f5f9;
         }
         body { font-family: 'Roboto Mono', monospace; background-color: var(--bg); color: var(--fg); -webkit-tap-highlight-color: transparent; }
         .card { background-color: var(--card); border: 1px solid var(--border-color); }
-        /* NOUVEAU STYLE TITRE V5.0.0 */
         .header-title { 
             font-family: 'Exo 2', sans-serif; 
-            font-size: 1.75rem;
-            color: var(--fg); 
-            letter-spacing: 0.05em;
+            font-size: 1.75rem; color: var(--fg); letter-spacing: 0.05em;
             text-shadow: 0 0 5px rgba(255,255,255,0.1), 0 0 15px var(--accent), 0 0 25px var(--accent);
         }
         .btn-primary { background-color: var(--accent); color: #00110e; } .btn-primary:hover { background-color: #52d9c3; }
@@ -39,14 +36,16 @@
         input, .bg-input { background-color: var(--input-bg); border: 1px solid var(--border-color-input); color: var(--fg); }
         .icon-btn { background-color: var(--card); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-in-out; border: 1px solid var(--border-color); }
         .icon-btn:hover { transform: scale(1.1); background-color: var(--btn-secondary-bg); }
+        .loader { border: 4px solid var(--btn-secondary-bg); border-radius: 50%; border-top: 4px solid var(--accent); width: 24px; height: 24px; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* STYLES VISUELS V5.0.0 */
+        /* STYLES VISUELS V4.0.0 */
         .cockpit-display {
             width: 220px; height: 220px; border-radius: 50%;
-            background: radial-gradient(circle at 50% 50%, transparent 60%, var(--cockpit-glow) 90%);
+            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(65, 209, 183, 0.05)) 90%;
             border: 2px solid var(--border-color); position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 0 40px var(--cockpit-glow) inset, 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 0 40px rgba(65, 209, 183, 0.05) inset, 0 5px 15px rgba(0,0,0,0.2);
         }
         #memorize-ring-btn {
             width: 150px; height: 150px; border-radius: 50%; color: var(--fg);
@@ -84,14 +83,14 @@
         </div>
     </header>
 
-    <main class="flex-grow overflow-y-auto px-4 pb-4 flex flex-col justify-center">
+    <main class="flex-grow overflow-y-auto px-4 pb-4 flex flex-col justify-start">
         <div id="app-container" class="w-full max-w-lg mx-auto relative card p-4 space-y-4">
             
             <div id="main-page">
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                          <div>
-                            <label class="block text-xs text-muted mb-1">Localisation (Latitude)</label>
+                            <label class="block text-xs text-muted mb-1" data-i18n="location">Localisation (Latitude)</label>
                             <div class="flex items-center gap-2">
                                 <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm text-center">
                                 <button type="button" id="get-location" title="Utiliser ma position" class="p-2 bg-input rounded-md hover:bg-btn-secondary-bg transition-colors flex-shrink-0">
@@ -100,7 +99,7 @@
                             </div>
                          </div>
                          <div>
-                            <label for="date-input" class="block text-xs text-muted mb-1">Date de Simulation</label>
+                            <label for="date-input" class="block text-xs text-muted mb-1" data-i18n="target_date">Date de Simulation</label>
                             <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm bg-input">
                          </div>
                     </div>
@@ -109,9 +108,9 @@
                 
                 <div class="border-t border-border-color my-4"></div>
                 
-                <div class="flex justify-center">
+                <div id="result-container" class="flex justify-center">
                     <div class="cockpit-display">
-                        <p class="text-xs text-muted">Angle Recommandé</p>
+                        <p class="text-xs text-muted" data-i18n="recommended_angle">Angle Recommandé</p>
                         <p id="result" class="text-7xl font-bold text-teal-400 my-1">--°</p>
                         <p id="date-display" class="text-sm text-accent-blue h-4"></p>
                     </div>
@@ -119,13 +118,13 @@
 
                 <div id="controls-container" class="space-y-4 pt-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-3 px-4 rounded-lg">Utiliser Capteurs</button>
-                        <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-3 px-4 rounded-lg">Saisie Manuelle</button>
+                        <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-3 px-4 rounded-lg" data-i18n="activate_sensors">Utiliser Capteurs</button>
+                        <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-3 px-4 rounded-lg" data-i18n="manual_entry">Saisie Manuelle</button>
                     </div>
                     
                     <div id="sensors-readout" class="hidden grid grid-cols-2 gap-4 text-center pt-4">
                          <div class="info-box p-3 rounded-lg">
-                            <p class="text-xs text-muted">Orientation</p>
+                            <p class="text-xs text-muted" data-i18n="orientation">Orientation</p>
                              <div class="relative w-16 h-16 mx-auto mt-1">
                                 <svg class="absolute inset-0 text-gray-700" fill="none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="1"/><text x="50" y="10" text-anchor="middle" font-size="10" fill="currentColor">S</text></svg>
                                 <div id="compass-rose-container" class="compass-rose"><svg class="w-full h-full text-accent" viewBox="0 0 100 100"><path d="M50 12 L45 22 L55 22 Z" fill="currentColor"/></svg></div>
@@ -133,7 +132,7 @@
                             <p class="text-md font-bold"><span id="current-compass">--</span></p>
                         </div>
                         <div class="info-box p-3 rounded-lg">
-                            <p class="text-xs text-muted">Inclinaison</p>
+                            <p class="text-xs text-muted" data-i18n="current_angle">Inclinaison</p>
                             <div class="relative w-20 h-12 mx-auto mt-2 flex items-center justify-center">
                                 <svg class="absolute inset-0 text-gray-700" viewBox="0 0 100 50"><path d="M0 25 H100" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
                                 <div id="inclinometer-line-container" class="w-full h-full absolute"><svg class="w-full h-full overflow-visible" viewBox="0 0 100 50"><line class="inclinometer-line" x1="-10" y1="25" x2="110" y2="25" stroke-width="3" stroke="var(--accent)" /></svg></div>
@@ -145,7 +144,7 @@
                     <div id="memorize-container" class="hidden flex-col items-center justify-center pt-4 space-y-2">
                         <div id="memorize-btn-wrapper" class="relative w-[150px] h-[150px] flex items-center justify-center">
                             <button type="button" id="memorize-ring-btn" disabled>
-                                <span id="memorize-btn-text" class="font-bold">Mémoriser</span>
+                                <span id="memorize-btn-text" class="font-bold" data-i18n="memorize_action">Mémoriser</span>
                                 <svg id="memorize-checkmark-icon" class="h-10 w-10 text-teal-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" /></svg>
                            </button>
                         </div>
@@ -155,19 +154,19 @@
                     <div id="manual-entry-display" class="hidden space-y-4 pt-4 border-t border-border-color">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="manual-tilt-input" class="block text-sm font-medium text-gray-400 mb-1">Inclinaison</label>
+                                <label for="manual-tilt-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="tilt">Inclinaison</label>
                                 <input type="number" id="manual-tilt-input" class="bg-input w-full p-2 rounded-md text-center">
                             </div>
                             <div>
-                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1">Orientation</label>
-                                <input type="number" id="manual-azimuth-input" class="bg-input w-full p-2 rounded-md text-center" placeholder="0 = Sud">
+                                <label for="manual-azimuth-input" class="block text-sm font-medium text-gray-400 mb-1" data-i18n="orientation_short">Orientation</label>
+                                <input type="number" id="manual-azimuth-input" class="bg-input w-full p-2 rounded-md text-center" data-i18n-placeholder="orientation_placeholder">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="border-t border-border-color my-4"></div>
-                <button type="button" id="goto-estimation-button" class="w-full bg-accent-blue text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center text-center">Estimer la Production</button>
+                <button type="button" id="goto-estimation-button" class="w-full bg-accent-blue text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center text-center" data-i18n="calculate_gain">Estimer la Production</button>
 
             </div>
             
@@ -175,32 +174,44 @@
                  <button type="button" id="back-button" class="absolute top-4 left-4 icon-btn btn-secondary">
                      <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
                  </button>
-                <h2 class="text-2xl font-bold text-center pt-8 text-accent-blue">Estimation de Production</h2>
+                <h2 class="text-2xl font-bold text-center pt-8 text-accent-blue" data-i18n="estimation_title">Estimation de Production</h2>
                 <div class="space-y-4 mt-6">
                     <div>
-                        <label for="peak-power" class="block text-sm font-medium text-gray-400">Puissance crête (kWc)</label>
+                        <label for="peak-power" class="block text-sm font-medium text-gray-400" data-i18n="peak_power">Puissance crête (kWc)</label>
                         <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md">
                     </div>
                     <div class="border-t border-border-color"></div>
                      <div>
-                        <label for="longitude-input" class="block text-sm font-medium text-gray-400">Longitude</label>
+                        <label for="longitude-input" class="block text-sm font-medium text-gray-400" data-i18n="longitude">Longitude</label>
                         <input type="number" id="longitude-input" class="mt-1 block w-full p-2 bg-input rounded-md">
                     </div>
                     <div>
-                        <label for="current-tilt-input" class="block text-sm font-medium text-gray-400">Inclinaison actuelle (°)</label>
+                        <label for="current-tilt-input" class="block text-sm font-medium text-gray-400" data-i18n="current_tilt">Inclinaison actuelle (°)</label>
                         <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md">
                     </div>
                      <div>
-                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400">Orientation actuelle (°/Sud)</label>
+                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth">Orientation actuelle (°/Sud)</label>
                         <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md">
                     </div>
                 </div>
                 <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg flex items-center justify-center">
-                    <span id="calculate-text">Calculer le gain</span>
+                    <span id="calculate-text" data-i18n="calculate_gain_long">Calculer le gain</span>
                     <div id="calculate-loader" class="loader hidden ml-3"></div>
                 </button>
                  <div id="production-results" class="mt-6 space-y-4 hidden">
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-400" data-i18n="prod_current_settings">Production (votre inclinaison)</p>
+                        <p id="current-production" class="text-2xl font-bold">-- kWh</p>
                     </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-green-300" data-i18n="prod_optimal_settings">Production (inclinaison optimale)</p>
+                        <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
+                    </div>
+                    <div class="info-box p-4 rounded-lg text-center">
+                        <p class="text-sm text-blue-300" data-i18n="monthly_gain">Gain potentiel mensuel</p>
+                        <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
+                    </div>
+                </div>
                  <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
             </div>
         </div>
@@ -210,8 +221,8 @@
         <a id="bug-report-button" href="#" class="icon-btn text-yellow-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
         </a>
-         <p class="text-xs text-gray-600">v5.0.0</p>
-         <a href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
+         <p class="text-xs text-gray-600">v4.0.0</p>
+         <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </a>
     </footer>
@@ -219,7 +230,7 @@
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
         <div class="w-full max-w-sm card rounded-lg shadow-lg">
             <div class="flex justify-between items-center p-4 border-b border-border-color">
-                <h3 class="text-lg font-bold text-accent">Réglages</h3>
+                <h3 class="text-lg font-bold text-accent" data-i18n="settings_title">Réglages</h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -227,7 +238,7 @@
             <div class="p-4 space-y-6">
                  <div class="flex items-center justify-between">
                     <label for="clipping-checkbox" class="font-medium flex items-center">
-                        <span>Optimiser pour l'écrêtage</span>
+                        <span data-i18n="clipping_label">Optimiser pour l'écrêtage</span>
                         <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-input hover:bg-btn-secondary-bg">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.07-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </button>
@@ -235,7 +246,7 @@
                     <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-input border-border-color-input text-accent focus:ring-accent">
                 </div>
                  <div class="pt-4 border-t border-border-color">
-                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg">Calibrer à plat</button>
+                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="calibrate_tilt">Calibrer à plat</button>
                 </div>
             </div>
         </div>
@@ -243,302 +254,173 @@
     
     <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4">
         <div class="card w-full max-w-lg p-4">
-            <h3 class="text-xl font-bold text-accent">Guide d'Utilisation</h3>
-            <p class="text-muted mt-2">Le contenu complet du guide doit être inséré ici.</p>
-            <button class="close-modal-btn mt-4 btn-secondary py-2 px-4 rounded-lg">Fermer</button>
+            <div class="flex justify-between items-center">
+                 <h3 class="text-xl font-bold text-accent" data-i18n="main_guide_title">Guide d'Utilisation</h3>
+                 <button class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 space-y-4 text-sm text-muted">
+                <div data-i18n="guide_step1_desc"><strong class="text-fg">Étape 1 : Localisation & Date</strong><br>Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.</div>
+                <div data-i18n="guide_step2_desc"><strong class="text-fg">Étape 2 : Choix du Mode</strong><br><strong>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation manuellement.</div>
+                <div class="text-warn">Attention : retirez toute coque magnétique pour éviter de fausser la mesure d'orientation.</div>
+            </div>
+            <button class="close-modal-btn mt-4 btn-secondary py-2 px-4 rounded-lg w-full" data-i18n="got_it">Compris</button>
         </div>
     </div>
-    
+
     <script>
-    // SCRIPT COMPLET BASÉ SUR V3.1.1 AVEC AMÉLIORATIONS VISUELLES
     (function() {
         'use strict';
-
-        const CONFIG = {
-            defaultLatitude: 44.21446,
-            defaultLongitude: 4.028,
-            sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
-        };
-        
-        const state = {
-            entryMode: null,
-            sensorsActive: false,
-            memorizedTilt: null,
-            memorizedAzimuthValue: null,
-            panelAzimuthLive: null,
-            tiltOffset: 0,
-            isStable: false,
-            lastReadings: [],
-            stabilityThreshold: 0.5,
-            stabilityBuffer: 5
-        };
-
+        const CONFIG = { defaultLatitude: 44.21446, defaultLongitude: 4.028, sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation', reportEmail: 'finjalrac@gmail.com' };
+        const state = { entryMode: null, sensorsActive: false, memorizedTilt: null, memorizedAzimuthValue: null, panelAzimuthLive: null, tiltOffset: 0, isStable: false, lastReadings: [], stabilityThreshold: 0.5, stabilityBuffer: 5 };
         const dom = {
-            mainPage: document.getElementById('main-page'),
-            settingsPage: document.getElementById('settings-page'),
-            latitudeInput: document.getElementById('latitude-input'),
-            dateInput: document.getElementById('date-input'),
-            dateDisplay: document.getElementById('date-display'),
-            getLocationButton: document.getElementById('get-location'),
-            locationError: document.getElementById('location-error'),
-            activateSensorsButton: document.getElementById('activate-sensors-button'),
-            manualEntryButton: document.getElementById('manual-entry-button'),
-            resultDisplay: document.getElementById('result'),
-            sensorsReadout: document.getElementById('sensors-readout'),
-            currentAngleDisplay: document.getElementById('current-angle'),
-            currentCompassDisplay: document.getElementById('current-compass'),
-            manualEntryDisplay: document.getElementById('manual-entry-display'),
-            manualTiltInput: document.getElementById('manual-tilt-input'),
-            manualAzimuthInput: document.getElementById('manual-azimuth-input'),
-            memorizeContainer: document.getElementById('memorize-container'),
-            memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'),
-            memorizeRingBtn: document.getElementById('memorize-ring-btn'),
-            memorizeBtnText: document.getElementById('memorize-btn-text'),
-            memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
-            sensorError: document.getElementById('sensor-error'),
-            gotoEstimationButton: document.getElementById('goto-estimation-button'),
-            backButton: document.getElementById('back-button'),
-            settingsButton: document.getElementById('settings-button'),
-            mainHelpButton: document.getElementById('main-help-button'),
-            compassRoseContainer: document.getElementById('compass-rose-container'),
-            inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
-            peakPowerInput: document.getElementById('peak-power'),
-            longitudeInput: document.getElementById('longitude-input'),
-            currentTiltInput: document.getElementById('current-tilt-input'),
-            currentAzimuthInput: document.getElementById('current-azimuth-input'),
-            calculateProductionButton: document.getElementById('calculate-production'),
-            // MODALES
-            settingsModal: document.getElementById('settings-modal'),
-            mainHelpModal: document.getElementById('main-help-modal'),
-            clippingCheckbox: document.getElementById('clipping-checkbox'),
-            calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
+            mainPage: document.getElementById('main-page'), settingsPage: document.getElementById('settings-page'), latitudeInput: document.getElementById('latitude-input'), dateInput: document.getElementById('date-input'),
+            dateDisplay: document.getElementById('date-display'), getLocationButton: document.getElementById('get-location'), locationError: document.getElementById('location-error'), activateSensorsButton: document.getElementById('activate-sensors-button'),
+            manualEntryButton: document.getElementById('manual-entry-button'), resultDisplay: document.getElementById('result'), sensorsReadout: document.getElementById('sensors-readout'), currentAngleDisplay: document.getElementById('current-angle'),
+            currentCompassDisplay: document.getElementById('current-compass'), manualEntryDisplay: document.getElementById('manual-entry-display'), manualTiltInput: document.getElementById('manual-tilt-input'), manualAzimuthInput: document.getElementById('manual-azimuth-input'),
+            memorizeContainer: document.getElementById('memorize-container'), memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'), memorizeRingBtn: document.getElementById('memorize-ring-btn'), memorizeBtnText: document.getElementById('memorize-btn-text'),
+            memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'), sensorError: document.getElementById('sensor-error'), gotoEstimationButton: document.getElementById('goto-estimation-button'), backButton: document.getElementById('back-button'),
+            settingsButton: document.getElementById('settings-button'), mainHelpButton: document.getElementById('main-help-button'), compassRoseContainer: document.getElementById('compass-rose-container'), inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
+            peakPowerInput: document.getElementById('peak-power'), longitudeInput: document.getElementById('longitude-input'), currentTiltInput: document.getElementById('current-tilt-input'), currentAzimuthInput: document.getElementById('current-azimuth-input'),
+            calculateProductionButton: document.getElementById('calculate-production'), calculateText: document.getElementById('calculate-text'), calculateLoader: document.getElementById('calculate-loader'), productionResults: document.getElementById('production-results'),
+            currentProductionDisplay: document.getElementById('current-production'), optimalProductionDisplay: document.getElementById('optimal-production'), potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'), pvgisError: document.getElementById('pvgis-error'),
+            bugReportButton: document.getElementById('bug-report-button'), donateButtonFab: document.getElementById('donate-button-fab'),
+            settingsModal: document.getElementById('settings-modal'), mainHelpModal: document.getElementById('main-help-modal'), clippingCheckbox: document.getElementById('clipping-checkbox'), calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
         };
-
         const utils = {
-            toRadians: (deg) => deg * Math.PI / 180,
-            getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
+            toRadians: (deg) => deg * Math.PI / 180, getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
             getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-            safeParseFloat: (v, fallback = NaN) => {
-                if (v === null || v === undefined || v === '') return fallback;
-                const s = String(v).replace(',', '.').trim();
-                const n = parseFloat(s);
-                return Number.isFinite(n) ? n : fallback;
-            },
-            clamp: (x, min, max) => Math.min(Math.max(x, min), max),
-            normalizeAngle: (a) => (a % 360 + 360) % 360,
+            safeParseFloat: (v, fallback = NaN) => { const s = String(v).replace(',', '.').trim(); const n = parseFloat(s); return Number.isFinite(n) ? n : fallback; },
+            clamp: (x, min, max) => Math.min(Math.max(x, min), max), normalizeAngle: (a) => (a % 360 + 360) % 360,
         };
-        
         const ui = {
-            updateDateDisplay: () => {
-                const date = new Date(dom.dateInput.value);
-                if(!isNaN(date.getTime())) {
-                    dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-                }
-            },
-            updateLocationFields: (lat) => {
-                dom.latitudeInput.value = lat.toFixed(5);
-                dom.locationError.textContent = '';
-                calculations.calculateAndDisplayAll();
-            },
+            updateDateDisplay: () => { const date = new Date(dom.dateInput.value); if(!isNaN(date.getTime())) dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }); },
+            updateLocationFields: (lat) => { dom.latitudeInput.value = lat.toFixed(5); dom.locationError.textContent = ''; calculations.calculateAndDisplayAll(); },
             setEntryMode: (mode) => {
                 state.entryMode = mode;
                 dom.sensorsReadout.classList.toggle('hidden', mode !== 'sensors');
                 dom.memorizeContainer.classList.toggle('hidden', mode !== 'sensors');
-                if(mode==='sensors') dom.memorizeContainer.classList.add('flex'); else dom.memorizeContainer.classList.remove('flex');
+                dom.memorizeContainer.classList.toggle('flex', mode === 'sensors');
                 dom.manualEntryDisplay.classList.toggle('hidden', mode !== 'manual');
-
                 dom.activateSensorsButton.classList.toggle('btn-danger', mode === 'sensors');
-                dom.manualEntryButton.classList.toggle('btn-danger', mode !== 'sensors');
-
-                if (mode === 'sensors' && !state.sensorsActive) {
-                    sensors.start();
-                } else if (mode !== 'sensors' && state.sensorsActive) {
-                    sensors.stop();
-                }
+                dom.manualEntryButton.classList.toggle('btn-danger', mode === 'manual');
+                dom.manualEntryButton.classList.toggle('btn-secondary', mode !== 'manual');
+                if (mode === 'sensors') { if (!state.sensorsActive) sensors.start(); } else { if (state.sensorsActive) sensors.stop(); }
                 calculations.calculateAndDisplayAll();
             },
-            showPage: (page) => {
-                 dom.mainPage.classList.toggle('hidden', page !== 'main');
-                 dom.settingsPage.classList.toggle('hidden', page !== 'settings');
-            }
+            showPage: (page) => { dom.mainPage.classList.toggle('hidden', page !== 'main'); dom.settingsPage.classList.toggle('hidden', page !== 'settings'); }
         };
-
         const calculations = {
             calculateAndDisplayAll: () => {
                 const lat = utils.safeParseFloat(dom.latitudeInput.value);
                 const dateValue = dom.dateInput.value;
-                if (isNaN(lat) || !dateValue) { return; }
-
-                let panelAzimuthDeviation = NaN;
-                if (state.entryMode === 'manual') {
-                    panelAzimuthDeviation = utils.safeParseFloat(dom.manualAzimuthInput.value);
-                } else if (state.entryMode === 'sensors' && state.panelAzimuthLive !== null) {
+                if (isNaN(lat) || !dateValue) return;
+                let panelAzimuthDeviation = 0;
+                if (state.entryMode === 'manual') panelAzimuthDeviation = utils.safeParseFloat(dom.manualAzimuthInput.value, 0);
+                else if (state.entryMode === 'sensors' && state.panelAzimuthLive !== null) {
                     let deviation = state.panelAzimuthLive - 180;
-                    if (deviation > 180) deviation -= 360;
-                    if (deviation < -180) deviation += 360;
+                    if (deviation > 180) deviation -= 360; if (deviation < -180) deviation += 360;
                     panelAzimuthDeviation = deviation;
                 }
-                
-                if (isNaN(panelAzimuthDeviation)) panelAzimuthDeviation = 0;
-
                 const selectedDate = new Date(dateValue);
                 if (isNaN(selectedDate.getTime())) return;
-
                 const dayOfYear = utils.getDayOfYear(selectedDate);
                 const declination = utils.getDeclination(dayOfYear);
                 const clipping = dom.clippingCheckbox.checked;
-
                 const dev = Math.abs(panelAzimuthDeviation);
                 const penalty = Math.min(6, dev / 12);
-
                 const solarNoonAltitude = 90 - Math.abs(lat - declination);
                 let optimalTilt = 90 - solarNoonAltitude;
-                
                 const isSummer = (Math.sign(lat) * Math.sign(declination) > 0) && Math.abs(declination) > 15;
                 if(clipping && isSummer) optimalTilt += 10;
-                
                 optimalTilt -= penalty;
                 optimalTilt = utils.clamp(optimalTilt, 0, 90);
-                
                 dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
             }
         };
-
         const sensors = {
             lastUpdate: 0,
             checkStability: (newReading) => {
                 state.lastReadings.push(newReading);
                 if (state.lastReadings.length > state.stabilityBuffer) state.lastReadings.shift();
                 if (state.lastReadings.length < state.stabilityBuffer) return false;
-                
                 const first = state.lastReadings[0];
-                return state.lastReadings.every(r => 
-                    Math.abs(r.tilt - first.tilt) <= state.stabilityThreshold &&
-                    Math.abs(r.heading - first.heading) <= state.stabilityThreshold
-                );
+                return state.lastReadings.every(r => Math.abs(r.tilt - first.tilt) <= state.stabilityThreshold && Math.abs(r.heading - first.heading) <= state.stabilityThreshold );
             },
-            setStable: (isStable) => {
-                if (state.isStable === isStable) return;
-                state.isStable = isStable;
-                dom.memorizeBtnWrapper.classList.toggle('stable', isStable);
-                dom.memorizeRingBtn.disabled = !isStable;
-            },
+            setStable: (isStable) => { if (state.isStable === isStable) return; state.isStable = isStable; dom.memorizeBtnWrapper.classList.toggle('stable', isStable); dom.memorizeRingBtn.disabled = !isStable; },
             getTiltFromEvent: (e) => e.beta == null ? null : utils.clamp(Math.round(Math.abs(e.beta - state.tiltOffset)), 0, 90),
             getHeadingFromEvent: (e) => {
-                if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading;
-                if (typeof e.alpha !== 'number') return null;
+                if (typeof e.webkitCompassHeading === 'number') return e.webkitCompassHeading; if (typeof e.alpha !== 'number') return null;
                 const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
                 return (360 - e.alpha + screenAngle + 360) % 360;
             },
             formatAzimuthForDisplay: (azimuth) => {
-                let deviation = azimuth - 180;
-                if (deviation > 180) deviation -= 360;
-                if (deviation < -180) deviation += 360;
-                
-                if (Math.abs(deviation) < 5) return "Plein Sud";
-                const direction = deviation < 0 ? "Est" : "Ouest";
+                let deviation = azimuth - 180; if (deviation > 180) deviation -= 360; if (deviation < -180) deviation += 360;
+                if (Math.abs(deviation) < 5) return "Plein Sud"; const direction = deviation < 0 ? "Est" : "Ouest";
                 return `${Math.round(Math.abs(deviation))}° ${direction}`;
             },
             handleOrientation: (event) => {
-                const now = performance.now();
-                if (now - sensors.lastUpdate < 100) return;
-                sensors.lastUpdate = now;
-                
-                const tilt = sensors.getTiltFromEvent(event);
-                const heading = sensors.getHeadingFromEvent(event);
-
-                if (tilt !== null) {
-                    dom.currentAngleDisplay.textContent = tilt;
-                    const tiltForVisual = utils.clamp(event.beta - state.tiltOffset, -90, 90);
-                    dom.inclinometerLineContainer.style.transform = `rotate(${tiltForVisual}deg)`;
-                }
-                if (heading !== null) {
-                    state.panelAzimuthLive = utils.normalizeAngle(heading);
-                    dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
-                    dom.compassRoseContainer.style.transform = `rotate(${state.panelAzimuthLive}deg)`;
-                }
-                if (tilt !== null && heading !== null) {
-                    dom.sensorError.textContent = '';
-                    sensors.setStable(sensors.checkStability({ tilt, heading }));
-                }
+                const now = performance.now(); if (now - sensors.lastUpdate < 100) return; sensors.lastUpdate = now;
+                const tilt = sensors.getTiltFromEvent(event); const heading = sensors.getHeadingFromEvent(event);
+                if (tilt !== null) { dom.currentAngleDisplay.textContent = tilt; const tiltForVisual = utils.clamp(event.beta - state.tiltOffset, -90, 90); dom.inclinometerLineContainer.style.transform = `rotate(${tiltForVisual}deg)`; }
+                if (heading !== null) { state.panelAzimuthLive = utils.normalizeAngle(heading); dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive); dom.compassRoseContainer.style.transform = `rotate(${state.panelAzimuthLive}deg)`; }
+                if (tilt !== null && heading !== null) { dom.sensorError.textContent = ''; sensors.setStable(sensors.checkStability({ tilt, heading })); }
                 calculations.calculateAndDisplayAll();
             },
-            start: () => {
-                if (state.sensorsActive) return;
-                state.sensorsActive = true;
-                dom.sensorError.textContent = "Activation...";
-                dom.activateSensorsButton.textContent = "Arrêter";
-                window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                dom.sensorError.textContent = "";
-            },
-            stop: () => {
-                if (!state.sensorsActive) return;
-                state.sensorsActive = false;
-                window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                dom.activateSensorsButton.textContent = "Utiliser Capteurs";
-                dom.activateSensorsButton.classList.remove('btn-danger');
-                sensors.setStable(false);
-                state.lastReadings = [];
-                state.panelAzimuthLive = null;
-            }
+            start: () => { if (state.sensorsActive) return; state.sensorsActive = true; dom.sensorError.textContent = "Activation..."; dom.activateSensorsButton.textContent = "Arrêter"; window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true); dom.sensorError.textContent = ""; },
+            stop: () => { if (!state.sensorsActive) return; state.sensorsActive = false; window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true); dom.activateSensorsButton.textContent = "Utiliser Capteurs"; dom.activateSensorsButton.classList.remove('btn-danger'); sensors.setStable(false); state.lastReadings = []; state.panelAzimuthLive = null; }
         };
-        
         const handlers = {
-            memorizeSensorValues: () => { /*... Logique de v3.1.1 ...*/},
-            calibrateTilt: () => { /*... Logique de v3.1.1 ...*/},
+            memorizeSensorValues: () => {
+                const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
+                const az = state.panelAzimuthLive;
+                if (!Number.isFinite(tilt) || !Number.isFinite(az)) return;
+                state.memorizedTilt = tilt; state.memorizedAzimuthValue = az;
+                dom.memorizeBtnText.classList.add('hidden'); dom.memorizeCheckmarkIcon.classList.remove('hidden');
+                setTimeout(() => { dom.memorizeBtnText.textContent = "Mémorisé !"; dom.memorizeBtnText.classList.remove('hidden'); dom.memorizeCheckmarkIcon.classList.add('hidden'); setTimeout(() => { dom.memorizeBtnText.textContent = "Mémoriser"; }, 1500); }, 300);
+            },
+            calibrateTilt: () => {
+                const once = (e) => {
+                    if (e.beta !== null) { state.tiltOffset = e.beta; localStorage.setItem('tiltOffset', state.tiltOffset.toString()); const originalText = dom.calibrateTiltBtn.textContent; dom.calibrateTiltBtn.textContent = "Calibration effectuée !"; setTimeout(() => { dom.calibrateTiltBtn.textContent = originalText; }, 2000); }
+                    window.removeEventListener(CONFIG.sensorEventName, once, true);
+                }; window.addEventListener(CONFIG.sensorEventName, once, true);
+            },
             prepareEstimationPage: () => {
-                 if (state.entryMode === 'manual') {
-                    dom.currentTiltInput.value = dom.manualTiltInput.value;
-                    dom.currentAzimuthInput.value = dom.manualAzimuthInput.value;
-                } else { 
+                if (state.entryMode === 'manual') { dom.currentTiltInput.value = dom.manualTiltInput.value; dom.currentAzimuthInput.value = dom.manualAzimuthInput.value; }
+                else {
                     dom.currentTiltInput.value = (state.memorizedTilt !== null) ? state.memorizedTilt : '';
-                    if (state.memorizedAzimuthValue !== null) {
-                         let deviation = state.memorizedAzimuthValue - 180;
-                        if (deviation > 180) deviation -= 360;
-                        if (deviation < -180) deviation += 360;
-                        dom.currentAzimuthInput.value = Math.round(deviation);
-                    } else { dom.currentAzimuthInput.value = ''; }
+                    if (state.memorizedAzimuthValue !== null) { let deviation = state.memorizedAzimuthValue - 180; if (deviation > 180) deviation -= 360; if (deviation < -180) deviation += 360; dom.currentAzimuthInput.value = Math.round(deviation); }
+                    else { dom.currentAzimuthInput.value = ''; }
                 }
-                dom.longitudeInput.value = CONFIG.defaultLongitude;
-                ui.showPage('settings');
-            }
+                dom.longitudeInput.value = CONFIG.defaultLongitude; ui.showPage('settings');
+            },
+            openBugReport: (event) => { event.preventDefault(); window.location.href = `mailto:${CONFIG.reportEmail}?subject=Suggestion%20/%20Bug%20pour%20Opti%20Solar`; }
         };
-
-        const geolocation = { get: () => { /*... la fonction de la v4.1 ... */ }};
-
+        const geolocation = { get: () => { dom.locationError.textContent = 'Obtention de la position...'; if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(p => ui.updateLocationFields(p.coords.latitude), () => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }); } else { dom.locationError.textContent = 'Géolocalisation non supportée.'; } } };
         function init() {
             dom.latitudeInput.value = CONFIG.defaultLatitude.toFixed(5);
             state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
-            
             const today = new Date();
             dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            ui.updateDateDisplay();
-            calculations.calculateAndDisplayAll();
-
-            // LISTENERS
-            const recalculate = () => { ui.updateDateDisplay(); calculations.calculateAndDisplayAll(); };
-            dom.dateInput.addEventListener('change', recalculate);
-            dom.latitudeInput.addEventListener('input', recalculate);
-            dom.clippingCheckbox.addEventListener('change', recalculate);
-            dom.manualAzimuthInput.addEventListener('input', recalculate);
-
+            ui.updateDateDisplay(); calculations.calculateAndDisplayAll();
+            const recalculate = () => { calculations.calculateAndDisplayAll(); };
+            dom.dateInput.addEventListener('change', () => { ui.updateDateDisplay(); recalculate(); });
+            dom.latitudeInput.addEventListener('input', recalculate); dom.clippingCheckbox.addEventListener('change', recalculate);
+            dom.manualTiltInput.addEventListener('input', recalculate); dom.manualAzimuthInput.addEventListener('input', recalculate);
             dom.getLocationButton.addEventListener('click', geolocation.get);
-            
             dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
             dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
             dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
             dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
             dom.backButton.addEventListener('click', () => ui.showPage('main'));
-
+            dom.bugReportButton.addEventListener('click', handlers.openBugReport);
             // MODALES LISTENERS
             dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
             dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));
-            document.querySelectorAll('.close-modal-btn').forEach(btn => 
-                btn.addEventListener('click', (e) => e.target.closest('.fixed').classList.add('hidden'))
-            );
+            document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('.fixed').classList.add('hidden')));
             dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
         }
-        
         window.addEventListener('load', init);
     })();
     </script>

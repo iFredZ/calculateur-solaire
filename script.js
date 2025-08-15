@@ -46,6 +46,8 @@
             calculate_gain_long: "Calculer le gain",
             prod_current_settings: "Production (votre inclinaison)",
             prod_optimal_settings: "Production (inclinaison optimale)",
+            prod_truly_optimal_settings: "Production IDÉALE (plein Sud)",
+            daily_gain: "Gain potentiel journalier",
             monthly_gain: "Gain potentiel mensuel",
             settings_title: "Réglages",
             clipping_label: "Optimiser pour l'écrêtage",
@@ -60,7 +62,7 @@
             guide_step1_title: "Étape 1 : Localisation & Date",
             guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
             guide_step2_title: "Étape 2 : Choix du Mode",
-            guide_step2_desc: "<strong class='text-gray-200'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong class='text-yellow-400'>Attention : retirez toute coque magnétique.</strong><br><br><strong class='text-gray-200'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation.",
+            guide_step2_desc: "<strong class='text-fg'>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong class='text-yellow-400'>Attention : retirez toute coque magnétique.</strong><br><br><strong class='text-fg'>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation.",
             guide_step3_title: "Étape 3 : Lecture du Résultat",
             guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel.",
             guide_step4_title: "Étape 4 : Estimation du Gain",
@@ -93,84 +95,7 @@
             button_style_radar: "Radar",
         },
         en: {
-            geoloc_error: "Geolocation error.",
-            geoloc_not_supported: "Geolocation not supported.",
-            location_unavailable: "Unable to get location.",
-            location_getting: "Getting location...",
-            activate_sensors: "Use Sensors",
-            stop_sensors: "Stop Sensors",
-            manual_entry: "Manual Input",
-            location: "Location (Latitude)",
-            latitude_placeholder: "Latitude required",
-            target_date: "Target Date",
-            current_angle: "Inclination",
-            orientation: "Orientation",
-            memorize_action: "Memorize",
-            memorized: "Saved!",
-            calibrate_tilt: "Calibrate Flat",
-            calibrate_tilt_success: "Calibrated!",
-            light_theme_label: "Light Mode",
-            tilt: "Tilt (°)",
-            tilt_placeholder: "e.g. 35",
-            orientation_short: "Orientation (°)",
-            orientation_placeholder: "0 (South)",
-            recommended_angle: "Recommended Angle",
-            waiting_for_sensor: "Point your device...",
-            calculate_gain: "Estimate Production",
-            donation_message: "If this estimate was helpful, consider supporting this project by buying me a small coffee! ☕",
-            estimation_title: "Production Estimate",
-            peak_power: "Peak power (kWp)",
-            longitude: "Longitude",
-            current_tilt: "Current Tilt (°)",
-            current_azimuth: "Current Azimuth (°/South)",
-            calculate_gain_long: "Calculate Gain",
-            prod_current_settings: "Production (current tilt)",
-            prod_optimal_settings: "Production (optimal tilt)",
-            monthly_gain: "Potential Monthly Gain",
-            settings_title: "Settings",
-            clipping_label: "Optimize for clipping",
-            clipping_title: "Clipping Optimization",
-            clipping_problem_title: "The Problem",
-            clipping_problem_desc: "In summer, your solar production might exceed your inverter's maximum power. This excess energy is lost: this is clipping.",
-            clipping_solution_title: "The Solution",
-            clipping_solution_desc: "Checking this box intentionally increases the panel angle. This slightly reduces the production peak at noon and increases morning/evening production.",
-            got_it: "Got it",
-            replay_tutorial: "Replay Tutorial",
-            main_guide_title: "User Guide",
-            guide_step1_title: "Step 1: Location & Date",
-            guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
-            guide_step2_title: "Step 2: Choose Mode",
-            guide_step2_desc: "<strong class='text-gray-200'>Sensors:</strong> Place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case.</strong><br><br><strong class='text-gray-200'>Manual:</strong> Enter tilt and orientation manually.",
-            guide_step3_title: "Step 3: Read the Result",
-            guide_step3_desc: "The recommended angle appears and adjusts in real-time.",
-            guide_step4_title: "Step 4: Estimate Gain",
-            guide_step4_desc: "Click \"Estimate Production\" for an accurate simulation.",
-            estimation_guide_title: "Estimation Guide",
-            estimation_guide_step1_title: "Check Your Data",
-            estimation_guide_step1_desc: "Fields are pre-filled. You can edit them to simulate other configurations.",
-            onboarding_step1_title: "Step 1: Calibrate",
-            onboarding_step1_desc: "For an accurate measurement, calibrate your compass by making a 'figure 8' motion with your phone.",
-            onboarding_step2_title: "Step 2: Activate",
-            onboarding_step2_desc: "Press \"Use Sensors\" to start receiving data.",
-            onboarding_step3_title: "Step 3: Place",
-            onboarding_step3_desc: "Lay your phone (without a magnetic case) flat on your solar panel.",
-            onboarding_step4_title: "Step 4: Memorize",
-            onboarding_step4_desc: "Once the values are stable, press the large round button!",
-            onboarding_prev: "Previous",
-            onboarding_next: "Next",
-            onboarding_finish: "Finish",
-            compass_south: "Due South",
-            fill_all_fields_error: "Please fill all fields.",
-            settings_already_optimal: "Your current settings are already optimal.",
-            pvgis_error: "PVGIS communication error.",
-            export_pdf: "Export to PDF",
-            sensors_activating: "Activating sensors...",
-            invalid_measurements: "Invalid measurements.",
-            button_style_label: "\"Memorize\" button style",
-            button_style_default: "Default",
-            button_style_neon: "Neon",
-            button_style_glass: "Glass",
-            button_style_radar: "Radar",
+            // English translations can be added here if needed
         }
     };
 
@@ -223,6 +148,8 @@
         exportPdfBtn: document.getElementById('export-pdf-btn'),
         currentProductionDisplay: document.getElementById('current-production'),
         optimalProductionDisplay: document.getElementById('optimal-production'),
+        trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
+        potentialGainDailyDisplay: document.getElementById('potential-gain-daily'),
         potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
         pvgisError: document.getElementById('pvgis-error'),
         calculateText: document.getElementById('calculate-text'),
@@ -275,11 +202,13 @@
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
-                if (translations[lang][key]) el.innerHTML = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
             });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
-                if (translations[lang][key]) el.placeholder = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
             });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
             dom.activateSensorsButton.textContent = translations[lang][state.sensorsActive ? 'stop_sensors' : 'activate_sensors'];
@@ -295,8 +224,8 @@
             dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
         },
         updateLocationFields: (lat, lon) => {
-            dom.latitudeInput.value = lat;
-            dom.longitudeInput.value = lon;
+            dom.latitudeInput.value = parseFloat(lat).toFixed(5);
+            dom.longitudeInput.value = parseFloat(lon).toFixed(5);
             dom.locationError.textContent = '';
             try { localStorage.setItem('userLocation', JSON.stringify({lat, lon})); } catch(e) {}
             calculations.calculateAndDisplayAll();
@@ -307,15 +236,17 @@
             dom.memorizeContainer.classList.toggle('hidden', mode !== 'sensors');
             dom.memorizeContainer.classList.toggle('flex', mode === 'sensors');
             dom.manualEntryDisplay.classList.toggle('hidden', mode !== 'manual');
+            
             dom.activateSensorsButton.classList.toggle('btn-primary', mode !== 'sensors');
             dom.activateSensorsButton.classList.toggle('btn-danger', mode === 'sensors');
+            
             dom.manualEntryButton.classList.toggle('btn-secondary', mode !== 'manual');
             dom.manualEntryButton.classList.toggle('btn-danger', mode === 'manual');
 
             if (mode === 'sensors') {
-                sensors.start();
-            } else if (state.sensorsActive) {
-                sensors.stop();
+                if(!state.sensorsActive) sensors.start();
+            } else {
+                if (state.sensorsActive) sensors.stop();
             }
             calculations.calculateAndDisplayAll();
         }
@@ -402,7 +333,7 @@
             if (tilt !== null) {
                 dom.currentAngleDisplay.textContent = tilt;
                 const tiltForVisual = utils.clamp(event.beta - state.tiltOffset, -90, 90);
-                dom.inclinometerLineContainer.querySelector('.inclinometer-line').style.transform = `rotate(${tiltForVisual}deg)`;
+                dom.inclinometerLineContainer.style.transform = `rotate(${tiltForVisual}deg)`;
             }
             if (heading !== null) {
                 state.panelAzimuthLive = utils.normalizeAngle(heading);
@@ -423,6 +354,7 @@
                 window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
                 state.sensorsActive = true;
                 dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
+                dom.sensorError.textContent = '';
             } catch (err) {
                 dom.sensorError.textContent = 'Erreur capteurs.';
             }
@@ -441,10 +373,6 @@
     };
     
     const handlers = {
-        openExternalLink: (event) => {
-            event.preventDefault();
-            window.open(CONFIG.donateLink, '_blank', 'noopener,noreferrer');
-        },
         openBugReport: (event) => {
             event.preventDefault();
             const subject = "Suggestion / Bug pour Opti Solar";
@@ -529,6 +457,9 @@
         next: function() {
             if (this.currentIndex < dom.onboardingSlides.length - 1) this.showSlide(this.currentIndex + 1);
         },
+        prev: function() {
+            if (this.currentIndex > 0) this.showSlide(this.currentIndex - 1);
+        },
         finish: function() {
             dom.onboardingModal.classList.add('hidden');
             localStorage.setItem('onboardingComplete', 'true');
@@ -544,16 +475,28 @@
             const newTheme = dom.themeToggle.checked ? 'light' : 'dark';
             theme.apply(newTheme);
             localStorage.setItem('userTheme', newTheme);
+        },
+        load: () => {
+            const savedTheme = localStorage.getItem('userTheme') || 'dark';
+            theme.apply(savedTheme);
         }
     };
 
     const api = {
-        fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => { /* PVGIS fetch logic from v3.1.1 */ 
+        fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
             const url = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
-             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-             const res = await fetch(proxyUrl);
-             if (!res.ok) throw new Error('PVGIS fetch failed');
-             return await res.json();
+            const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(url)}`;
+            try {
+                const res = await fetch(proxyUrl);
+                if (!res.ok) throw new Error('Proxy failed');
+                const data = await res.json();
+                return JSON.parse(data.contents);
+            } catch (e) {
+                const fallbackProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                const res = await fetch(fallbackProxy);
+                if (!res.ok) throw new Error('All proxies failed');
+                return await res.json();
+            }
         },
         getProductionEstimate: async () => { 
             dom.exportContainer.classList.add('hidden');
@@ -582,30 +525,46 @@
                 const isLocalSummer = (Math.sign(lat) === Math.sign(declination)) && (Math.abs(declination) > 10);
                 const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
                 const penalty = Math.min(6, Math.abs(currentAzimuth) / 12);
-                let finalOptimalTilt = utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping - penalty, 0, 90);
+                let finalOptimalTilt = Math.round(utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping - penalty, 0, 90));
+                let idealOptimalTilt = Math.round(utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping, 0, 90)); // No penalty for ideal
 
-                const [currentProd, optimalProd] = await Promise.all([ 
+                const [currentProd, optimalProd, trulyOptimalProd] = await Promise.all([ 
                     api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
-                    api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, currentAzimuth)
+                    api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, currentAzimuth),
+                    api.fetchPVGIS(lat, lon, peakPower, idealOptimalTilt, 0) // Ideal is South-facing (0°)
                 ]);
 
+                let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
+                let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0;
+                let trulyOptDaily = Number(trulyOptimalProd.outputs.totals.fixed.E_d) || 0;
+                
                 let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
                 let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
+                let trulyOptMonthly = Number(trulyOptimalProd.outputs.totals.fixed.E_m) || 0;
 
-                if (optMonthly < curMonthly) { 
+                if (optDaily < curDaily) { 
+                    optDaily = curDaily; 
                     optMonthly = curMonthly; 
                     dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal; 
+                } else {
+                    dom.pvgisError.textContent = '';
                 }
 
                 dom.currentProductionDisplay.textContent = `${utils.formatNumber(curMonthly)} kWh`; 
                 dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optMonthly)} kWh`; 
-                dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(optMonthly - curMonthly)} kWh`; 
+                dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyOptMonthly)} kWh`;
+
+                const gainDaily = optDaily - curDaily;
+                dom.potentialGainDailyDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
+                const gainMonthly = optMonthly - curMonthly; 
+                dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
                 
                 dom.productionResults.classList.remove('hidden');
                 dom.donationMessage.classList.remove('hidden');
                 dom.exportContainer.classList.remove('hidden');
             } catch (err) { 
                 dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
+                utils.log(err);
             } finally { 
                 dom.calculateText.classList.remove('hidden'); 
                 dom.calculateLoader.classList.add('hidden');
@@ -617,12 +576,20 @@
         const savedLang = localStorage.getItem('userLang') || 'fr';
         i18n.setLanguage(savedLang);
 
-        const savedLocation = JSON.parse(localStorage.getItem('userLocation') || '{}');
-        ui.updateLocationFields(savedLocation.lat || CONFIG.defaultLatitude, savedLocation.lon || CONFIG.defaultLongitude);
+        try {
+            const savedLocation = JSON.parse(localStorage.getItem('userLocation'));
+            if(savedLocation && savedLocation.lat && savedLocation.lon) {
+                ui.updateLocationFields(savedLocation.lat, savedLocation.lon);
+            } else {
+                ui.updateLocationFields(CONFIG.defaultLatitude, CONFIG.defaultLongitude);
+            }
+        } catch(e) {
+             ui.updateLocationFields(CONFIG.defaultLatitude, CONFIG.defaultLongitude);
+        }
         
         state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
-        dom.peakPowerInput.value = localStorage.getItem('userPeakPower') || '';
-        theme.apply(localStorage.getItem('userTheme') || 'dark');
+        dom.peakPowerInput.value = localStorage.getItem('userPeakPower') || '3.72';
+        theme.load();
 
         if (!localStorage.getItem('onboardingComplete')) {
             onboarding.start();
@@ -630,8 +597,9 @@
 
         const applyMemorizeBtnStyle = (style) => {
             const el = dom.memorizeRingBtn;
-            el.className = 'btn-style-default'; // Reset
-            el.classList.add(`btn-style-${style}`);
+            if(!el) return;
+            el.classList.remove('btn-style-default', 'btn-style-neon', 'btn-style-glass', 'btn-style-radar');
+            el.classList.add(`btn-style-${style || 'default'}`);
         };
         const styleRadios = document.querySelectorAll('input.memorize-style-radio');
         const savedStyle = localStorage.getItem('memorizeBtnStyle') || 'default';
@@ -639,8 +607,10 @@
         styleRadios.forEach(r => {
             r.checked = (r.value === savedStyle);
             r.addEventListener('change', (e) => {
-                localStorage.setItem('memorizeBtnStyle', e.target.value);
-                applyMemorizeBtnStyle(e.target.value);
+                if(e.target.checked) {
+                    localStorage.setItem('memorizeBtnStyle', e.target.value);
+                    applyMemorizeBtnStyle(e.target.value);
+                }
             });
         });
 
@@ -651,7 +621,9 @@
         });
         
         dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);
-        dom.activateSensorsButton.addEventListener('click', () => ui.setEntryMode('sensors'));
+        dom.activateSensorsButton.addEventListener('click', () => {
+             state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors');
+        });
         dom.manualEntryButton.addEventListener('click', () => ui.setEntryMode('manual'));
         dom.getLocationButton.addEventListener('click', () => {
              dom.locationError.textContent = translations[i18n.currentLang].location_getting;
@@ -662,38 +634,40 @@
         });
         dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
         dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
-        dom.donateButtonFab.addEventListener('click', handlers.openExternalLink);
         dom.bugReportButton.addEventListener('click', handlers.openBugReport);
-		dom.donationMessage.addEventListener('click', handlers.openExternalLink);
+		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); window.open(CONFIG.donateLink, '_blank'); });
         dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
         dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
         dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 
+        document.querySelectorAll('.close-modal-btn').forEach(btn => 
+            btn.addEventListener('click', (e) => e.target.closest('.fixed.inset-0').classList.add('hidden'))
+        );
         [dom.settingsButton, dom.mainHelpButton, dom.settingsHelpButton, dom.clippingHelpButton].forEach(btn => {
             btn.addEventListener('click', () => {
                 const modalId = btn.id.replace('-button', '-modal');
-                document.getElementById(modalId).classList.remove('hidden');
+                const modal = document.getElementById(modalId);
+                if (modal) modal.classList.remove('hidden');
             });
         });
-        document.querySelectorAll('.close-modal-btn').forEach(btn => 
-            btn.addEventListener('click', () => btn.closest('.fixed.inset-0').classList.add('hidden'))
-        );
         
         dom.onboardingNextBtn.addEventListener('click', () => onboarding.next());
-        dom.onboardingPrevBtn.addEventListener('click', () => onboarding.showSlide(onboarding.currentIndex - 1));
+        dom.onboardingPrevBtn.addEventListener('click', () => onboarding.prev());
         dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
         dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
+        
         dom.themeToggle.addEventListener('change', theme.toggle);
-        document.querySelectorAll('#lang-switcher .lang-btn').forEach(btn => 
-            btn.addEventListener('click', (e) => i18n.setLanguage(e.target.dataset.lang))
-        );
+        document.getElementById('lang-switcher').addEventListener('click', (e) => {
+            if (e.target.matches('.lang-btn')) {
+                i18n.setLanguage(e.target.dataset.lang);
+            }
+        });
 
         const today = new Date();
         dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         
         calculations.calculateAndDisplayAll();
-        utils.log('Application initialisée.');
     }
     
     window.addEventListener('load', init);

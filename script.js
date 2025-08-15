@@ -19,26 +19,10 @@
     location_getting: "Obtention de la position...",
     activate_sensors: "Utiliser Capteurs",
     stop_sensors: "Arrêter Capteurs",
-    manual_entry: "Saisie Manuelle",
-    location: "Localisation",
-    latitude_placeholder: "Latitude requise",
-    target_date: "Date Cible",
-    current_angle: "Angle Actuel",
-    orientation: "Orientation",
     orientation_south: "Sud",
-    memorize_action: "Mémoriser",
-    calibrate_tilt_success: "Calibration effectuée !",
-    recommended_tilt: "Inclinaison recommandée",
-    with_clipping: "(optimisée écrêtage)",
-    estimation_title: "Estimation de Production",
-    prod_current_settings: "Production (votre inclinaison)",
-    prod_optimal_settings: "Production (inclinaison optimale)",
-    daily_gain: "Gain potentiel quotidien",
-    monthly_gain: "Gain potentiel mensuel",
-    export_pdf: "Exporter en PDF",
-    donation_message: "Si cette application vous aide, vous pouvez m'offrir un café ☕",
     pvgis_error: "Erreur communication PVGIS.",
-    fill_all_fields_error: "Veuillez remplir tous les champs valides."
+    fill_all_fields_error: "Veuillez remplir tous les champs valides.",
+    monthly_gain: "Gain potentiel mensuel"
   };
 
   function $(id){ return document.getElementById(id); }
@@ -46,9 +30,9 @@
   var dom = {
     mainSection: $('main-page'),
     settingsPage: $('settings-page'),
-
+    // header
     settingsButton: $('settings-button'),
-
+    // main
     latInput: $('latitude-input'),
     dateInput: $('date-input'),
     resultDisplay: $('result'),
@@ -58,7 +42,7 @@
     currentCompass: $('current-compass'),
     currentAngle: $('current-angle'),
     compassRose: $('compass-rose-container'),
-
+    // controls
     activateSensorsBtn: $('activate-sensors-button'),
     manualEntryBtn: $('manual-entry-button'),
     geolocateBtn: $('get-location'),
@@ -69,12 +53,12 @@
     gotoEstimationBtn: $('goto-estimation-button'),
     clippingCheckbox: $('clipping-checkbox'),
     calibrateTiltBtn: $('calibrate-tilt-btn'),
-
+    // modals
     settingsModal: $('settings-modal'),
-    settingsHelpModal: $('settings-help-modal'),
     settingsHelpButton: $('settings-help-button'),
+    settingsHelpModal: $('settings-help-modal'),
     clippingHelpButton: $('clipping-help-button'),
-
+    // estimation page
     backButton: $('back-button'),
     peakPower: $('peak-power'),
     lonInput: $('longitude-input'),
@@ -86,18 +70,20 @@
     resultsBox: $('production-results'),
     currentProduction: $('current-production'),
     optimalProduction: $('optimal-production'),
+    trulyOptimal: $('truly-optimal-production'),
     potentialGainMonthly: $('potential-gain-monthly'),
     pvgisError: $('pvgis-error'),
-    trulyOptimal: $('truly-optimal-production'),
     exportPdfBtn: $('export-pdf-btn'),
     donationMessage: $('donation-message'),
-
+    // theme & style
     themeToggle: $('theme-toggle'),
     memorizeStyleRadios: (function(){ return Array.prototype.slice.call(document.querySelectorAll('.memorize-style-radio')); })(),
-
+    // footer & help
     bugReportButton: $('bug-report-button'),
     donateButtonFab: $('donate-button-fab'),
-
+    mainHelpButton: $('main-help-button'),
+    mainHelpModal: $('main-help-modal'),
+    // onboarding
     onboardingModal: $('onboarding-modal'),
     onboardingSlides: (function(){ return Array.prototype.slice.call(document.querySelectorAll('.onboarding-slide')); })(),
     onboardingDots: (function(){ return Array.prototype.slice.call(document.querySelectorAll('.onboarding-dot')); })(),
@@ -110,7 +96,7 @@
     sensorsActive: false,
     zeroTiltOffset: 0,
     lastTilt: null,
-    lastAzimuth: null,
+    lastAzimuth: null, // degrees from South, East<0 West>0
     tiltBuffer: [],
     azBuffer: [],
     lastRecommended: null
@@ -124,20 +110,8 @@
     normalizeAngle: function(a){ return (a%360+360)%360; },
     dayOfYear: function(date){ return Math.floor((date - new Date(date.getFullYear(),0,0))/86400000); },
     declination: function(n){ return -23.44 * Math.cos((360/365)*(n+10)*Math.PI/180); },
-    safeF: function(v){
-      if (v === null || v === void 0 || v === '') return NaN;
-      var n = parseFloat(String(v).replace(',','.'));
-      return isFinite(n)?n:NaN;
-    },
-    playSuccess: function(){
-      try{ if (navigator.vibrate) navigator.vibrate(30); }catch(e){}
-      try{
-        var ctx = new (window.AudioContext||window.webkitAudioContext)();
-        var o = ctx.createOscillator(); var g = ctx.createGain();
-        o.type='sine'; o.frequency.value=880; g.gain.value=0.2;
-        o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.12);
-      }catch(e){}
-    }
+    safeF: function(v){ if (v===null||v===void 0||v==='') return NaN; var n=parseFloat(String(v).replace(',','.')); return isFinite(n)?n:NaN; },
+    playSuccess: function(){ try{ if(navigator.vibrate) navigator.vibrate(30);}catch(e){} }
   };
 
   var theme = {
@@ -150,13 +124,9 @@
       var mode='dark'; try{ mode = localStorage.getItem('userTheme')||'dark'; }catch(e){}
       theme.apply(mode);
       if (dom.themeToggle) dom.themeToggle.addEventListener('change', function(){ theme.apply(dom.themeToggle.checked?'light':'dark'); });
-      // memorize style
       var style='default'; try{ style = localStorage.getItem('memorizeStyle')||'default'; }catch(e){}
       ui.setMemorizeStyle(style);
-      dom.memorizeStyleRadios.forEach(function(r){
-        if (r.value===style) r.checked = true;
-        r.addEventListener('change', function(e){ ui.setMemorizeStyle(e.target.value); });
-      });
+      dom.memorizeStyleRadios.forEach(function(r){ if (r.value===style) r.checked=true; r.addEventListener('change', function(e){ ui.setMemorizeStyle(e.target.value); }); });
     }
   };
 
@@ -178,13 +148,31 @@
     updateResult: function(){
       var lat = utils.safeF(dom.latInput && dom.latInput.value);
       if (!isFinite(lat)) { if (dom.resultDisplay) dom.resultDisplay.textContent='--°'; return; }
+
       var date = (dom.dateInput && dom.dateInput.value) ? new Date(dom.dateInput.value) : new Date();
       var n = utils.dayOfYear(date);
       var decl = utils.declination(n);
-      var recommended = utils.clamp(lat - decl, 0, 85);
-      if (dom.clippingCheckbox && dom.clippingCheckbox.checked) recommended = utils.clamp(recommended + CONFIG.clippingAdjustment, 0, 85);
-      state.lastRecommended = recommended;
-      if (dom.resultDisplay) dom.resultDisplay.textContent = utils.fmt(recommended,0) + '°';
+
+      var panelDev = 0;
+      if (state.sensorsActive && state.lastAzimuth !== null && state.lastAzimuth !== void 0) {
+        panelDev = state.lastAzimuth; // [-180, 180] (0 = Sud)
+      } else if (dom.manualAzimuthInput && dom.manualAzimuthInput.value !== '') {
+        var man = utils.safeF(dom.manualAzimuthInput.value); if (isFinite(man)) panelDev = man;
+      }
+      var devAbs = Math.abs(panelDev);
+      var penalty = Math.min(6, devAbs / 12);
+
+      var isLocalSummer = (Math.sign(lat) === Math.sign(decl)) && (Math.abs(decl) > 10);
+      var clipping = (dom.clippingCheckbox && dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+
+      var solarNoonAltitude = 90 - Math.abs(lat - decl);
+      var optimalTilt = 90 - solarNoonAltitude; // ≈ |lat - decl|
+      optimalTilt += clipping;
+      optimalTilt -= penalty;
+      optimalTilt = utils.clamp(optimalTilt, 0, 90);
+
+      state.lastRecommended = optimalTilt;
+      if (dom.resultDisplay) dom.resultDisplay.textContent = Math.round(optimalTilt) + '°';
       if (dom.dateDisplay) dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long' });
     }
   };
@@ -194,28 +182,20 @@
       if (state.sensorsActive) return;
       state.sensorsActive = true;
       if (dom.sensorError) dom.sensorError.textContent='';
-      if (dom.activateSensorsBtn){
-        dom.activateSensorsBtn.classList.add('active');
-        dom.activateSensorsBtn.textContent = t.stop_sensors;
-      }
+      if (dom.activateSensorsBtn){ dom.activateSensorsBtn.classList.add('active'); dom.activateSensorsBtn.textContent = t.stop_sensors; }
       state.tiltBuffer=[]; state.azBuffer=[];
+      var wrap = $('memorize-btn-wrapper'); if (wrap && wrap.scrollIntoView) { try{ wrap.scrollIntoView({behavior:'smooth', block:'center'});}catch(e){} }
 
       try {
         if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
           DeviceOrientationEvent.requestPermission().then(function(res){
             if (res!=='granted') throw new Error('denied');
             window.addEventListener(CONFIG.sensorEventName, sensors.onOrientation);
-          }).catch(function(){
-            if (dom.sensorError) dom.sensorError.textContent = "Capteurs non disponibles.";
-            sensors.stop();
-          });
+          }).catch(function(){ if (dom.sensorError) dom.sensorError.textContent = "Capteurs non disponibles."; sensors.stop(); });
         } else {
           window.addEventListener(CONFIG.sensorEventName, sensors.onOrientation);
         }
-      } catch(e){
-        if (dom.sensorError) dom.sensorError.textContent = "Capteurs non disponibles.";
-        sensors.stop();
-      }
+      } catch(e){ if (dom.sensorError) dom.sensorError.textContent = "Capteurs non disponibles."; sensors.stop(); }
 
       if (dom.sensorsReadout) dom.sensorsReadout.classList.remove('hidden');
       var mem = $('memorize-container'); if (mem) mem.classList.remove('hidden');
@@ -223,10 +203,7 @@
     stop: function(){
       state.sensorsActive=false;
       window.removeEventListener(CONFIG.sensorEventName, sensors.onOrientation);
-      if (dom.activateSensorsBtn){
-        dom.activateSensorsBtn.classList.remove('active');
-        dom.activateSensorsBtn.textContent = t.activate_sensors;
-      }
+      if (dom.activateSensorsBtn){ dom.activateSensorsBtn.classList.remove('active'); dom.activateSensorsBtn.textContent = t.activate_sensors; }
     },
     onOrientation: function(ev){
       var a = (typeof ev.alpha==='number')? ev.alpha : null;
@@ -239,15 +216,12 @@
       var tilt = utils.clamp(rawTilt - state.zeroTiltOffset, 0, 90);
 
       var north = utils.normalizeAngle(a);
-      var azFromSouth = utils.normalizeAngle(180 - north);
-      if (azFromSouth > 180) azFromSouth -= 360;
-
+      var azFromSouth = utils.normalizeAngle(180 - north); if (azFromSouth > 180) azFromSouth -= 360; // [-180,180]
       state.lastTilt = tilt; state.lastAzimuth = azFromSouth;
 
       if (dom.currentAngle) dom.currentAngle.textContent = utils.fmt(tilt,1);
       if (dom.currentCompass){
-        var abs = Math.abs(azFromSouth);
-        var dir = azFromSouth < 0 ? "Est" : "Ouest";
+        var abs = Math.abs(azFromSouth), dir = azFromSouth < 0 ? "Est" : "Ouest";
         dom.currentCompass.textContent = (abs<1?'0':utils.fmt(abs,0)) + "° / " + (abs<1?t.orientation_south:dir);
       }
       var needle = dom.compassRose ? dom.compassRose.querySelector('.needle') : null;
@@ -257,18 +231,21 @@
       state.azBuffer.push(azFromSouth); if (state.azBuffer.length>CONFIG.stability.samples) state.azBuffer.shift();
       var stable=false;
       if (state.tiltBuffer.length===CONFIG.stability.samples){
-        var tmin = Math.min.apply(Math, state.tiltBuffer), tmax = Math.max.apply(Math, state.tiltBuffer);
-        var amin = Math.min.apply(Math, state.azBuffer), amax = Math.max.apply(Math, state.azBuffer);
+        var tmin=Math.min.apply(Math,state.tiltBuffer), tmax=Math.max.apply(Math,state.tiltBuffer);
+        var amin=Math.min.apply(Math,state.azBuffer), amax=Math.max.apply(Math,state.azBuffer);
         stable = (tmax-tmin)<=CONFIG.stability.tiltTol && (amax-amin)<=CONFIG.stability.azTol;
       }
       if (dom.memorizeWrapper) dom.memorizeWrapper.classList.toggle('stable', stable);
       if (dom.memorizeBtn) dom.memorizeBtn.disabled = !stable;
+
+      // Met à jour l'angle recommandé en fonction de l'orientation live
+      ui.updateResult();
     },
     calibrate: function(){
       if (state.lastTilt==null) return;
       state.zeroTiltOffset = state.lastTilt;
       try{ localStorage.setItem('zeroTiltOffset', String(state.zeroTiltOffset)); }catch(e){}
-      alert(t.calibrate_tilt_success);
+      alert("Calibration effectuée !");
     }
   };
 
@@ -303,9 +280,7 @@
         }).then(function(data){
           api.cacheSet(key, data);
           return data;
-        }).catch(function(err){
-          return tryNext(err);
-        });
+        }).catch(function(err){ return tryNext(err); });
       }
       return tryNext(null);
     }
@@ -326,10 +301,13 @@
       }
 
       var optTilt = (state.lastRecommended!=null) ? state.lastRecommended : (function(){
-        var n = utils.dayOfYear(new Date());
-        var base = utils.clamp(lat - utils.declination(n),0,85);
-        if (dom.clippingCheckbox && dom.clippingCheckbox.checked) base = utils.clamp(base + CONFIG.clippingAdjustment,0,85);
-        return base;
+        var n = utils.dayOfYear(new Date()); var decl = utils.declination(n);
+        var isLocalSummer = (Math.sign(lat) === Math.sign(decl)) && (Math.abs(decl) > 10);
+        var clipping = (dom.clippingCheckbox && dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+        var solarNoonAltitude = 90 - Math.abs(lat - decl);
+        var optimalTilt = 90 - solarNoonAltitude;
+        var devAbs = Math.abs(curAz||0); var penalty = Math.min(6, devAbs/12);
+        return utils.clamp(optimalTilt + clipping - penalty,0,90);
       })();
 
       if (dom.calcText) dom.calcText.classList.add('hidden');
@@ -338,7 +316,7 @@
       Promise.all([
         api.fetchPVGIS(lat,lon,peak,curTilt,curAz),
         api.fetchPVGIS(lat,lon,peak,optTilt,curAz),
-        api.fetchPVGIS(lat,lon,peak,optTilt,0)
+        api.fetchPVGIS(lat,lon,peak,optTilt,0) // 0°/Sud
       ]).then(function(arr){
         function parse(d){
           try{
@@ -383,6 +361,7 @@
         + '<tr><td style="border:1px solid #e5e7eb;padding:6px">Puissance crête</td><td style="border:1px solid #e5e7eb;padding:6px">'+(dom.peakPower?dom.peakPower.value:'')+' kWc</td></tr>'
         + '<tr><td style="border:1px solid #e5e7eb;padding:6px">Inclinaison actuelle</td><td style="border:1px solid #e5e7eb;padding:6px">'+(dom.currentTiltInput?dom.currentTiltInput.value:'')+'°</td></tr>'
         + '<tr><td style="border:1px solid #e5e7eb;padding:6px">Orientation actuelle</td><td style="border:1px solid #e5e7eb;padding:6px">'+(dom.currentAzimuthInput?dom.currentAzimuthInput.value:'')+'° / Sud</td></tr>'
+        + '<tr><td style="border:1px solid #e5e7eb;padding:6px">Inclinaison recommandée (aujourd\'hui)</td><td style="border:1px solid #e5e7eb;padding:6px">'+(state.lastRecommended!=null?Math.round(state.lastRecommended)+'°':'--')+'</td></tr>'
         + '</table>'
         + '<h3 style="margin:14px 0 6px 0">Résultats</h3>'
         + '<table style="width:100%;border-collapse:collapse;font-size:14px">'
@@ -391,8 +370,8 @@
         + (dom.trulyOptimal?('<tr><td style="border:1px solid #e5e7eb;padding:6px">Production vraiment optimale (0°/Sud)</td><td style="border:1px solid #e5e7eb;padding:6px">'+dom.trulyOptimal.textContent+'</td></tr>'):'')
         + '<tr><td style="border:1px solid #e5e7eb;padding:6px">'+t.monthly_gain+'</td><td style="border:1px solid #e5e7eb;padding:6px">'+(dom.potentialGainMonthly?dom.potentialGainMonthly.textContent:'')+'</td></tr>'
         + '</table>'
-        + '<p style="font-size:12px;color:#374151;margin-top:10px">“Inclinaison optimale” = angle recommandé par latitude/date'+((dom.clippingCheckbox&&dom.clippingCheckbox.checked)?' (avec optimisation écrêtage)':'')+'. “Vraiment optimale” suppose orientation plein Sud.</p>'
-        + '<p style="font-size:11px;color:#6b7280;margin-top:10px">Sources: PVGIS (JRC, Commission Européenne). Résultats indicatifs.</p>';
+        + '<p style="font-size:12px;color:#374151;margin-top:10px">“Inclinaison optimale” = angle recommandé par latitude/date, ajusté si option d’écrêtage (uniquement en été local) et pénalisation lorsque l’orientation n’est pas plein Sud.</p>'
+        + '<p style="font-size:11px;color:#6b7280;margin-top:10px">Sources: PVGIS (JRC, Commission Européenne). Résultats indicatifs. Les estimations ne constituent pas une garantie de performance. L’installateur doit valider l’implantation (ombrages, masques lointains, réflectance, pertes réelles, câblage, onduleur, température, etc.).</p>';
       var filename = 'OptiSolar_Rapport_'+(new Date().toISOString().slice(0,10))+'.pdf';
       html2pdf().from(html).set({ margin:10, filename:filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} }).save();
     }
@@ -415,8 +394,8 @@
     },
     memorize: function(){
       if (state.lastTilt==null || state.lastAzimuth==null) return;
-      var tlt = utils.fmt(state.lastTilt,1);
-      var az = Math.round(state.lastAzimuth);
+      var tlt = (Math.round(state.lastTilt*10)/10).toFixed(1).replace(',','.');
+      var az = String(Math.round(state.lastAzimuth)).replace(',','.');
       if (dom.manualTiltInput) dom.manualTiltInput.value = tlt;
       if (dom.manualAzimuthInput) dom.manualAzimuthInput.value = az;
       if (dom.currentTiltInput) dom.currentTiltInput.value = tlt;
@@ -424,15 +403,12 @@
       utils.playSuccess();
     },
     openSettings: function(){ if (dom.settingsModal) dom.settingsModal.classList.remove('hidden'); },
-    closeModals: function(){
-      var list = document.querySelectorAll('.fixed.inset-0');
-      for (var i=0;i<list.length;i++){ list[i].classList.add('hidden'); }
-    },
+    closeModals: function(){ var list = document.querySelectorAll('.fixed.inset-0'); for (var i=0;i<list.length;i++){ list[i].classList.add('hidden'); } },
     gotoEstimation: function(){
       if (dom.lonInput && !dom.lonInput.value) dom.lonInput.value = (CONFIG.defaultLongitude).toFixed(5);
       if (dom.peakPower && !dom.peakPower.value) dom.peakPower.value = "3.72";
-      if (state.lastTilt!=null && dom.currentTiltInput) dom.currentTiltInput.value = utils.fmt(state.lastTilt,1);
-      if (state.lastAzimuth!=null && dom.currentAzimuthInput) dom.currentAzimuthInput.value = Math.round(state.lastAzimuth);
+      if (state.lastTilt!=null && dom.currentTiltInput) dom.currentTiltInput.value = (Math.round(state.lastTilt*10)/10).toFixed(1);
+      if (state.lastAzimuth!=null && dom.currentAzimuthInput) dom.currentAzimuthInput.value = String(Math.round(state.lastAzimuth));
       ui.showPage('estimation');
     },
     back: function(){ ui.showPage('main'); },
@@ -450,10 +426,7 @@
     if (dom.dateInput && !dom.dateInput.value) dom.dateInput.value = today.toISOString().slice(0,10);
     if (dom.latInput && !dom.latInput.value) dom.latInput.value = (CONFIG.defaultLatitude).toFixed(5);
     ui.updateResult();
-    try {
-      var savedOffset = parseFloat(localStorage.getItem('zeroTiltOffset'));
-      if (isFinite(savedOffset)) state.zeroTiltOffset = savedOffset;
-    } catch(e){}
+    try { var savedOffset = parseFloat(localStorage.getItem('zeroTiltOffset')); if (isFinite(savedOffset)) state.zeroTiltOffset = savedOffset; } catch(e){}
   }
 
   function bind(){
@@ -470,14 +443,10 @@
     if (dom.calibrateTiltBtn) dom.calibrateTiltBtn.addEventListener('click', sensors.calibrate);
 
     if (dom.settingsButton) dom.settingsButton.addEventListener('click', handlers.openSettings);
-    var closes = document.querySelectorAll('.close-modal-btn');
-    for (var i=0;i<closes.length;i++){ closes[i].addEventListener('click', handlers.closeModals); }
-    if (dom.clippingHelpButton){
-      dom.clippingHelpButton.addEventListener('click', function(){
-        var m = $('clipping-help-modal'); if (m) m.classList.remove('hidden');
-      });
-    }
     if (dom.settingsHelpButton && dom.settingsHelpModal) dom.settingsHelpButton.addEventListener('click', function(){ dom.settingsHelpModal.classList.remove('hidden'); });
+    if (dom.mainHelpButton && dom.mainHelpModal) dom.mainHelpButton.addEventListener('click', function(){ dom.mainHelpModal.classList.remove('hidden'); });
+    var closes = document.querySelectorAll('.close-modal-btn'); for (var i=0;i<closes.length;i++){ closes[i].addEventListener('click', handlers.closeModals); }
+    if (dom.clippingHelpButton){ dom.clippingHelpButton.addEventListener('click', function(){ var m=$('clipping-help-modal'); if(m) m.classList.remove('hidden'); }); }
 
     if (dom.gotoEstimationBtn) dom.gotoEstimationBtn.addEventListener('click', handlers.gotoEstimation);
     if (dom.backButton) dom.backButton.addEventListener('click', handlers.back);
@@ -488,9 +457,7 @@
 
     if (dom.bugReportButton) dom.bugReportButton.addEventListener('click', handlers.bugReport);
 
-    theme.init();
-
-    // Onboarding (non bloquant)
+    // onboarding (optional)
     if (dom.onboardingModal){
       var seen=false; try{ seen = localStorage.getItem('onboardingComplete')==='true'; }catch(e){}
       if (!seen){
@@ -516,4 +483,81 @@
   }
 
   document.addEventListener('DOMContentLoaded', bind);
+})();
+
+
+// === DEV SELF-TEST ===
+// Lance un banc d'essai en visitant la page avec le hash #selftest
+// Il interroge PVGIS pour 4 emplacements et 3 orientations et télécharge un JSON des résultats.
+(function(){
+  function download(name, text){
+    var a = document.createElement('a'); a.setAttribute('href','data:application/json;charset=utf-8,'+encodeURIComponent(text));
+    a.setAttribute('download', name); a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+  function runSelfTest(){
+    var places = [
+      { name:'Europe-Paris',   lat:48.8566, lon:2.3522 },
+      { name:'AmSud-Santiago', lat:-33.4489, lon:-70.6693 },
+      { name:'NA-NewYork',     lat:40.7128, lon:-74.0060 },
+      { name:'Océanie-Sydney', lat:-33.8688, lon:151.2093 }
+    ];
+    var orientations = [
+      { name:'Sud',  az:0 },
+      { name:'Sud-15E', az:-15 },
+      { name:'Sud-15O', az:15 }
+    ];
+    var peak = 3.72;
+    var loss = 14;
+    var today = new Date();
+    var n = utils.dayOfYear(today); var decl = utils.declination(n);
+
+    var tasks = [];
+    places.forEach(function(p){
+      orientations.forEach(function(o){
+        // Recalcule une inclinaison "opt" similaire à ui.updateResult pour ce site/orientation
+        var isLocalSummer = (Math.sign(p.lat) === Math.sign(decl)) && (Math.abs(decl) > 10);
+        var clipping = (dom.clippingCheckbox && dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
+        var penalty = Math.min(6, Math.abs(o.az)/12);
+        var solarNoonAltitude = 90 - Math.abs(p.lat - decl);
+        var optTilt = Math.max(0, Math.min(90, (90 - solarNoonAltitude) + clipping - penalty));
+
+        // Angle actuel = optTilt pour comparer "actuel" vs "opt" (syntaxe simple)
+        tasks.push(
+          Promise.all([
+            api.fetchPVGIS(p.lat, p.lon, peak, optTilt, o.az, loss),
+            api.fetchPVGIS(p.lat, p.lon, peak, optTilt, 0, loss)
+          ]).then(function(res){
+            function parse(d){
+              try{
+                if (d && d.outputs && Array.isArray(d.outputs.monthly)){
+                  var sum = d.outputs.monthly.reduce(function(s,m){ return s + (Number(m.E_m)||0); }, 0);
+                  var year = (d.outputs.totals && Number(d.outputs.totals.E_y)) || sum;
+                  return {year:year, month:year/12};
+                }
+                var y = d && d.outputs && d.outputs.totals && Number(d.outputs.totals.E_y);
+                return {year:y, month:y/12};
+              }catch(e){ return {year:NaN, month:NaN}; }
+            }
+            var opt = parse(res[0]), tru = parse(res[1]);
+            return { place:p.name, lat:p.lat, lon:p.lon, orient:o.name, az:o.az, optTilt:optTilt, prod_opt_kWh_y:opt.year, prod_truly_south_kWh_y:tru.year };
+          }).catch(function(e){
+            return { place:p.name, lat:p.lat, lon:p.lon, orient:o.name, az:o.az, error:String(e) };
+          })
+        );
+      });
+    });
+
+    Promise.all(tasks).then(function(rows){
+      try{ download('opti-solar-selftest.json', JSON.stringify(rows, null, 2)); }catch(e){ console.log(rows); }
+      alert('Self-test terminé. Un fichier JSON a été généré (ou voir la console).');
+    });
+  }
+
+  function maybeRun(){
+    if (location.hash === '#selftest') {
+      setTimeout(runSelfTest, 1200);
+    }
+  }
+  window.addEventListener('hashchange', maybeRun);
+  document.addEventListener('DOMContentLoaded', maybeRun);
 })();

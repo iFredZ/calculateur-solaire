@@ -11,6 +11,7 @@
         sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
     };
     
+    // FIX: Correction et validation complète des traductions anglaises
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -291,7 +292,7 @@
         getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
         getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
         formatNumber: (n, dec = 2) => {
-            if (n === null || isNaN(n)) return '--';
+            if (n === null || n === undefined || isNaN(n)) return '--';
             return Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })
         },
         safeParseFloat: (v, fallback = NaN) => {
@@ -578,7 +579,6 @@
         savePeakPower: () => {
             localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
         },
-        // FIX: Fonction PDF entièrement réécrite pour être plus robuste
         exportToPDF: () => {
             if (!state.lastCurrentProd || !state.lastOptimalProd || !state.lastTrulyOptimalProd) {
                 alert(translations[i18n.currentLang].export_error_no_data);
@@ -591,7 +591,6 @@
 
             const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
             
-            // Préparation sécurisée des variables
             const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
             const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
             const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
@@ -600,7 +599,8 @@
             const recommendedTilt = state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--';
             const gainMonthly = dom.potentialGainMonthlyDisplay.textContent || '~ -- kWh';
 
-            let html = `
+            const reportElement = document.createElement('div');
+            reportElement.innerHTML = `
                 <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
                     <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
                     <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
@@ -660,9 +660,6 @@
                     </div>
                 </div>
             `;
-            
-            const reportElement = document.createElement('div');
-            reportElement.innerHTML = html;
 
             const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
             html2pdf().from(reportElement).set({
@@ -842,8 +839,8 @@
         const applyMemorizeBtnStyle = (style) => {
             const el = dom.memorizeRingBtn;
             if(!el) return;
-            el.className = ''; // Réinitialisation complète
-            el.classList.add('font-bold'); // Ajout de la classe de base
+            el.className = '';
+            el.classList.add('font-bold');
             el.classList.add(`btn-style-${style || 'default'}`);
         };
         const styleRadios = document.querySelectorAll('input.memorize-style-radio');
@@ -860,9 +857,9 @@
         });
 
         ['change', 'input'].forEach(evt => {
-            [dom.latitudeInput, dom.dateInput, dom.clippingCheckbox, dom.manualTiltInput, dom.manualAzimuthInput].forEach(el => 
-                el.addEventListener(evt, calculations.calculateAndDisplayAll)
-            );
+            [dom.latitudeInput, dom.dateInput, dom.clippingCheckbox, dom.manualTiltInput, dom.manualAzimuthInput].forEach(el => {
+                if(el) el.addEventListener(evt, calculations.calculateAndDisplayAll);
+            });
         });
         
         dom.peakPowerInput.addEventListener('input', handlers.savePeakPower);

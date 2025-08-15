@@ -11,7 +11,7 @@
         sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
     };
     
-    // FIX: Restauration des textes exacts de la v3.1.1
+    // FIX: Ajout de la traduction anglaise complète
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -107,7 +107,100 @@
             button_style_glass: "Verre",
             button_style_radar: "Radar",
         },
-        en: {} // English translations...
+        en: {
+            geoloc_error: "Geolocation error.",
+            geoloc_not_supported: "Geolocation not supported.",
+            location_unavailable: "Unable to get location.",
+            location_getting: "Getting location...",
+            activate_sensors: "Use Sensors",
+            stop_sensors: "Stop Sensors",
+            manual_entry: "Manual Input",
+            location: "Location (Latitude)",
+            latitude_placeholder: "Latitude required",
+            target_date: "Target Date",
+            current_angle: "Tilt",
+            orientation: "Azimuth",
+            memorize_action: "Memorize",
+            memorized: "Saved!",
+            calibrate_tilt: "Calibrate Flat",
+            calibrate_tilt_success: "Calibrated!",
+            light_theme_label: "Light Mode",
+            tilt: "Tilt",
+            tilt_placeholder: "e.g. 35",
+            orientation_short: "Azimuth",
+            orientation_placeholder: "0 (South)",
+            recommended_angle: "Recommended Angle",
+            waiting_for_sensor: "Point your device...",
+            calculate_gain: "Estimate Production",
+            donation_message: "If this estimate was helpful, consider supporting this project by buying me a small coffee! ☕",
+            estimation_title: "Production Estimate",
+            peak_power: "Peak power (kWp)",
+            longitude: "Longitude",
+            current_tilt: "Current Tilt (°)",
+            current_azimuth: "Current Azimuth (Deviation / South)",
+            azimuth_placeholder: "e.g. -10 (10° East)",
+            calculate_gain_long: "Calculate Gain",
+            prod_current_settings: "Production (your tilt)",
+            prod_optimal_settings: "Production (optimal tilt for YOUR azimuth)",
+            prod_truly_optimal_settings: "IDEAL Production (if South-facing)",
+            daily_gain: "Potential Daily Gain",
+            monthly_gain: "Potential Monthly Gain",
+            settings_title: "Settings",
+            clipping_label: "Optimize for clipping",
+            clipping_title: "Clipping Optimization",
+            clipping_problem_title: "The Problem",
+            clipping_problem_desc: "In summer, your solar production might exceed your inverter's maximum power. This excess energy is lost: this is clipping.",
+            clipping_solution_title: "The Solution",
+            clipping_solution_desc: "Checking this box intentionally increases the panel angle. This slightly reduces the production peak at noon and increases morning/evening production.",
+            got_it: "Got it",
+            replay_tutorial: "Replay Guide",
+            main_guide_title: "User Guide",
+            guide_step1_title: "Step 1: Location & Date",
+            guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
+            guide_step2_title: "Step 2: Choose Mode",
+            guide_step2_desc: "<strong class='text-fg'>Sensors:</strong> For a real measurement, place your phone on the panel.<br><strong class='text-yellow-400'>Warning: remove any magnetic case.</strong><br><br><strong class='text-fg'>Manual:</strong> For a simulation, enter tilt and azimuth manually.",
+            guide_step3_title: "Step 3: Read the Result",
+            guide_step3_desc: "The recommended angle appears and adjusts in real-time.",
+            guide_step4_title: "Step 4: Estimate Gain",
+            guide_step4_desc: "Click \"Estimate Production\" for an accurate simulation.",
+            estimation_guide_title: "Estimation Guide",
+            estimation_guide_step1_title: "Check Your Data",
+            estimation_guide_step1_desc: "The fields are pre-filled from the previous page. You can edit them to simulate other configurations.",
+            estimation_guide_step2_title: "Run the Calculation",
+            estimation_guide_step2_desc: "Click \"Calculate\" to compare the estimated annual production of your current setup with the recommended optimal setup.",
+            onboarding_step1_title: "Step 1: Calibrate",
+            onboarding_step1_desc: "For an accurate measurement, calibrate your compass by making a 'figure 8' motion with your phone.",
+            onboarding_step2_title: "Step 2: Activate",
+            onboarding_step2_desc: "Press \"Use Sensors\" to start receiving data.",
+            onboarding_step3_title: "Step 3: Place",
+            onboarding_step3_desc: "Lay your phone (without a magnetic case) flat on your solar panel.",
+            onboarding_step4_title: "Step 4: Memorize",
+            onboarding_step4_desc: "Once the values are stable, press the large round button!",
+            onboarding_prev: "Previous",
+            onboarding_next: "Next",
+            onboarding_finish: "Finish",
+            compass_north: "N",
+            compass_south: "SOUTH",
+            compass_east: "E",
+            compass_west: "W",
+            fill_all_fields_error: "Please fill all fields.",
+            settings_already_optimal: "Your current settings are already optimal.",
+            pvgis_error: "PVGIS communication error.",
+            export_pdf: "Export to PDF",
+            exporting_pdf: "Generating...",
+            export_error_no_data: "Please run a production estimate first.",
+            pdf_disclaimer_title: "Important Disclaimer Regarding Accuracy",
+            pdf_disclaimer_text: "The production data and tilt/orientation measurements in this report are estimates. Sensor accuracy (compass, accelerometer) can vary significantly between phone models. Furthermore, the presence of nearby metallic objects, and especially the use of <strong>magnetic cases or mounts</strong>, can cause significant orientation errors. It is strongly recommended to remove any magnetic case before measuring. The creators of this application cannot be held responsible for discrepancies between the estimates and actual production.",
+            pdf_explanation_title: "About the Estimates",
+            pdf_explanation_text: "The 'Optimal Production' compares your current tilt to the best possible tilt for YOUR orientation. The 'Ideal Production' is a reference value showing the potential if your installation were perfectly South-facing with an optimal tilt.",
+            sensors_activating: "Activating sensors...",
+            invalid_measurements: "Invalid measurements.",
+            button_style_label: "\"Memorize\" button style",
+            button_style_default: "Default",
+            button_style_neon: "Neon",
+            button_style_glass: "Glass",
+            button_style_radar: "Radar",
+        }
     };
 
     const state = {
@@ -119,7 +212,8 @@
         tiltOffset: 0,
         isStable: false,
         lastReadings: [],
-        stabilityThreshold: 0.5, 
+        // FIX: Augmentation du seuil de tolérance pour la stabilité
+        stabilityThreshold: 2.0, // Tolérance de 2 degrés au lieu de 0.5
         stabilityBuffer: 5,
         lastCurrentProd: null,
         lastOptimalProd: null,
@@ -236,7 +330,7 @@
     const i18n = {
         currentLang: 'fr',
         setLanguage: function(lang) {
-            if (!translations[lang]) return;
+            if (!translations[lang] || !translations[lang].compass_west) return; // Sécurité
             this.currentLang = lang;
             document.documentElement.lang = lang;
             localStorage.setItem('userLang', lang);
@@ -251,7 +345,6 @@
                 if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
             });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
-            // FIX: La traduction du bouton est gérée par le data-i18n et la logique dans sensors.start/stop
             calculations.calculateAndDisplayAll();
         }
     };
@@ -353,7 +446,6 @@
             const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
             return (360 - e.alpha + screenAngle + 360) % 360;
         },
-        // FIX: Logique d'affichage de l'orientation pour les panneaux solaires
         formatAzimuthForDisplay: (azimuth) => {
             const lang = i18n.currentLang;
             const tolerance = 5;
@@ -498,6 +590,7 @@
             const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
             
             const reportElement = document.createElement('div');
+            // FIX: Utilisation de utils.formatNumber pour garantir l'affichage
             const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
             const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
             const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
@@ -741,7 +834,8 @@
         const applyMemorizeBtnStyle = (style) => {
             const el = dom.memorizeRingBtn;
             if(!el) return;
-            el.className = 'font-bold'; // Reset classes
+            el.className = ''; // Réinitialisation complète
+            el.classList.add('font-bold'); // Ajout de la classe de base
             el.classList.add(`btn-style-${style || 'default'}`);
         };
         const styleRadios = document.querySelectorAll('input.memorize-style-radio');

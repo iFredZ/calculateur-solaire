@@ -11,7 +11,6 @@
         sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
     };
     
-    // FIX: Correction et validation complète des traductions anglaises
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -338,15 +337,18 @@
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerHTML = translations[lang][key];
-                }
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
             });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
-                if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
+                if (translations[lang][key]) el.placeholder = translations[lang][key];
             });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+            
+            // FIX: Rétablissement de la logique v3 pour le bouton des capteurs
+            const buttonKey = state.sensorsActive ? 'stop_sensors' : 'activate_sensors';
+            dom.activateSensorsButton.textContent = translations[lang][buttonKey];
+
             calculations.calculateAndDisplayAll();
         }
     };
@@ -637,7 +639,7 @@
                             </tr>
                              <tr style="background-color: #f1f5f9;">
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${recommendedTilt}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${idealOptimalTilt}°</td>
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td>
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptMonthlyProd} kWh</td>
                             </tr>
@@ -717,23 +719,79 @@
         }
     };
 
+    // FIX: Restauration de la fonction réseau de la v3.1.1 (plus robuste)
     const api = {
         fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
-            const url = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
-            const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(url)}`;
+            const cacheKey = `pvgis:${lat}:${lon}:${peakpower}:${angle}:${aspect}`;
             try {
-                const res = await fetch(proxyUrl);
-                if (!res.ok) throw new Error('Proxy failed');
-                const data = await res.json();
-                if(!data.contents) throw new Error('Proxy returned empty content');
-                return JSON.parse(data.contents);
+                const cachedData = sessionStorage.getItem(cacheKey);
+                if (cachedData) {
+                    utils.log('Returning cached PVGIS data.');
+                    return JSON.parse(cachedData);
+                }
             } catch (e) {
-                const fallbackProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-                const res = await fetch(fallbackProxy);
-                if (!res.ok) throw new Error('All proxies failed');
-                return await res.json();
+                utils.log('Could not access sessionStorage', e);
             }
+
+            const fetchWithTimeout = (resource, options = {}, timeout = 8000) => {
+              return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const id = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error('Fetch timeout'));
+                }, timeout);
+                fetch(resource, { ...options, signal: controller.signal })
+                  .then(response => {
+                    clearTimeout(id);
+                    resolve(response);
+                  })
+                  .catch(error => {
+                    clearTimeout(id);
+                    reject(error);
+                  });
+              });
+            };
+
+            const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
+            
+            const strategies = [
+                async () => {
+                     const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
+                     const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                     if (!res.ok) throw new Error('Proxy allorigins.win failed');
+                     const data = await res.json();
+                     if (!data.contents) throw new Error('Proxy returned empty content');
+                     return JSON.parse(data.contents);
+                },
+                async () => {
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pvgisUrl)}`;
+                    const res = await fetchWithTimeout(proxyUrl, {}, 8000);
+                    if (!res.ok) throw new Error('Proxy corsproxy.io failed');
+                    return await res.json();
+                }
+            ];
+
+            for (let i = 0; i < strategies.length; i++) {
+                try {
+                    utils.log(`Attempting PVGIS fetch with strategy #${i + 1}`);
+                    const json = await strategies[i]();
+                    if (json?.outputs?.totals?.fixed) {
+                        utils.log(`Strategy #${i + 1} succeeded.`);
+                        try {
+                            sessionStorage.setItem(cacheKey, JSON.stringify(json));
+                        } catch (e) {
+                            utils.log('Could not save to sessionStorage', e);
+                        }
+                        return json;
+                    }
+                } catch (error) {
+                    utils.log(`Strategy #${i + 1} failed:`, error.message);
+                }
+            }
+
+            throw new Error('All PVGIS fetch strategies failed.');
         },
+        // FIX: Uniformisation des unités en kWh/jour
         getProductionEstimate: async () => { 
             dom.exportContainer.classList.add('hidden');
             dom.pvgisError.textContent = ''; 
@@ -778,25 +836,22 @@
 
                 let curDaily = Number(current.outputs.totals.fixed.E_d) || 0; 
                 let optDaily = Number(optimal.outputs.totals.fixed.E_d) || 0;
-                let curMonthly = Number(current.outputs.totals.fixed.E_m) || 0; 
-                let optMonthly = Number(optimal.outputs.totals.fixed.E_m) || 0; 
-                let trulyOptMonthly = Number(trulyOptimal.outputs.totals.fixed.E_m) || 0;
+                let trulyOptDaily = Number(trulyOptimal.outputs.totals.fixed.E_d) || 0;
 
                 if (optDaily < curDaily) { 
-                    optDaily = curDaily; 
-                    optMonthly = curMonthly; 
+                    optDaily = curDaily;
                     dom.pvgisError.textContent = translations[i18n.currentLang].settings_already_optimal; 
                 } else {
                     dom.pvgisError.textContent = '';
                 }
 
-                dom.currentProductionDisplay.textContent = `${utils.formatNumber(curMonthly)} kWh`; 
-                dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optMonthly)} kWh`; 
-                dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyOptMonthly)} kWh`;
+                dom.currentProductionDisplay.textContent = `${utils.formatNumber(curDaily)} kWh`; 
+                dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optDaily)} kWh`; 
+                dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyOptDaily)} kWh`;
 
                 const gainDaily = optDaily - curDaily;
                 dom.potentialGainDailyDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
-                const gainMonthly = optMonthly - curMonthly; 
+                const gainMonthly = gainDaily * 30.4; // Average days in month
                 dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
                 
                 dom.productionResults.classList.remove('hidden');

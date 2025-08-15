@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Opti Solar v4.0.0</title>
+    <title>Opti Solar v4.1.0</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,44 +30,29 @@
         .btn-primary { background-color: var(--accent); color: #00110e; } .btn-primary:hover { background-color: #52d9c3; }
         .btn-secondary { background-color: var(--btn-secondary-bg); color: var(--fg); } .btn-secondary:hover { background-color: #3a4a6a; }
         .light-mode .btn-secondary { color: #1f2937; } .light-mode .btn-secondary:hover { background-color: #d1d5db; }
+        .btn-danger { background-color: var(--bad); color: #fff; }
         input, .bg-input { background-color: var(--input-bg); border: 1px solid var(--border-color-input); color: var(--fg); }
         input::placeholder { color: var(--muted); }
         .loader { border: 4px solid var(--btn-secondary-bg); border-radius: 50%; border-top: 4px solid var(--accent); width: 24px; height: 24px; animation: spin 2s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .icon-btn { background-color: var(--card); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-in-out; }
+        .icon-btn { background-color: var(--card); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-in-out; border: 1px solid var(--border-color); }
         .icon-btn:hover { transform: scale(1.1); background-color: var(--btn-secondary-bg); }
-        /* NOUVEAUX STYLES V4.0.0 */
         .cockpit-display {
-            width: 240px; height: 240px; border-radius: 50%;
+            width: 220px; height: 220px; border-radius: 50%;
             background: radial-gradient(circle at 50% 50%, transparent 60%, var(--cockpit-glow) 90%);
             border: 2px solid var(--border-color); position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 0 40px var(--cockpit-glow) inset, 0 5px 15px rgba(0,0,0,0.2);
         }
-        .cockpit-display::before, .cockpit-display::after {
-            content: ''; position: absolute; border-radius: 50%; pointer-events: none;
-        }
-        .cockpit-display::before {
-            inset: 8px; border: 1px dashed var(--border-color); opacity: 0.5;
-        }
-        .cockpit-display.active {
-            border-color: var(--accent);
-            animation: pulse-glow 2.5s ease-in-out infinite;
-        }
+        .cockpit-display.active { border-color: var(--accent); animation: pulse-glow 2.5s ease-in-out infinite; }
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 40px var(--cockpit-glow) inset, 0 5px 15px rgba(0,0,0,0.2), 0 0 10px var(--accent); }
             50% { box-shadow: 0 0 50px var(--cockpit-glow) inset, 0 5px 15px rgba(0,0,0,0.2), 0 0 25px var(--accent); }
-        }
-        .gauge { width: 120px; height: 60px; border: 1px solid var(--border-color); border-bottom: 0; border-radius: 120px 120px 0 0; position: relative; overflow: hidden; }
-        .gauge-needle {
-            width: 2px; height: 50px; background-color: var(--accent); position: absolute; bottom: 0; left: 59px;
-            transform-origin: bottom; transition: transform 0.2s ease-out;
         }
         .compass-rose { width: 100%; height: 100%; position: absolute; top:0; left:0; transition: transform 0.2s ease-out; }
         .inclinometer-line { transition: transform 0.2s ease-out; }
         .status-icon.active svg { color: var(--accent) !important; animation: blink 1.5s ease-in-out infinite; }
         @keyframes blink { 50% { opacity: 0.4; } }
-        /* FIN NOUVEAUX STYLES */
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -91,30 +76,38 @@
         <div id="app-container" class="w-full max-w-lg mx-auto relative">
             
             <div id="main-page">
-                <div class="flex justify-center gap-6 mb-4">
-                    <div id="status-gps" class="status-icon text-center">
-                        <svg class="h-6 w-6 text-gray-600 mx-auto" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                        <p class="text-xs text-muted mt-1">GPS</p>
+                <div class="card p-4 mb-4 space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                         <div>
+                            <label class="block text-xs text-muted mb-1">Localisation (Latitude)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm text-center">
+                                <button type="button" id="get-location" title="Utiliser ma position" class="p-2 bg-input rounded-md hover:bg-btn-secondary-bg transition-colors flex-shrink-0">
+                                    <svg class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                </button>
+                            </div>
+                         </div>
+                         <div>
+                            <label for="date-input" class="block text-xs text-muted mb-1">Date de Simulation</label>
+                            <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm bg-input">
+                         </div>
                     </div>
-                    <div id="status-sensors" class="status-icon text-center">
-                        <svg class="h-6 w-6 text-gray-600 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
-                        <p class="text-xs text-muted mt-1" data-i18n="sensors">Capteurs</p>
-                    </div>
+                    <p id="location-error" class="text-xs text-red-400 h-4 text-center" role="alert"></p>
                 </div>
 
-                <div class="flex justify-center mb-6">
+                <div class="flex justify-center mb-4">
                     <div id="cockpit" class="cockpit-display">
-                        <p class="text-xs text-muted" data-i18n="recommended_angle">Angle Recommandé</p>
+                        <p class="text-xs text-muted">Angle Recommandé</p>
                         <p id="result" class="text-7xl font-bold text-teal-400 my-1" aria-live="polite">--°</p>
                         <p id="date-display" class="text-sm text-accent-blue h-4"></p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 text-center mb-6">
+                <div class="grid grid-cols-2 gap-4 text-center mb-4">
                     <div class="card p-3">
-                        <p class="text-xs text-muted" data-i18n="orientation">Orientation</p>
+                        <p class="text-xs text-muted">Orientation</p>
                         <div class="relative w-24 h-24 mx-auto mt-2">
-                             <svg class="absolute inset-0 text-gray-700" fill="none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="2"/><path d="M50 0 L50 10 M50 100 L50 90 M0 50 L10 50 M100 50 L90 50" stroke="currentColor" stroke-width="1.5"/><text x="50" y="10" text-anchor="middle" font-size="10" fill="currentColor">S</text></svg>
+                             <svg class="absolute inset-0 text-gray-700" fill="none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="1"/><path d="M50 0 L50 10 M50 100 L50 90 M0 50 L10 50 M100 50 L90 50" stroke="currentColor" stroke-width="1"/><text x="50" y="10" text-anchor="middle" font-size="10" fill="currentColor">S</text></svg>
                              <div id="compass-rose-container" class="compass-rose">
                                 <svg class="w-full h-full text-accent" viewBox="0 0 100 100"><path d="M50 12 L45 22 L55 22 Z" fill="currentColor"/></svg>
                              </div>
@@ -122,7 +115,7 @@
                         <p class="text-lg font-bold"><span id="current-compass">--</span></p>
                     </div>
                     <div class="card p-3">
-                        <p class="text-xs text-muted" data-i18n="current_angle">Inclinaison</p>
+                        <p class="text-xs text-muted">Inclinaison</p>
                         <div class="relative w-28 h-20 mx-auto mt-2 flex items-center justify-center">
                              <svg class="absolute inset-0 text-gray-700" viewBox="0 0 100 50">
                                 <path d="M0 25 H100" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
@@ -139,239 +132,99 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
-                    <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-3 px-4 rounded-lg" data-i18n="activate_sensors"></button>
-                    <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-3 px-4 rounded-lg" data-i18n="manual_entry"></button>
+                    <button type="button" id="activate-sensors-button" class="btn-primary font-bold py-3 px-4 rounded-lg">Activer Capteurs</button>
+                    <button type="button" id="goto-estimation-button" class="bg-accent-blue text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center text-center">Estimer Prod.</button>
                 </div>
                  <p id="sensor-error" class="text-xs text-red-400 h-4 text-center" role="alert"></p>
-
-                <button type="button" id="goto-estimation-button" class="hidden mt-4 w-full bg-accent-blue text-white font-bold py-3 px-4 rounded-lg transition-all text-lg flex items-center justify-center">
-                    <span data-i18n="calculate_gain">Estimer la Production</span>
-                    <svg class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                </button>
             </div>
-
+            
             <div id="settings-page" class="hidden">
                  <button type="button" id="back-button" class="absolute top-0 left-0 icon-btn btn-secondary" aria-label="Retour">
                      <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                  </button>
-                <h2 class="text-2xl font-bold text-center pt-8 page-title" data-i18n="estimation_title">Estimation de Production</h2>
-                
-                <div class="space-y-4 mt-6">
-                    <div class="card p-4">
-                        <h3 class="font-bold text-muted mb-2 uppercase text-sm" data-i18n="data_source">Données Source</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                             <div>
-                                <label for="latitude-input" class="block text-xs font-medium text-gray-400">Latitude</label>
-                                <input type="number" id="latitude-input" step="any" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
-                            </div>
-                            <div>
-                                <label for="longitude-input" class="block text-xs font-medium text-gray-400">Longitude</label>
-                                <input type="number" id="longitude-input" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
-                            </div>
-                        </div>
-                         <div class="mt-4">
-                            <label for="peak-power" class="block text-xs font-medium text-gray-400" data-i18n="peak_power">Puissance Crête (kWc)</label>
-                            <input type="number" id="peak-power" value="3.72" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
-                        </div>
-                    </div>
-                    <div class="card p-4">
-                        <h3 class="font-bold text-muted mb-2 uppercase text-sm" data-i18n="your_settings">Vos Réglages Actuels</h3>
-                         <div class="grid grid-cols-2 gap-4">
-                             <div>
-                                <label for="current-tilt-input" class="block text-xs font-medium text-gray-400" data-i18n="current_tilt">Inclinaison (°)</label>
-                                <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
-                            </div>
-                             <div>
-                                <label for="current-azimuth-input" class="block text-xs font-medium text-gray-400" data-i18n="current_azimuth">Orientation (°/Sud)</label>
-                                <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md shadow-sm">
-                            </div>
-                        </div>
-                    </div>
+                <h2 class="text-2xl font-bold text-center pt-8 page-title">Estimation de Production</h2>
                 </div>
-
-                <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center text-lg">
-                    <span id="calculate-text" data-i18n="calculate_gain_long">Calculer</span>
-                    <div id="calculate-loader" class="loader hidden ml-3"></div>
-                </button>
-                 <p id="pvgis-error" class="text-xs text-red-400 h-4 mt-2 text-center" role="alert"></p>
-
-                <div id="production-results" class="mt-6 space-y-2 hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div class="info-box p-4 rounded-lg text-center border-2 border-transparent">
-                            <p class="text-sm text-gray-400 uppercase" data-i18n="prod_current_settings">Votre Production</p>
-                            <p id="current-production" class="text-3xl font-bold">-- kWh</p>
-                        </div>
-                         <div class="info-box p-4 rounded-lg text-center border-2 border-accent">
-                            <p class="text-sm text-accent uppercase" data-i18n="prod_optimal_settings">Production Optimale</p>
-                            <p id="optimal-production" class="text-3xl font-bold text-accent">-- kWh</p>
-                        </div>
-                    </div>
-                    <div class="info-box p-6 rounded-lg text-center bg-green-900/30">
-                        <p class="text-lg text-green-300 uppercase font-bold" data-i18n="monthly_gain_title">Gain Mensuel Potentiel</p>
-                        <p id="potential-gain-monthly" class="text-5xl font-bold text-green-300">+ -- kWh</p>
-                    </div>
-                     <div class="text-center pt-2">
-                         <p class="text-xs text-muted" data-i18n="prod_truly_optimal_settings_label">Prod. Idéale (Plein Sud): <span id="truly-optimal-production" class="font-bold">-- kWh</span></p>
-                    </div>
-                </div>
-                 <div id="export-container" class="mt-4 text-center hidden">
-                    <button type="button" id="export-pdf-btn" class="btn-secondary font-bold py-2 px-4 rounded-lg"><span data-i18n="export_pdf">Exporter en PDF</span></button>
-                </div>
-            </div>
 
         </div>
     </main>
     
     <footer class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <input type="date" id="date-input" class="p-2 h-10 rounded-lg bg-input" aria-label="Date cible">
+        <div class="status-icon" id="status-gps">
+             <svg class="h-6 w-6 text-gray-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
         </div>
-        <p class="text-xs text-gray-600">v4.0.0</p>
-        <div class="flex items-center gap-2">
-             <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
-                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </a>
+        <p class="text-xs text-gray-600">v4.1.0</p>
+        <div class="status-icon" id="status-sensors">
+            <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
         </div>
     </footer>
     
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50" role="dialog">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md card">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg leading-6 font-bold text-teal-300 page-title">Réglages</h3>
+                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="mt-4 p-4 space-y-6">
+                 <div class="flex items-center justify-between">
+                    <label for="clipping-checkbox" class="font-medium flex items-center">
+                        <span>Optimiser pour l'écrêtage</span>
+                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </label>
+                    <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-teal-500 focus:ring-teal-600">
+                </div>
+                 </div>
+        </div>
+    </div>
+    
     </body>
     <script>
-        // IIFE pour encapsuler le code
         (function() {
             'use strict';
 
-            const DEBUG = false;
             const CONFIG = {
-                donateLink: 'https://paypal.me/iFredZ',
-                reportEmail: 'finjalrac@gmail.com',
                 defaultLatitude: 44.21446,
-                defaultLongitude: 4.028,
-                clippingAdjustment: 10,
                 sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
-            };
-            
-            // NOTE: Les traductions sont gardées pour la compatibilité, mais pas toutes utilisées dans la v4
-            const translations = {
-                fr: {
-                    sensors: "Capteurs",
-                    activate_sensors: "Activer Capteurs",
-                    stop_sensors: "Arrêter",
-                    manual_entry: "Saisie Manuelle",
-                    orientation: "Orientation",
-                    current_angle: "Inclinaison",
-                    recommended_angle: "Angle Recommandé",
-                    calculate_gain: "Estimer la Production",
-                    estimation_title: "Estimation de Production",
-                    peak_power: "Puissance Crête (kWc)",
-                    current_tilt: "Inclinaison (°)",
-                    current_azimuth: "Orientation (°/Sud)",
-                    calculate_gain_long: "Calculer",
-                    prod_current_settings: "Votre Production",
-                    prod_optimal_settings: "Production Optimale",
-                    monthly_gain_title: "Gain Mensuel Potentiel",
-                    prod_truly_optimal_settings_label: "Prod. Idéale (Plein Sud)",
-                    export_pdf: "Exporter en PDF",
-                    data_source: "Données Source",
-                    your_settings: "Vos Réglages Actuels",
-                    compass_south: "SUD", compass_east: "E", compass_west: "O", compass_north: "N",
-                    pvgis_error: "Erreur communication PVGIS.",
-                    sensors_activating: "Activation des capteurs...",
-                },
-                en: {
-                    sensors: "Sensors",
-                    activate_sensors: "Activate Sensors",
-                    stop_sensors: "Stop",
-                    manual_entry: "Manual Input",
-                    orientation: "Orientation",
-                    current_angle: "Tilt",
-                    recommended_angle: "Recommended Angle",
-                    calculate_gain: "Estimate Production",
-                    estimation_title: "Production Estimate",
-                    peak_power: "Peak Power (kWp)",
-                    current_tilt: "Tilt (°)",
-                    current_azimuth: "Azimuth (°/South)",
-                    calculate_gain_long: "Calculate",
-                    prod_current_settings: "Your Production",
-                    prod_optimal_settings: "Optimal Production",
-                    monthly_gain_title: "Potential Monthly Gain",
-                    prod_truly_optimal_settings_label: "Ideal Prod. (South-facing)",
-                    export_pdf: "Export to PDF",
-                    data_source: "Source Data",
-                    your_settings: "Your Current Settings",
-                    compass_south: "SOUTH", compass_east: "E", compass_west: "W", compass_north: "N",
-                    pvgis_error: "PVGIS communication error.",
-                    sensors_activating: "Activating sensors...",
-                }
-            };
-
-            const i18n = {
-                currentLang: 'fr',
-                setLanguage: function(lang) {
-                    this.currentLang = lang;
-                    document.querySelectorAll('[data-i18n]').forEach(el => {
-                        const key = el.dataset.i18n;
-                        if (translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
-                    });
-                     if(state.sensorsActive) {
-                       dom.activateSensorsButton.textContent = (translations[lang] || translations.fr).stop_sensors;
-                    } else {
-                       dom.activateSensorsButton.textContent = (translations[lang] || translations.fr).activate_sensors;
-                    }
-                }
             };
             
             const state = {
                 sensorsActive: false,
                 tiltOffset: 0,
-                lastRecommendedTilt: null,
             };
 
-            // Références aux éléments du DOM
             const dom = {
                 mainPage: document.getElementById('main-page'),
                 settingsPage: document.getElementById('settings-page'),
                 latitudeInput: document.getElementById('latitude-input'),
-                longitudeInput: document.getElementById('longitude-input'),
                 dateInput: document.getElementById('date-input'),
                 dateDisplay: document.getElementById('date-display'),
+                getLocationButton: document.getElementById('get-location'),
+                locationError: document.getElementById('location-error'),
                 activateSensorsButton: document.getElementById('activate-sensors-button'),
-                manualEntryButton: document.getElementById('manual-entry-button'),
                 resultDisplay: document.getElementById('result'),
                 currentAngleDisplay: document.getElementById('current-angle'),
                 currentCompassDisplay: document.getElementById('current-compass'),
                 gotoEstimationButton: document.getElementById('goto-estimation-button'),
                 backButton: document.getElementById('back-button'),
                 settingsButton: document.getElementById('settings-button'),
-                peakPowerInput: document.getElementById('peak-power'),
-                currentTiltInput: document.getElementById('current-tilt-input'),
-                currentAzimuthInput: document.getElementById('current-azimuth-input'),
-                calculateProductionButton: document.getElementById('calculate-production'),
-                calculateText: document.getElementById('calculate-text'),
-                calculateLoader: document.getElementById('calculate-loader'),
-                pvgisError: document.getElementById('pvgis-error'),
-                productionResults: document.getElementById('production-results'),
-                currentProductionDisplay: document.getElementById('current-production'),
-                optimalProductionDisplay: document.getElementById('optimal-production'),
-                potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
-                trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
-                exportContainer: document.getElementById('export-container'),
-                exportPdfBtn: document.getElementById('export-pdf-btn'),
                 sensorError: document.getElementById('sensor-error'),
-                // NOUVEAUX ELEMENTS V4.0.0
                 statusGps: document.getElementById('status-gps'),
                 statusSensors: document.getElementById('status-sensors'),
                 cockpit: document.getElementById('cockpit'),
                 compassRoseContainer: document.getElementById('compass-rose-container'),
                 inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
+                // MODALES
+                settingsModal: document.getElementById('settings-modal'),
+                clippingCheckbox: document.getElementById('clipping-checkbox'),
             };
 
             const utils = {
-                log: (...args) => { if (DEBUG) console.log('[OptiSolarV4]', ...args); },
                 toRadians: (deg) => deg * Math.PI / 180,
-                toDegrees: (rad) => rad * 180 / Math.PI,
                 getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
                 getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-                formatNumber: (n, dec = 1) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
                 safeParseFloat: (v, fallback = NaN) => {
                     if (v === null || v === undefined || v === '') return fallback;
                     const s = String(v).replace(',', '.').trim();
@@ -391,6 +244,12 @@
                     if(!isNaN(date.getTime())) {
                         dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
                     }
+                },
+                updateLocationFields: (lat) => {
+                    dom.latitudeInput.value = lat.toFixed(5);
+                    dom.locationError.textContent = '';
+                    dom.statusGps.classList.add('active');
+                    calculations.calculateAndDisplayOptimalAngle();
                 }
             };
 
@@ -398,6 +257,8 @@
                 calculateAndDisplayOptimalAngle: () => {
                     const lat = utils.safeParseFloat(dom.latitudeInput.value);
                     const dateValue = dom.dateInput.value;
+                    const clipping = dom.clippingCheckbox.checked;
+
                     if (isNaN(lat) || !dateValue) {
                         dom.resultDisplay.textContent = '--°';
                         return;
@@ -410,9 +271,14 @@
                     
                     const solarNoonAltitude = 90 - Math.abs(lat - declination);
                     let optimalTilt = 90 - solarNoonAltitude;
-                    optimalTilt = utils.clamp(optimalTilt, 0, 90);
                     
-                    state.lastRecommendedTilt = optimalTilt;
+                    // Application de l'ajustement pour l'écrêtage
+                    const isSummer = (Math.sign(lat) * Math.sign(declination) > 0) && Math.abs(declination) > 15;
+                    if(clipping && isSummer) {
+                        optimalTilt += 10;
+                    }
+                    
+                    optimalTilt = utils.clamp(optimalTilt, 0, 90);
                     dom.resultDisplay.textContent = `${Math.round(optimalTilt)}°`;
                 }
             };
@@ -426,21 +292,9 @@
                     const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
                     return (360 - e.alpha + screenAngle + 360) % 360;
                 },
-                formatAzimuthForDisplay: (azimuth) => {
-                    const lang = i18n.currentLang;
-                    if (azimuth > 337.5 || azimuth <= 22.5) return `${Math.round(azimuth)}° N`;
-                    if (azimuth > 22.5 && azimuth <= 67.5) return `${Math.round(azimuth)}° NE`;
-                    if (azimuth > 67.5 && azimuth <= 112.5) return `${Math.round(azimuth)}° E`;
-                    if (azimuth > 112.5 && azimuth <= 157.5) return `${Math.round(azimuth)}° SE`;
-                    if (azimuth > 157.5 && azimuth <= 202.5) return `${Math.round(azimuth)}° SUD`;
-                    if (azimuth > 202.5 && azimuth <= 247.5) return `${Math.round(azimuth)}° SO`;
-                    if (azimuth > 247.5 && azimuth <= 292.5) return `${Math.round(azimuth)}° O`;
-                    if (azimuth > 292.5 && azimuth <= 337.5) return `${Math.round(azimuth)}° NO`;
-                    return '--';
-                },
                 handleOrientation: (event) => {
                     const now = performance.now();
-                    if (now - sensors.lastUpdate < 100) return; // Limite la fréquence de mise à jour
+                    if (now - sensors.lastUpdate < 100) return;
                     sensors.lastUpdate = now;
                     
                     const tilt = sensors.getTiltFromEvent(event);
@@ -452,160 +306,69 @@
                         dom.inclinometerLineContainer.style.transform = `rotate(${tiltForVisual}deg)`;
                     }
                     if (heading !== null) {
-                        dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(heading);
+                        dom.currentCompassDisplay.textContent = `${Math.round(heading)}°`;
                         dom.compassRoseContainer.style.transform = `rotate(${heading}deg)`;
                     }
                 },
                 start: () => {
-                    if (state.sensorsActive) {
-                        sensors.stop();
-                        return;
-                    }
-                    dom.sensorError.textContent = translations[i18n.currentLang].sensors_activating;
-                    try {
-                        // Demander la permission est une bonne pratique
-                        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                            DeviceOrientationEvent.requestPermission().then(permissionState => {
-                                if (permissionState === 'granted') {
-                                    window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                                }
-                            });
-                        } else {
-                             window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
-                        }
-                        state.sensorsActive = true;
-                        dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
-                        dom.activateSensorsButton.classList.add('btn-danger'); dom.activateSensorsButton.classList.remove('btn-primary');
-                        dom.statusSensors.classList.add('active');
-                        dom.cockpit.classList.add('active');
-                        dom.gotoEstimationButton.classList.remove('hidden');
-                        dom.sensorError.textContent = '';
-                    } catch (err) {
-                        dom.sensorError.textContent = 'Erreur capteurs.';
-                        utils.log('DeviceOrientation error', err);
-                    }
+                    if (state.sensorsActive) { sensors.stop(); return; }
+                    dom.sensorError.textContent = "Activation...";
+                    state.sensorsActive = true;
+                    window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                    dom.activateSensorsButton.textContent = "Arrêter";
+                    dom.activateSensorsButton.classList.add('btn-danger');
+                    dom.statusSensors.classList.add('active');
+                    dom.cockpit.classList.add('active');
+                    dom.sensorError.textContent = "";
                 },
                 stop: () => {
                     if (!state.sensorsActive) return;
-                    window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
                     state.sensorsActive = false;
-                    dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
-                    dom.activateSensorsButton.classList.remove('btn-danger'); dom.activateSensorsButton.classList.add('btn-primary');
+                    window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
+                    dom.activateSensorsButton.textContent = "Activer Capteurs";
+                    dom.activateSensorsButton.classList.remove('btn-danger');
                     dom.statusSensors.classList.remove('active');
                     dom.cockpit.classList.remove('active');
                 }
             };
             
-            const handlers = {
-                 prepareEstimationPage: () => {
-                    dom.latitudeInput.value = CONFIG.defaultLatitude; // Mettre à jour avec la vraie valeur
-                    dom.longitudeInput.value = CONFIG.defaultLongitude;
-                    
-                    if (state.sensorsActive) {
-                        const tilt = parseInt(dom.currentAngleDisplay.textContent, 10);
-                        if (!isNaN(tilt)) dom.currentTiltInput.value = tilt;
-                        // Logique pour l'azimuth
-                    }
-                    ui.showPage('settings');
-                },
-                 calculateProduction: async () => {
-                    dom.productionResults.classList.add('hidden');
-                    dom.pvgisError.textContent = '';
-                    dom.calculateLoader.classList.remove('hidden');
-                    dom.calculateText.classList.add('hidden');
-                    
-                    const lat = utils.safeParseFloat(dom.latitudeInput.value); 
-                    const lon = utils.safeParseFloat(dom.longitudeInput.value); 
-                    const peakPower = utils.safeParseFloat(dom.peakPowerInput.value); 
-                    const currentTilt = utils.safeParseFloat(dom.currentTiltInput.value); 
-                    const currentAzimuth = utils.safeParseFloat(dom.currentAzimuthInput.value);
-                    
-                    if ([lat, lon, peakPower, currentTilt, currentAzimuth].some(isNaN)) {
-                        dom.pvgisError.textContent = "Veuillez remplir tous les champs.";
-                        dom.calculateLoader.classList.add('hidden');
-                        dom.calculateText.classList.remove('hidden');
-                        return;
-                    }
-                    
-                    const optimalTilt = state.lastRecommendedTilt || currentTilt;
-
-                    try {
-                        const [currentProd, optimalProd, trulyOptimalProd] = await Promise.all([ 
-                            api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
-                            api.fetchPVGIS(lat, lon, peakPower, optimalTilt, currentAzimuth),
-                            api.fetchPVGIS(lat, lon, peakPower, optimalTilt, 0) 
-                        ]);
-
-                        const curMonthly = currentProd.outputs.totals.fixed.E_m;
-                        let optMonthly = optimalProd.outputs.totals.fixed.E_m;
-                        const trulyOptMonthly = trulyOptimalProd.outputs.totals.fixed.E_m;
-
-                        if (optMonthly < curMonthly) optMonthly = curMonthly;
-
-                        dom.currentProductionDisplay.textContent = `${utils.formatNumber(curMonthly)} kWh`;
-                        dom.optimalProductionDisplay.textContent = `${utils.formatNumber(optMonthly)} kWh`;
-                        dom.trulyOptimalProductionDisplay.textContent = `${utils.formatNumber(trulyOptMonthly)} kWh`;
-                        
-                        const gainMonthly = optMonthly - curMonthly;
-                        dom.potentialGainMonthlyDisplay.textContent = `+ ${utils.formatNumber(gainMonthly)} kWh`;
-                        
-                        dom.productionResults.classList.remove('hidden');
-                        dom.exportContainer.classList.remove('hidden');
-
-                    } catch (err) {
-                        dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error;
-                        utils.log('PVGIS error', err);
-                    } finally {
-                        dom.calculateLoader.classList.add('hidden');
-                        dom.calculateText.classList.remove('hidden');
-                    }
-                }
-            };
-            
-            const api = {
-                fetchPVGIS: async (lat, lon, peakpower, angle, aspect) => {
-                    const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
-                    const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
-                    try {
-                        const res = await fetch(proxyUrl);
-                        if (!res.ok) throw new Error('Proxy failed');
-                        const data = await res.json();
-                        return JSON.parse(data.contents);
-                    } catch (error) {
-                         utils.log(`PVGIS fetch failed:`, error.message);
-                         throw error;
+            const geolocation = {
+                get: () => {
+                    dom.locationError.textContent = 'Obtention de la position...';
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            p => ui.updateLocationFields(p.coords.latitude),
+                            () => { dom.locationError.textContent = 'Impossible d’obtenir la position.'; }
+                        );
+                    } else {
+                        dom.locationError.textContent = 'Géolocalisation non supportée.';
                     }
                 }
             };
 
             function init() {
-                // Langue
-                i18n.setLanguage('fr');
-
-                // Valeurs par défaut
-                dom.latitudeInput.value = CONFIG.defaultLatitude;
-                dom.longitudeInput.value = CONFIG.defaultLongitude;
-                dom.statusGps.classList.add('active'); // Simule un fix GPS
+                dom.latitudeInput.value = CONFIG.defaultLatitude.toFixed(5);
                 
-                // Date
                 const today = new Date();
                 dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 ui.updateDateDisplay();
-
-                // Calcul initial
                 calculations.calculateAndDisplayOptimalAngle();
 
-                // Ajout des écouteurs d'événements
+                // Listeners
                 dom.dateInput.addEventListener('change', () => {
                     ui.updateDateDisplay();
                     calculations.calculateAndDisplayOptimalAngle();
                 });
+                dom.latitudeInput.addEventListener('input', calculations.calculateAndDisplayOptimalAngle);
                 dom.activateSensorsButton.addEventListener('click', sensors.start);
-                dom.settingsButton.addEventListener('click', handlers.prepareEstimationPage);
-                dom.backButton.addEventListener('click', () => ui.showPage('main'));
-                dom.calculateProductionButton.addEventListener('click', handlers.calculateProduction);
+                dom.getLocationButton.addEventListener('click', geolocation.get);
                 
-                utils.log('Application initialisée v4.0.0.');
+                // Listeners pour les modales
+                dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
+                dom.settingsModal.querySelectorAll('.close-modal-btn').forEach(btn => 
+                    btn.addEventListener('click', () => dom.settingsModal.classList.add('hidden'))
+                );
+                dom.clippingCheckbox.addEventListener('change', calculations.calculateAndDisplayOptimalAngle);
             }
             
             window.addEventListener('load', init);

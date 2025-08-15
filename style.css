@@ -334,3 +334,67 @@ input:checked + .slider:before { transform: translateX(24px); }
 /* Indication visuelle du bouton Mémoriser (dans l'écran principal) */
 .pg-pulse{animation:pgPulse 1.3s ease-in-out 3}
 @keyframes pgPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.0)}50%{box-shadow:0 0 0 12px rgba(245,158,11,.25)}}
+
+
+/* === New splash visuals: globe + solar scene === */
+.splash-pg .pg-globe{
+  width:min(70vw,320px); height: min(35vw,160px);
+  border-radius:14px; position:relative; overflow:hidden;
+  background: radial-gradient(120% 100% at 10% 0%, rgba(34,211,238,0.1), transparent 60%),
+              linear-gradient(180deg, #07121f, #0b1526);
+  border:1px solid rgba(34,211,238,0.35);
+  box-shadow: inset 0 0 22px rgba(34,211,238,0.18), 0 0 30px rgba(245,158,11,0.18);
+  transform: scale(.92);
+}
+.splash-pg .pg-grid{
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px);
+  mask-image: radial-gradient(120% 200% at 50% 50%, #000 65%, transparent 100%);
+}
+.splash-pg .pg-location{
+  --x:50%; --y:50%;
+  position:absolute; width:10px;height:10px;border-radius:50%;
+  left: calc(var(--x)); top: calc(var(--y));
+  transform: translate(-50%,-50%);
+  background:#22d3ee; box-shadow: 0 0 16px rgba(34,211,238,.9), 0 0 36px rgba(34,211,238,.5);
+  animation: pgPing 1.8s ease-out infinite;
+}
+@keyframes pgPing{0%{transform:translate(-50%,-50%) scale(.8)}70%{transform:translate(-50%,-50%) scale(1.2)}100%{transform:translate(-50%,-50%) scale(.8)}}
+.splash-pg.pg-zoom .pg-globe{animation: pgZoom 2s ease forwards}
+@keyframes pgZoom{0%{transform:scale(.88)}100%{transform:scale(1)}}
+
+/* Solar panel scene */
+.splash-pg .pg-scene{position:relative;width:min(76vw,340px);height:min(42vw,180px);}
+.splash-pg .pg-sky{position:absolute;inset:0;border-radius:14px 14px 0 0;
+  background: linear-gradient(180deg,#0b1b2e,#0a1220 60%, transparent 60%);
+  overflow:hidden;
+}
+.splash-pg .pg-sun{position:absolute;left:-10%;top:18%;
+  width:22px;height:22px;border-radius:50%;background:#fbbf24;
+  box-shadow:0 0 24px rgba(245,158,11,.8),0 0 46px rgba(245,158,11,.45);
+  animation: sunPath 5.2s linear infinite;
+}
+@keyframes sunPath{
+  0%{transform:translateX(0) translateY(0)}
+  50%{transform:translateX(60vw) translateY(-4px)}
+  100%{transform:translateX(120vw) translateY(0)}
+}
+.splash-pg .pg-panel{
+  position:absolute; left:8%; right:8%; bottom:10%; height:34%;
+  background: linear-gradient(180deg,#0e223a,#0b1627);
+  border-radius:10px; border:1px solid rgba(34,211,238,.3);
+  box-shadow: inset 0 0 18px rgba(34,211,238,.2), 0 10px 30px rgba(0,0,0,.35);
+  transform: perspective(500px) rotateX(16deg);
+  overflow:hidden;
+}
+.splash-pg .pg-panel-grid{position:absolute;inset:8px;background:
+  repeating-linear-gradient(90deg, rgba(34,211,238,.15) 0 1px, transparent 1px 36px),
+  repeating-linear-gradient(0deg, rgba(34,211,238,.15) 0 1px, transparent 1px 36px);
+}
+.splash-pg .pg-sheen{position:absolute;inset:-20%;background:
+  linear-gradient(60deg, rgba(255,255,255,.0) 0%, rgba(255,255,255,.15) 45%, rgba(255,255,255,.0) 60%);
+  animation: sheenMove 4.6s ease-in-out infinite;
+}
+@keyframes sheenMove{0%{transform:translateX(-60%)}50%{transform:translateX(60%)}100%{transform:translateX(160%)}}

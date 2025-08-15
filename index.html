@@ -351,22 +351,37 @@
     <script src="script.js?v=4.1.7" defer></script>
 
     <!-- Splash "Photon Grid" - overlay non intrusif -->
-    <div id="pg-splash" class="splash-pg" aria-hidden="true" role="presentation">
+    <div id="pg-splash" class="splash-pg pg-hide" aria-hidden="true" role="presentation">
       <div class="pg-wrap">
         <div class="pg-logo">
           <div class="pg-orbit"></div>
           <div class="pg-flare"></div>
-          <span class="pg-title">Solar Setup</span>
+          <span class="pg-title" id="pg-appname">Solar Setup</span>
         </div>
-        <div class="pg-dial">
-          <div class="pg-needle" id="pg-needle"></div>
-          <div class="pg-center">°</div>
+
+        <!-- Globe stylisé avec position -->
+        <div class="pg-globe" aria-hidden="true">
+          <div class="pg-grid"></div>
+          <div class="pg-location" id="pg-loc"></div>
         </div>
+
+        <!-- Scène panneau solaire + soleil est-ouest -->
+        <div class="pg-scene" aria-hidden="true">
+          <div class="pg-sky">
+            <div class="pg-sun"></div>
+          </div>
+          <div class="pg-panel">
+            <div class="pg-panel-grid"></div>
+            <div class="pg-sheen"></div>
+          </div>
+        </div>
+
         <button class="pg-cta" id="pg-calibrate" type="button" aria-label="Calibrer avec ma position">
           Calibrer avec ma position
         </button>
         <div class="pg-tip" id="pg-tip">+3 à +12% d’énergie / an selon le réglage</div>
       </div>
+    </div>
     </div>
     
 </body>

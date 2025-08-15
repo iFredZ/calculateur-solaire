@@ -922,7 +922,7 @@
             updateThemeKnob();
         });
 
-        const savedThemeId = localStorage.getItem('userTheme') || 'dark';
+        const savedThemeId = localStorage.getItem('userTheme') || 'solar';
         currentThemeIndex = themeOptions.findIndex(opt => opt.id === savedThemeId);
         if (currentThemeIndex === -1) currentThemeIndex = 0;
         updateThemeKnob();
@@ -997,55 +997,93 @@
 // === Photon Grid Splash (non intrusif) ===
 (function(){
   if (typeof window === 'undefined') return;
-  if (sessionStorage.getItem('pg_splash_seen')) return;
-  sessionStorage.setItem('pg_splash_seen','1');
   const splash = document.getElementById('pg-splash');
   if (!splash) return;
+  // Option pour désactiver: ?nosplash=1
+  const bypass = /[?&]nosplash=1/.test(location.search);
+  if (sessionStorage.getItem('pg_splash_seen') || bypass){
+    splash.classList.add('pg-hide'); // s'assurer qu'il est masqué si on ne joue pas l'anim
+    return;
+  }
+  // On va l'afficher : retirer pg-hide et marquer vu
+  splash.classList.remove('pg-hide');
+  sessionStorage.setItem('pg_splash_seen','1');
+
   const needle = document.getElementById('pg-needle');
   function setAngle(a){
     const clamped = Math.max(0, Math.min(90, a || 0));
     needle.style.transform = `translate(-50%,-100%) rotate(${clamped-90}deg)`;
   }
-  // Angle plausible basé sur lat stockée si dispo
+
   const lastLat = parseFloat(localStorage.getItem('lastLat') || localStorage.getItem('latitude') || '44.13');
   const approx = Math.max(0, Math.min(90, Math.round(Math.abs(lastLat)*0.8)));
-  // 0-2s : logo
-  // 2-4s : on anime l'aiguille vers angle plausible
   setTimeout(()=> setAngle(approx), 1200);
-  // 7-10s : indication "Mémoriser" -> pulse sur bouton si on le trouve
+
   const pulseMemorize = () => {
     const candidates = Array.from(document.querySelectorAll('button, [role="button"]'));
     const target = candidates.find(el => /m[ée]moriser/i.test(el.textContent||''));
     if (target){ target.classList.add('pg-pulse'); setTimeout(()=>target.classList.remove('pg-pulse'), 3000); }
   };
+
   function closeSplash(){
+    if (!splash || splash.classList.contains('pg-hide')) return;
     splash.classList.add('pg-hide');
-    setTimeout(()=>{ splash.remove(); pulseMemorize(); }, 620);
+    setTimeout(()=>{ try{splash.remove();}catch(e){} pulseMemorize(); }, 620);
   }
-  document.getElementById('pg-calibrate')?.addEventListener('click', async ()=>{
+
+  // Fermer si on tape hors bouton également (fail‑safe UX)
+  splash.addEventListener('click', (e)=>{
+    if (!(e.target && (e.target.id === 'pg-calibrate'))) { closeSplash(); }
+  });
+
+  document.getElementById('pg-calibrate')?.addEventListener('click', async (ev)=>{
+    ev.stopPropagation();
     try{
-      // haptique
       if (window.Capacitor?.Plugins?.Haptics) { await window.Capacitor.Plugins.Haptics.vibrate(); }
       else if (navigator.vibrate) { navigator.vibrate(10); }
     }catch(_){}
-    let done = false;
+    let ended = false;
     if (navigator.geolocation){
       navigator.geolocation.getCurrentPosition((pos)=>{
         const lat = pos.coords.latitude, lon = pos.coords.longitude;
         localStorage.setItem('lastLat', String(lat));
         localStorage.setItem('lastLon', String(lon));
         window.dispatchEvent(new CustomEvent('photon:geo', {detail:{lat,lon}}));
-        // Appeler gracieusement des hooks si l'app les expose
         ['onGeoUpdate','updateLocation','applyGeo','handleGPS','calibrateWithPosition'].forEach(fn=>{
-          if (typeof window[fn] === 'function'){ try{ window[fn](lat,lon); done=true; }catch(e){} }
+          if (typeof window[fn] === 'function'){ try{ window[fn](lat,lon); ended=true; }catch(e){} }
         });
-        // feedback visuel : needle vers une nouvelle valeur approximée
         setAngle(Math.max(0, Math.min(90, Math.round(Math.abs(lat)*0.9))));
         setTimeout(closeSplash, 800);
-      }, closeSplash, {timeout:2500, maximumAge:60000});
+      }, ()=>{ closeSplash(); }, {timeout:2500, maximumAge:60000});
     }
-    if (!done){ setTimeout(closeSplash, 1200); }
+    if (!ended){ setTimeout(closeSplash, 1200); }
   });
-  // Auto close en douceur au bout de 4.8s si l’utilisateur ne clique pas
-  setTimeout(closeSplash, 4800);
+
+  // Fail‑safe ultime : ferme quoi qu’il arrive après 6,5s
+  setTimeout(closeSplash, 6500);
+})();
+
+// Enhance splash visuals: set app name, place location, play zoom
+(function(){
+  const splash = document.getElementById('pg-splash');
+  if (!splash) return;
+  const appnameEl = document.getElementById('pg-appname');
+  const metaApp = document.querySelector('meta[name="application-name"]')?.content;
+  const titleApp = document.title;
+  const appName = (metaApp && metaApp.trim()) || (titleApp && titleApp.trim()) || 'Solar Setup';
+  if (appnameEl) appnameEl.textContent = appName;
+
+  const loc = document.getElementById('pg-loc');
+  // lat/lon last known (fallback Alès approx)
+  const lat = parseFloat(localStorage.getItem('lastLat') || localStorage.getItem('latitude') || '44.12');
+  const lon = parseFloat(localStorage.getItem('lastLon') || localStorage.getItem('longitude') || '4.08');
+  if (!isNaN(lat) && !isNaN(lon) && loc){
+    // simple equirectangular projection onto the globe box: 0..100%
+    const x = ((lon + 180) / 360) * 100;
+    const y = ((90 - lat) / 180) * 100;
+    loc.style.setProperty('--x', x+'%');
+    loc.style.setProperty('--y', y+'%');
+  }
+  // small zoom effect class
+  splash.classList.add('pg-zoom');
 })();

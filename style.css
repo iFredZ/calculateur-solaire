@@ -199,3 +199,6 @@ main { flex: 1 0 auto; }
 
 /* Ensure modals overlay correctly */
 #settings-modal,#clipping-help-modal,#main-help-modal,#settings-help-modal,#onboarding-modal{z-index:100}
+
+/* Utility: mimic Tailwind's .hidden */
+.hidden{display:none!important}

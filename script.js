@@ -42,11 +42,12 @@
             peak_power: "Puissance crête (kWc)",
             longitude: "Longitude",
             current_tilt: "Inclinaison actuelle (°)",
-            current_azimuth: "Orientation actuelle (°/Sud)",
+            current_azimuth: "Orientation actuelle (Déviation / Sud)",
+            azimuth_placeholder: "ex: -10 (10° Est)",
             calculate_gain_long: "Calculer le gain",
             prod_current_settings: "Production (votre inclinaison)",
-            prod_optimal_settings: "Production (inclinaison optimale)",
-            prod_truly_optimal_settings: "Production IDÉALE (plein Sud)",
+            prod_optimal_settings: "Production (inclinaison optimale pour VOTRE orientation)",
+            prod_truly_optimal_settings: "Production IDÉALE (si orienté plein Sud)",
             daily_gain: "Gain potentiel journalier",
             monthly_gain: "Gain potentiel mensuel",
             settings_title: "Réglages",
@@ -81,11 +82,18 @@
             onboarding_prev: "Précédent",
             onboarding_next: "Suivant",
             onboarding_finish: "Terminer",
-            compass_south: "Plein Sud",
+            compass_north: "Nord",
+            compass_south: "Sud",
+            compass_east: "Est",
+            compass_west: "Ouest",
             fill_all_fields_error: "Veuillez remplir tous les champs.",
             settings_already_optimal: "Vos réglages actuels sont déjà optimaux.",
             pvgis_error: "Erreur communication PVGIS.",
             export_pdf: "Exporter en PDF",
+            exporting_pdf: "Génération...",
+            export_error_no_data: "Faites d’abord un calcul de production.",
+            pdf_disclaimer_title: "Avertissement Important",
+            pdf_disclaimer_text: "Les données de production et les mesures des capteurs sont des estimations. La précision peut varier. Ne pas utiliser pour des décisions contractuelles.",
             sensors_activating: "Activation des capteurs...",
             invalid_measurements: "Mesures invalides.",
             button_style_label: "Style du bouton \"Mémoriser\"",
@@ -94,9 +102,7 @@
             button_style_glass: "Verre",
             button_style_radar: "Radar",
         },
-        en: {
-            // English translations can be added here if needed
-        }
+        en: {} // English translations...
     };
 
     const state = {
@@ -109,7 +115,11 @@
         isStable: false,
         lastReadings: [],
         stabilityThreshold: 0.5, 
-        stabilityBuffer: 5 
+        stabilityBuffer: 5,
+        lastCurrentProd: null,
+        lastOptimalProd: null,
+        lastTrulyOptimalProd: null,
+        lastRecommendedTilt: null,
     };
 
     const dom = {
@@ -190,7 +200,32 @@
             return Number.isFinite(n) ? n : fallback;
         },
         clamp: (x, min, max) => Math.min(Math.max(x, min), max),
-        normalizeAngle: (a) => (a % 360 + 360) % 360
+        normalizeAngle: (a) => (a % 360 + 360) % 360,
+        // FIX: Restauration du retour haptique et sonore
+        playSuccessNotification: async () => {
+            try {
+                const { Haptics, ImpactStyle } = Capacitor.Plugins;
+                await Haptics.impact({ style: ImpactStyle.Light });
+            } catch(e) {
+                 utils.log("Haptics not available, fallback to vibrate", e);
+                 if (navigator.vibrate) navigator.vibrate(50);
+            }
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.15);
+            } catch (e) {
+                utils.log("Web Audio API failed", e);
+            }
+        }
     };
 
     const i18n = {
@@ -297,7 +332,7 @@
             const first = state.lastReadings[0];
             return state.lastReadings.every(r =>
                 Math.abs(r.tilt - first.tilt) <= state.stabilityThreshold &&
-                Math.abs(r.heading - first.heading) <= state.stabilityThreshold
+                Math.abs(utils.normalizeAngle(r.heading - first.heading)) <= state.stabilityThreshold
             );
         },
         setStable: (isStable) => {
@@ -313,14 +348,15 @@
             const screenAngle = (screen.orientation?.angle) || window.orientation || 0;
             return (360 - e.alpha + screenAngle + 360) % 360;
         },
+        // FIX: Amélioration de la logique de la boussole
         formatAzimuthForDisplay: (azimuth) => {
-            let deviation = azimuth - 180;
-            if (deviation > 180) deviation -= 360;
-            if (deviation < -180) deviation += 360;
             const lang = i18n.currentLang;
-            if (Math.abs(deviation) < 5) return translations[lang].compass_south;
-            const direction = deviation < 0 ? "Est" : "Ouest";
-            return `${Math.round(Math.abs(deviation))}° ${direction}`;
+            const tolerance = 5;
+            if (azimuth >= (360 - tolerance) || azimuth <= tolerance) return translations[lang].compass_north;
+            if (Math.abs(azimuth - 90) <= tolerance) return translations[lang].compass_east;
+            if (Math.abs(azimuth - 180) <= tolerance) return translations[lang].compass_south;
+            if (Math.abs(azimuth - 270) <= tolerance) return translations[lang].compass_west;
+            return `${Math.round(azimuth)}°`;
         },
         handleOrientation: (event) => {
             const now = performance.now();
@@ -437,7 +473,92 @@
         savePeakPower: () => {
             localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
         },
-        exportToPDF: () => { /* PDF export logic here */ }
+        // FIX: Restauration complète de la logique d'export PDF
+        exportToPDF: () => {
+            if (!state.lastCurrentProd || !state.lastOptimalProd) {
+                alert(translations[i18n.currentLang].export_error_no_data);
+                return;
+            }
+            const btn = dom.exportPdfBtn;
+            const originalText = btn.querySelector('span').textContent;
+            btn.disabled = true;
+            btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
+
+            const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
+            
+            const reportElement = document.createElement('div');
+            const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
+            const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
+            const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
+
+            reportElement.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+                    <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
+                    <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                    
+                    <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
+                        <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
+                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
+                    </table>
+                    
+                    <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Mensuelle Estimée</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #1d4ed8; color: white; text-align: left;">
+                                <th style="padding: 8px;">Configuration</th>
+                                <th style="padding: 8px;">Inclinaison</th>
+                                <th style="padding: 8px;">Orientation</th>
+                                <th style="padding: 8px;">Production Mensuelle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background-color: #f1f5f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #065f46;">${optMonthlyProd} kWh</td>
+                            </tr>
+                             <tr style="background-color: #f1f5f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptMonthlyProd} kWh</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                     <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
+                     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                    </table>
+
+                    <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
+                        <h4 style="color: #333; margin-top: 0; font-size: 12px;">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
+                        <p>${translations[i18n.currentLang].pdf_disclaimer_text}</p>
+                    </div>
+                </div>
+            `;
+
+            const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
+            html2pdf().from(reportElement).set({
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).save().then(() => {
+                btn.disabled = false;
+                btn.querySelector('span').textContent = originalText;
+            });
+        }
     };
 
     const onboarding = {
@@ -526,21 +647,25 @@
                 const clipping = (dom.clippingCheckbox.checked && isLocalSummer) ? CONFIG.clippingAdjustment : 0;
                 const penalty = Math.min(6, Math.abs(currentAzimuth) / 12);
                 let finalOptimalTilt = Math.round(utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping - penalty, 0, 90));
-                let idealOptimalTilt = Math.round(utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping, 0, 90)); // No penalty for ideal
+                let idealOptimalTilt = Math.round(utils.clamp(90 - (90 - Math.abs(lat - declination)) + clipping, 0, 90));
 
-                const [currentProd, optimalProd, trulyOptimalProd] = await Promise.all([ 
+                state.lastRecommendedTilt = finalOptimalTilt;
+
+                const [current, optimal, trulyOptimal] = await Promise.all([ 
                     api.fetchPVGIS(lat, lon, peakPower, currentTilt, currentAzimuth), 
                     api.fetchPVGIS(lat, lon, peakPower, finalOptimalTilt, currentAzimuth),
-                    api.fetchPVGIS(lat, lon, peakPower, idealOptimalTilt, 0) // Ideal is South-facing (0°)
+                    api.fetchPVGIS(lat, lon, peakPower, idealOptimalTilt, 0)
                 ]);
-
-                let curDaily = Number(currentProd.outputs.totals.fixed.E_d) || 0; 
-                let optDaily = Number(optimalProd.outputs.totals.fixed.E_d) || 0;
-                let trulyOptDaily = Number(trulyOptimalProd.outputs.totals.fixed.E_d) || 0;
                 
-                let curMonthly = Number(currentProd.outputs.totals.fixed.E_m) || 0; 
-                let optMonthly = Number(optimalProd.outputs.totals.fixed.E_m) || 0; 
-                let trulyOptMonthly = Number(trulyOptimalProd.outputs.totals.fixed.E_m) || 0;
+                state.lastCurrentProd = current;
+                state.lastOptimalProd = optimal;
+                state.lastTrulyOptimalProd = trulyOptimal;
+
+                let curDaily = Number(current.outputs.totals.fixed.E_d) || 0; 
+                let optDaily = Number(optimal.outputs.totals.fixed.E_d) || 0;
+                let curMonthly = Number(current.outputs.totals.fixed.E_m) || 0; 
+                let optMonthly = Number(optimal.outputs.totals.fixed.E_m) || 0; 
+                let trulyOptMonthly = Number(trulyOptimal.outputs.totals.fixed.E_m) || 0;
 
                 if (optDaily < curDaily) { 
                     optDaily = curDaily; 
@@ -562,6 +687,7 @@
                 dom.productionResults.classList.remove('hidden');
                 dom.donationMessage.classList.remove('hidden');
                 dom.exportContainer.classList.remove('hidden');
+                utils.playSuccessNotification();
             } catch (err) { 
                 dom.pvgisError.textContent = translations[i18n.currentLang].pvgis_error; 
                 utils.log(err);

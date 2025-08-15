@@ -129,3 +129,72 @@ input, .bg-input {
 .info-box {
     background-color: var(--info-box-bg);
 }
+
+/* === Styles avancés pour le bouton Mémoriser (hérités de v3.1.1) === */
+#memorize-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Style: Classique HD */
+.btn-style-default {
+  background: linear-gradient(180deg, rgba(13,148,136,0.18), rgba(13,148,136,0.05));
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 0 1px rgba(13,148,136,0.3) inset, 0 10px 30px rgba(13,148,136,0.08);
+}
+#memorize-btn-wrapper.stable .btn-style-default {
+  background: linear-gradient(180deg, rgba(13,148,136,0.35), rgba(13,148,136,0.08));
+  box-shadow: 0 0 0 1px rgba(13,148,136,0.6) inset, 0 12px 40px rgba(13,148,136,0.15);
+}
+
+/* Style: Neon Reactor */
+.btn-style-neon {
+  border: 1px solid rgba(16,185,129,0.5);
+  box-shadow: 0 0 20px rgba(16,185,129,0.2), inset 0 0 12px rgba(16,185,129,0.2);
+  background: radial-gradient(circle at 50% 30%, rgba(16,185,129,0.18), transparent 60%);
+}
+#memorize-btn-wrapper.stable .btn-style-neon {
+  box-shadow: 0 0 28px rgba(16,185,129,0.45), inset 0 0 16px rgba(16,185,129,0.35);
+  background: radial-gradient(circle at 50% 30%, rgba(16,185,129,0.30), transparent 60%);
+}
+
+/* Style: Glass Core */
+.btn-style-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+#memorize-btn-wrapper.stable .btn-style-glass {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset, 0 8px 26px rgba(16,185,129,0.25);
+}
+
+/* Style: Radar Lock-On */
+.btn-style-radar {
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.04) 45%, transparent 48%),
+              conic-gradient(from 0deg, transparent 0deg, rgba(16,185,129,0.15) 30deg, transparent 60deg);
+  border: 2px solid rgba(16,185,129,0.35);
+  box-shadow: 0 0 12px rgba(16,185,129,0.12) inset;
+}
+.btn-style-radar::before {
+  content: "";
+  position: absolute; inset: -25%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent, rgba(16,185,129,0.22), transparent);
+  animation: radarSpin 2.6s linear infinite;
+}
+#memorize-btn-wrapper.stable .btn-style-radar {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(16,185,129,0.35) inset, 0 0 42px rgba(16,185,129,0.25);
+}
+#memorize-btn-wrapper.stable .btn-style-radar::before {
+  animation-play-state: paused; opacity: .15;
+}
+@keyframes radarSpin { to { transform: rotate(360deg); } }
+
+/* Z-index corrections for modals */
+#settings-modal, #clipping-help-modal, #main-help-modal, #settings-help-modal, #onboarding-modal {
+  z-index: 100;
+}

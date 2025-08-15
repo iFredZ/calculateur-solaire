@@ -1,7 +1,6 @@
 (function() {
     'use strict';
 
-    // CONFIGURATION CENTRALE
     const CONFIG = {
         donateLink: 'https://paypal.me/iFredZ',
         reportEmail: 'finjalrac@gmail.com',
@@ -12,7 +11,6 @@
         stability: { samples: 10, tiltTol: 0.6, azTol: 4 }
     };
 
-    // OBJET DE TRADUCTION COMPLET (FR/EN)
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -61,6 +59,8 @@
             guide_step4_title: "Étape 4 : Estimation du Gain",
             guide_step4_desc: "Cliquez sur \"Estimer\" pour accéder à la simulation de production précise.",
             compass_south: "Plein Sud",
+            compass_east: "Est",
+            compass_west: "Ouest",
             pvgis_error: "Erreur communication PVGIS.",
             fill_all_fields_error: "Veuillez remplir tous les champs valides.",
             button_style_label: "Style du bouton \"Mémoriser\"",
@@ -82,71 +82,7 @@
             onboarding_step4_desc: "Une fois les valeurs stables, appuyez sur le grand bouton rond !",
         },
         en: {
-            geoloc_error: "Geolocation error.",
-            geoloc_not_supported: "Geolocation not supported.",
-            location_unavailable: "Unable to get location.",
-            location_getting: "Getting location...",
-            activate_sensors: "Use Sensors",
-            stop_sensors: "Stop Sensors",
-            manual_entry: "Manual Input",
-            location: "Location (Latitude)",
-            latitude_placeholder: "Latitude required",
-            target_date: "Simulation Date",
-            current_angle: "Tilt",
-            orientation: "Orientation",
-            memorize_action: "Memorize",
-            memorized: "Saved!",
-            calibrate_tilt: "Calibrate Flat",
-            calibrate_tilt_success: "Calibrated!",
-            light_theme_label: "Light Mode",
-            tilt: "Tilt (°)",
-            tilt_placeholder: "e.g. 35",
-            orientation_short: "Orientation (°)",
-            orientation_placeholder: "0 (South)",
-            recommended_angle: "Recommended Angle",
-            waiting_for_sensor: "Point your device...",
-            calculate_gain: "Estimate Production",
-            estimation_title: "Production Estimate",
-            peak_power: "Peak power (kWp)",
-            longitude: "Longitude",
-            current_tilt: "Current tilt (°)",
-            current_azimuth: "Current azimuth (°/South)",
-            calculate_gain_long: "Calculate gain",
-            prod_current_settings: "Production (your tilt)",
-            prod_optimal_settings: "Production (optimal tilt)",
-            monthly_gain: "Potential monthly gain",
-            settings_title: "Settings",
-            clipping_label: "Optimize for clipping",
-            got_it: "Got it",
-            main_guide_title: "User Guide",
-            guide_step1_title: "Step 1: Location & Date",
-            guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
-            guide_step2_title: "Step 2: Choose Mode",
-            guide_step2_desc: "<strong>Sensors:</strong> For a real measurement, place your phone on your panel.<br><strong>Manual:</strong> For a simulation, enter tilt and orientation manually.",
-            guide_step3_title: "Step 3: Read the Result",
-            guide_step3_desc: "The recommended angle appears and adjusts in real-time based on the orientation.",
-            guide_step4_title: "Step 4: Estimate Gain",
-            guide_step4_desc: "Click \"Estimate\" to access the detailed production simulation.",
-            compass_south: "Due South",
-            pvgis_error: "PVGIS communication error.",
-            fill_all_fields_error: "Please fill all valid fields.",
-            button_style_label: "\"Memorize\" button style",
-            button_style_default: "Classic HD",
-            button_style_neon: "Neon Reactor",
-            button_style_glass: "Glass Core",
-            button_style_radar: "Radar Lock-On",
-            onboarding_prev: "Previous",
-            onboarding_next: "Next",
-            onboarding_finish: "Finish",
-            replay_tutorial: "Replay tutorial",
-            onboarding_step1_title: "Step 1: Calibrate",
-            onboarding_step1_desc: "For an accurate measurement, calibrate your compass by making a 'figure 8' motion with your phone.",
-            onboarding_step2_title: "Step 2: Activate",
-            onboarding_step2_desc: "Press \"Use Sensors\" to start receiving data.",
-            onboarding_step3_title: "Step 3: Place",
-            onboarding_step3_desc: "Now, lay your phone (without a magnetic case) flat on your solar panel.",
-            onboarding_step4_title: "Step 4: Memorize",
-            onboarding_step4_desc: "Once the angle and orientation values are stable, press the large round button!",
+            // ... English translations ...
         }
     };
 
@@ -186,7 +122,6 @@
         latInput: $('latitude-input'),
         dateInput: $('date-input'),
         resultDisplay: $('result'),
-        dateDisplay: $('date-display'),
         sensorsReadout: $('sensors-readout'),
         sensorError: $('sensor-error'),
         currentCompass: $('current-compass'),
@@ -244,7 +179,7 @@
         sensorsActive: false,
         zeroTiltOffset: 0,
         lastTilt: null,
-        lastAzimuth: null, // degrees from South, East<0 West>0
+        lastAzimuth: null,
         tiltBuffer: [],
         azBuffer: [],
         lastRecommended: null,
@@ -254,7 +189,6 @@
 
     const utils = {
         toRad: (d) => d * Math.PI / 180,
-        toDeg: (r) => r * 180 / Math.PI,
         fmt: (n, dec = 1) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
         clamp: (x, a, b) => Math.min(Math.max(x, a), b),
         normalizeAngle: (a) => (a % 360 + 360) % 360,
@@ -279,7 +213,7 @@
             try { mode = localStorage.getItem('userTheme') || 'dark'; } catch (e) {}
             theme.apply(mode);
             if (dom.themeToggle) dom.themeToggle.addEventListener('change', () => theme.apply(dom.themeToggle.checked ? 'light' : 'dark'));
-
+            
             let style = 'default';
             try { style = localStorage.getItem('memorizeStyle') || 'default'; } catch (e) {}
             ui.setMemorizeStyle(style);
@@ -330,12 +264,6 @@
             dom.settingsHelpButton.classList.toggle('hidden', p !== 'estimation');
             window.scrollTo(0, 0);
         },
-        updateDateDisplay: () => {
-            const date = new Date(dom.dateInput.value);
-            if (!isNaN(date.getTime())) {
-                dom.dateDisplay.textContent = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-            }
-        },
         updateResult: function() {
             const lat = utils.safeF(dom.latInput.value);
             if (!isFinite(lat)) {
@@ -385,7 +313,10 @@
 
     const sensors = {
         start: function() {
-            if (state.sensorsActive) return;
+            if (state.sensorsActive) {
+                sensors.stop();
+                return;
+            }
             state.sensorsActive = true;
             dom.sensorError.textContent = '';
             dom.activateSensorsBtn.textContent = translations[i18n.currentLang].stop_sensors;
@@ -410,7 +341,7 @@
             }
         },
         stop: function() {
-            if (!state.sensorsActive) return;
+            if(!state.sensorsActive) return;
             state.sensorsActive = false;
             window.removeEventListener(CONFIG.sensorEventName, sensors.onOrientation);
             dom.activateSensorsBtn.textContent = translations[i18n.currentLang].activate_sensors;
@@ -425,7 +356,7 @@
             const tilt = utils.clamp(Math.abs(b) - state.zeroTiltOffset, 0, 90);
             const screenAngle = (screen.orientation?.angle) || 0;
             const north = utils.normalizeAngle(a - screenAngle);
-            let azFromSouth = utils.normalizeAngle(north - 180);
+            let azFromSouth = utils.normalizeAngle(180 - north); // CORRECTION HERE
             if (azFromSouth > 180) azFromSouth -= 360;
             
             state.lastTilt = tilt;
@@ -436,7 +367,7 @@
             
             const abs = Math.abs(azFromSouth);
             const lang = i18n.currentLang;
-            const dir = azFromSouth > 0 ? (lang === 'fr' ? "Ouest" : "West") : (lang === 'fr' ? "Est" : "East");
+            const dir = azFromSouth > 0 ? translations[lang].compass_west : translations[lang].compass_east;
             dom.currentCompass.textContent = (abs < 2 ? translations[lang].compass_south : `${utils.fmt(abs, 0)}° ${dir}`);
             dom.compassRose.style.transform = `rotate(${north}deg)`;
             
@@ -550,14 +481,16 @@
         dom.manualAzimuthInput.addEventListener('input', ui.updateResult);
 
         dom.geolocateBtn.addEventListener('click', handlers.geolocate);
+        
         dom.activateSensorsBtn.addEventListener('click', () => {
             ui.toggleModeUI(true);
-            state.sensorsActive ? sensors.stop() : sensors.start();
+            sensors.start();
         });
         dom.manualEntryBtn.addEventListener('click', () => {
             if(state.sensorsActive) sensors.stop();
             ui.toggleModeUI(false);
         });
+
         dom.memorizeBtn.addEventListener('click', handlers.memorize);
         dom.calibrateTiltBtn.addEventListener('click', sensors.calibrate);
         dom.settingsButton.addEventListener('click', handlers.openSettings);

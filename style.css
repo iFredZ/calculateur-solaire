@@ -26,7 +26,7 @@
     --info-box-bg: #f1f5f9;
 }
 body {
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg);
     color: var(--fg);
     -webkit-tap-highlight-color: transparent;
@@ -98,8 +98,8 @@ input, .bg-input {
     margin-top: 0.25rem;
 }
 .cockpit-display {
-    width: 220px;
-    height: 220px;
+    width: 190px;
+    height: 190px;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(65, 209, 183, 0.05) 90%);
     border: 2px solid var(--border-color);

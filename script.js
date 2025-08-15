@@ -12,7 +12,7 @@
         stability: { samples: 10, tiltTol: 0.6, azTol: 4 }
     };
 
-    // OBJET DE TRADUCTION COMPLET
+    // OBJET DE TRADUCTION COMPLET (FR/EN)
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -52,8 +52,14 @@
             clipping_label: "Optimiser pour l'écrêtage",
             got_it: "Compris",
             main_guide_title: "Guide d'Utilisation",
-            guide_step1_desc: "<strong class='text-fg'>Étape 1 : Localisation & Date</strong><br>Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
-            guide_step2_desc: "<strong class='text-fg'>Étape 2 : Choix du Mode</strong><br><strong>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation manuellement.",
+            guide_step1_title: "Étape 1 : Localisation & Date",
+            guide_step1_desc: "Assurez-vous que votre latitude est correcte (utilisez le GPS si besoin) et que la date cible est bien celle souhaitée.",
+            guide_step2_title: "Étape 2 : Choix du Mode",
+            guide_step2_desc: "<strong>Capteurs :</strong> Pour une mesure réelle, posez le téléphone sur votre panneau.<br><strong>Manuel :</strong> Pour une simulation, entrez l'inclinaison et l'orientation manuellement.",
+            guide_step3_title: "Étape 3 : Lecture du Résultat",
+            guide_step3_desc: "L'angle recommandé s'affiche et s'ajuste en temps réel en fonction de l'orientation.",
+            guide_step4_title: "Étape 4 : Estimation du Gain",
+            guide_step4_desc: "Cliquez sur \"Estimer\" pour accéder à la simulation de production précise.",
             compass_south: "Plein Sud",
             pvgis_error: "Erreur communication PVGIS.",
             fill_all_fields_error: "Veuillez remplir tous les champs valides.",
@@ -113,8 +119,14 @@
             clipping_label: "Optimize for clipping",
             got_it: "Got it",
             main_guide_title: "User Guide",
-            guide_step1_desc: "<strong class='text-fg'>Step 1: Location & Date</strong><br>Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
-            guide_step2_desc: "<strong class='text-fg'>Step 2: Choose Mode</strong><br><strong>Sensors:</strong> For a real measurement, place your phone on your panel.<br><strong>Manual:</strong> For a simulation, enter tilt and orientation manually.",
+            guide_step1_title: "Step 1: Location & Date",
+            guide_step1_desc: "Ensure your latitude is correct (use GPS if needed) and the target date is set as desired.",
+            guide_step2_title: "Step 2: Choose Mode",
+            guide_step2_desc: "<strong>Sensors:</strong> For a real measurement, place your phone on your panel.<br><strong>Manual:</strong> For a simulation, enter tilt and orientation manually.",
+            guide_step3_title: "Step 3: Read the Result",
+            guide_step3_desc: "The recommended angle appears and adjusts in real-time based on the orientation.",
+            guide_step4_title: "Step 4: Estimate Gain",
+            guide_step4_desc: "Click \"Estimate\" to access the detailed production simulation.",
             compass_south: "Due South",
             pvgis_error: "PVGIS communication error.",
             fill_all_fields_error: "Please fill all valid fields.",
@@ -198,7 +210,6 @@
         calibrateTiltBtn: $('calibrate-tilt-btn'),
         settingsModal: $('settings-modal'),
         settingsHelpButton: $('settings-help-button'),
-        clippingHelpButton: $('clipping-help-button'),
         backButton: $('back-button'),
         peakPower: $('peak-power'),
         lonInput: $('longitude-input'),
@@ -302,8 +313,8 @@
     const ui = {
         setMemorizeStyle: function(style) {
             if (!dom.memorizeBtn) return;
-            const classList = "w-[150px] h-[150px] rounded-full text-[var(--fg)] flex items-center justify-center transition-all duration-300 ease-in-out relative z-10 text-xl overflow-hidden font-exo";
-            dom.memorizeBtn.className = classList;
+            dom.memorizeBtn.className = '';
+            dom.memorizeBtn.classList.add('w-[150px]', 'h-[150px]', 'rounded-full', 'text-[var(--fg)]', 'flex', 'items-center', 'justify-center', 'transition-all', 'duration-300', 'ease-in-out', 'relative', 'z-10', 'text-xl', 'overflow-hidden', 'font-exo');
             
             if (style === 'neon') dom.memorizeBtn.classList.add('btn-style-neon');
             else if (style === 'glass') dom.memorizeBtn.classList.add('btn-style-glass');
@@ -339,7 +350,7 @@
             let panelDev = 0;
             if (state.entryMode === 'sensors' && state.lastAzimuth !== null) {
                 panelDev = state.lastAzimuth;
-            } else if(state.entryMode === 'manual' && dom.manualAzimuthInput.value !== '') {
+            } else if (state.entryMode === 'manual' && dom.manualAzimuthInput.value !== '') {
                 const man = utils.safeF(dom.manualAzimuthInput.value);
                 if (isFinite(man)) panelDev = man;
             }
@@ -357,6 +368,18 @@
             
             state.lastRecommended = optimalTilt;
             dom.resultDisplay.textContent = Math.round(optimalTilt) + '°';
+        },
+        toggleModeUI: function(isSensors) {
+            state.entryMode = isSensors ? 'sensors' : 'manual';
+            
+            dom.sensorsReadout.classList.toggle('hidden', !isSensors);
+            dom.memorizeContainer.classList.toggle('hidden', !isSensors);
+            dom.memorizeContainer.classList.toggle('flex', isSensors);
+            dom.manualEntryDisplay.classList.toggle('hidden', isSensors);
+
+            dom.activateSensorsBtn.classList.toggle('btn-danger', isSensors);
+            dom.manualEntryBtn.classList.toggle('btn-danger', !isSensors);
+            dom.manualEntryBtn.classList.toggle('btn-secondary', isSensors);
         }
     };
 
@@ -365,7 +388,6 @@
             if (state.sensorsActive) return;
             state.sensorsActive = true;
             dom.sensorError.textContent = '';
-            dom.activateSensorsBtn.classList.add('btn-danger');
             dom.activateSensorsBtn.textContent = translations[i18n.currentLang].stop_sensors;
             state.tiltBuffer = [];
             state.azBuffer = [];
@@ -388,9 +410,9 @@
             }
         },
         stop: function() {
+            if (!state.sensorsActive) return;
             state.sensorsActive = false;
             window.removeEventListener(CONFIG.sensorEventName, sensors.onOrientation);
-            dom.activateSensorsBtn.classList.remove('btn-danger');
             dom.activateSensorsBtn.textContent = translations[i18n.currentLang].activate_sensors;
             dom.memorizeWrapper.classList.remove('stable');
             dom.memorizeBtn.disabled = true;
@@ -413,8 +435,9 @@
             dom.inclinometerLine.style.transform = `rotate(${utils.clamp(b - state.zeroTiltOffset, -90, 90)}deg)`;
             
             const abs = Math.abs(azFromSouth);
-            const dir = azFromSouth > 0 ? "Ouest" : "Est";
-            dom.currentCompass.textContent = (abs < 2 ? translations[i18n.currentLang].compass_south : `${utils.fmt(abs, 0)}° ${dir}`);
+            const lang = i18n.currentLang;
+            const dir = azFromSouth > 0 ? (lang === 'fr' ? "Ouest" : "West") : (lang === 'fr' ? "Est" : "East");
+            dom.currentCompass.textContent = (abs < 2 ? translations[lang].compass_south : `${utils.fmt(abs, 0)}° ${dir}`);
             dom.compassRose.style.transform = `rotate(${north}deg)`;
             
             state.tiltBuffer.push(tilt); if (state.tiltBuffer.length > CONFIG.stability.samples) state.tiltBuffer.shift();
@@ -527,8 +550,14 @@
         dom.manualAzimuthInput.addEventListener('input', ui.updateResult);
 
         dom.geolocateBtn.addEventListener('click', handlers.geolocate);
-        dom.activateSensorsBtn.addEventListener('click', () => { state.sensorsActive ? sensors.stop() : ui.setEntryMode('sensors'); });
-        dom.manualEntryBtn.addEventListener('click', () => ui.setEntryMode('manual'));
+        dom.activateSensorsBtn.addEventListener('click', () => {
+            ui.toggleModeUI(true);
+            state.sensorsActive ? sensors.stop() : sensors.start();
+        });
+        dom.manualEntryBtn.addEventListener('click', () => {
+            if(state.sensorsActive) sensors.stop();
+            ui.toggleModeUI(false);
+        });
         dom.memorizeBtn.addEventListener('click', handlers.memorize);
         dom.calibrateTiltBtn.addEventListener('click', sensors.calibrate);
         dom.settingsButton.addEventListener('click', handlers.openSettings);

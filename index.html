@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-T">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Opti Solar v4.1.2</title>
+    <title>Opti Solar v4.1.3</title>
     
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <link rel="stylesheet" href="style.css?v=4.1.2">
+    <link rel="stylesheet" href="style.css?v=4.1.3">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -57,7 +57,7 @@
                     <p id="location-error" class="text-xs text-red-400 h-4 text-center" role="alert"></p>
                 </div>
                 
-                <div id="result-container" class="flex justify-center pt-4">
+                <div id="result-container" class="flex justify-center">
                     <div class="cockpit-display">
                         <p class="text-xs text-muted" data-i18n="recommended_angle">Angle Recommandé</p>
                         <p id="result" class="text-6xl font-bold text-teal-400 my-1">--°</p>
@@ -129,6 +129,9 @@
                  <button type="button" id="back-button" class="absolute top-4 left-4 icon-btn btn-secondary">
                      <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
                  </button>
+                 <button type="button" id="close-settings-btn" class="absolute top-4 right-4 icon-btn btn-secondary">
+                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                 </button>
                 <h2 class="text-2xl font-bold text-center pt-8 text-accent-blue" data-i18n="estimation_title">Estimation de Production</h2>
                 <div class="space-y-4 mt-6">
                     <div>
@@ -145,8 +148,8 @@
                         <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md">
                     </div>
                      <div>
-                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth">Orientation actuelle (°/Sud)</label>
-                        <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+                        <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth">Orientation actuelle (Déviation / Sud)</label>
+                        <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md" data-i18n-placeholder="azimuth_placeholder">
                     </div>
                 </div>
                 <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg flex items-center justify-center">
@@ -159,7 +162,7 @@
                         <p id="current-production" class="text-2xl font-bold">-- kWh</p>
                     </div>
                     <div class="info-box p-4 rounded-lg text-center">
-                        <p class="text-sm text-green-300" data-i18n="prod_optimal_settings">Production (inclinaison optimale)</p>
+                        <p class="text-sm text-green-300" data-i18n="prod_optimal_settings">Production (inclinaison optimale pour VOTRE orientation)</p>
                         <p id="optimal-production" class="text-2xl font-bold text-green-300">-- kWh</p>
                     </div>
                      <div class="info-box p-4 rounded-lg text-center">
@@ -171,7 +174,7 @@
                         <p id="potential-gain-monthly" class="text-3xl font-bold text-blue-300">~ -- kWh</p>
                     </div>
                     <div class="info-box p-4 rounded-lg text-center border border-amber-500/50">
-                        <p class="text-sm text-amber-300" data-i18n="prod_truly_optimal_settings">Production IDÉALE (plein Sud)</p>
+                        <p class="text-sm text-amber-300" data-i18n="prod_truly_optimal_settings">Production IDÉALE (si orienté plein Sud)</p>
                         <p id="truly-optimal-production" class="text-2xl font-bold text-amber-300">-- kWh</p>
                     </div>
                 </div>
@@ -193,161 +196,12 @@
         <a id="bug-report-button" href="#" class="icon-btn text-yellow-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
         </a>
-         <p class="text-xs text-gray-600">v4.1.2</p>
+         <p class="text-xs text-gray-600">v4.1.3</p>
          <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </a>
     </footer>
     
-    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
-        <div class="w-full max-w-sm card rounded-lg shadow-lg">
-            <div class="flex justify-between items-center p-4 border-b border-border-color">
-                <h3 class="text-lg font-bold text-accent" data-i18n="settings_title">Réglages</h3>
-                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
-                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="p-4 space-y-6">
-                 <div class="flex items-center justify-between">
-                    <label for="clipping-checkbox" class="font-medium flex items-center">
-                        <span data-i18n="clipping_label">Optimiser pour l'écrêtage</span>
-                        <button type="button" id="clipping-help-button" class="ml-2 p-1 rounded-full bg-input hover:bg-btn-secondary-bg">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.07-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </button>
-                    </label>
-                    <input type="checkbox" id="clipping-checkbox" class="h-5 w-5 rounded bg-input border-border-color-input text-accent focus:ring-accent">
-                </div>
-                 <div class="flex items-center justify-between">
-                     <label for="theme-toggle" class="font-medium" data-i18n="light_theme_label"></label>
-                     <div class="theme-switch-wrapper">
-                         <label class="theme-switch" for="theme-toggle">
-                             <input type="checkbox" id="theme-toggle" />
-                             <div class="slider"></div>
-                         </label>
-                     </div>
-                </div>
-                <div class="space-y-2">
-                    <label class="font-medium" data-i18n="button_style_label"></label>
-                    <fieldset class="space-y-2">
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_default"></span>
-                            <input type="radio" name="memorize-style" value="default" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_neon"></span>
-                            <input type="radio" name="memorize-style" value="neon" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_glass"></span>
-                            <input type="radio" name="memorize-style" value="glass" class="memorize-style-radio">
-                        </label>
-                        <label class="flex items-center justify-between p-2 rounded border border-gray-700">
-                            <span data-i18n="button_style_radar"></span>
-                            <input type="radio" name="memorize-style" value="radar" class="memorize-style-radio">
-                        </label>
-                    </fieldset>
-                </div>
-                 <div class="pt-4 border-t border-border-color">
-                    <button type="button" id="calibrate-tilt-btn" class="w-full btn-secondary font-bold py-2 px-4 rounded-lg" data-i18n="calibrate_tilt">Calibrer à plat</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4">
-        <div class="card w-full max-w-lg p-5">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xl leading-6 font-bold text-accent" data-i18n="main_guide_title"></h3>
-                <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
-                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="mt-4 px-2 py-3 space-y-6">
-                 <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-input flex items-center justify-center"><svg class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="guide_step1_title"></h4><p class="text-sm text-muted mt-1" data-i18n="guide_step1_desc"></p></div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-input flex items-center justify-center"><svg class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="guide_step2_title"></h4><p class="text-sm text-muted mt-1" data-i18n="guide_step2_desc"></p></div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-input flex items-center justify-center"><svg class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="guide_step3_title"></h4><p class="text-sm text-muted mt-1" data-i18n="guide_step3_desc"></p></div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-input flex items-center justify-center"><svg class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="guide_step4_title"></h4><p class="text-sm text-muted mt-1" data-i18n="guide_step4_desc"></p></div>
-                </div>
-            </div>
-            <div class="items-center px-4 pt-3 flex gap-4">
-                <button type="button" id="replay-tutorial-btn" class="px-4 py-2 btn-primary rounded-md w-full" data-i18n="replay_tutorial">Revoir le tutoriel</button>
-                <button type="button" class="close-modal-btn px-4 py-2 btn-secondary rounded-md w-full" data-i18n="got_it">Compris</button>
-            </div>
-        </div>
-    </div>
-    <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
-        <div class="card w-full max-w-lg p-5">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="estimation_guide_title"></h3>
-                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
-                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="mt-4 px-2 py-3 space-y-6">
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center"><svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="estimation_guide_step1_title"></h4><p class="text-sm text-gray-400 mt-1" data-i18n="estimation_guide_step1_desc"></p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
-        <div class="card w-full max-w-lg p-5">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="clipping_title"></h3>
-                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
-                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="mt-4 px-2 py-3 space-y-4">
-                 <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center"><svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
-                    <div><h4 class="font-bold text-lg" data-i18n="clipping_problem_title"></h4><p class="text-sm text-gray-400 mt-1" data-i18n="clipping_problem_desc"></p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
-        <div class="card w-full max-w-sm rounded-2xl p-6 text-center flex flex-col shadow-2xl">
-            <div class="flex-grow">
-                <div class="onboarding-slide">
-                    <img src="etape1_calibrage.png" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step1_title"></h3><p class="text-gray-400" data-i18n="onboarding_step1_desc"></p>
-                </div>
-                <div class="onboarding-slide hidden">
-                    <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step2_title"></h3><p class="text-gray-400" data-i18n="onboarding_step2_desc"></p>
-                </div>
-                <div class="onboarding-slide hidden">
-                    <img src="etape3_placement.png" alt="Illustration placement" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step3_title"></h3><p class="text-gray-400" data-i18n="onboarding_step3_desc"></p>
-                </div>
-                <div class="onboarding-slide hidden">
-                    <img src="etape4_memorisation.png" alt="Illustration mémorisation" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step4_title"></h3><p class="text-gray-400" data-i18n="onboarding_step4_desc"></p>
-                </div>
-            </div>
-            <div id="onboarding-dots" class="flex justify-center gap-2 my-4">
-                <div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div><div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div><div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div><div class="onboarding-dot h-2 w-2 rounded-full bg-gray-600"></div>
-            </div>
-            <div class="flex justify-between items-center mt-4">
-                <button id="onboarding-prev-btn" class="btn-secondary px-4 py-2 rounded-lg invisible" data-i18n="onboarding_prev">Précédent</button>
-                <button id="onboarding-next-btn" class="btn-primary px-4 py-2 rounded-lg" data-i18n="onboarding_next">Suivant</button>
-                <button id="onboarding-finish-btn" class="btn-primary px-4 py-2 rounded-lg hidden" data-i18n="onboarding_finish">Terminer</button>
-            </div>
-        </div>
-    </div>
-    
-    <script src="script.js?v=4.1.2" defer></script>
+    <script src="script.js?v=4.1.3" defer></script>
 </body>
 </html>

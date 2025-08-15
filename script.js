@@ -11,7 +11,6 @@
         sensorEventName: ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation'
     };
     
-    // FIX: Ajout de la traduction anglaise complète
     const translations = {
         fr: {
             geoloc_error: "Erreur géoloc.",
@@ -212,8 +211,7 @@
         tiltOffset: 0,
         isStable: false,
         lastReadings: [],
-        // FIX: Augmentation du seuil de tolérance pour la stabilité
-        stabilityThreshold: 2.0, // Tolérance de 2 degrés au lieu de 0.5
+        stabilityThreshold: 2.0,
         stabilityBuffer: 5,
         lastCurrentProd: null,
         lastOptimalProd: null,
@@ -292,7 +290,10 @@
         toRadians: (deg) => deg * Math.PI / 180,
         getDayOfYear: (date) => Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000),
         getDeclination: (dayOfYear) => -23.44 * Math.cos(utils.toRadians((360 / 365) * (dayOfYear + 10))),
-        formatNumber: (n, dec = 2) => Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }),
+        formatNumber: (n, dec = 2) => {
+            if (n === null || isNaN(n)) return '--';
+            return Number(n).toLocaleString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })
+        },
         safeParseFloat: (v, fallback = NaN) => {
             if (v === null || v === undefined || v === '') return fallback;
             const s = String(v).replace(',', '.').trim();
@@ -330,7 +331,7 @@
     const i18n = {
         currentLang: 'fr',
         setLanguage: function(lang) {
-            if (!translations[lang] || !translations[lang].compass_west) return; // Sécurité
+            if (!translations[lang] || !translations[lang].compass_west) return;
             this.currentLang = lang;
             document.documentElement.lang = lang;
             localStorage.setItem('userLang', lang);
@@ -577,8 +578,9 @@
         savePeakPower: () => {
             localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
         },
+        // FIX: Fonction PDF entièrement réécrite pour être plus robuste
         exportToPDF: () => {
-            if (!state.lastCurrentProd || !state.lastOptimalProd) {
+            if (!state.lastCurrentProd || !state.lastOptimalProd || !state.lastTrulyOptimalProd) {
                 alert(translations[i18n.currentLang].export_error_no_data);
                 return;
             }
@@ -589,13 +591,16 @@
 
             const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
             
-            const reportElement = document.createElement('div');
-            // FIX: Utilisation de utils.formatNumber pour garantir l'affichage
+            // Préparation sécurisée des variables
             const curMonthlyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_m);
             const optMonthlyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_m);
             const trulyOptMonthlyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_m);
+            const currentTilt = dom.currentTiltInput.value || '--';
+            const currentAzimuth = dom.currentAzimuthInput.value || '--';
+            const recommendedTilt = state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--';
+            const gainMonthly = dom.potentialGainMonthlyDisplay.textContent || '~ -- kWh';
 
-            reportElement.innerHTML = `
+            let html = `
                 <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
                     <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
                     <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
@@ -620,19 +625,19 @@
                         <tbody>
                             <tr style="background-color: #f1f5f9;">
                                 <td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentTiltInput.value}°</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${currentTilt}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td>
                                 <td style="padding: 8px; border: 1px solid #ddd;">${curMonthlyProd} kWh</td>
                             </tr>
                             <tr>
                                 <td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
-                                <td style="padding: 8px; border: 1px solid #ddd;">${dom.currentAzimuthInput.value}° / Sud</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${recommendedTilt}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td>
                                 <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #065f46;">${optMonthlyProd} kWh</td>
                             </tr>
                              <tr style="background-color: #f1f5f9;">
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--'}°</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${recommendedTilt}°</td>
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td>
                                 <td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptMonthlyProd} kWh</td>
                             </tr>
@@ -641,7 +646,7 @@
 
                      <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
                      <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${dom.potentialGainMonthlyDisplay.textContent}</td></tr>
+                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainMonthly}</td></tr>
                     </table>
                     
                     <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
@@ -655,6 +660,9 @@
                     </div>
                 </div>
             `;
+            
+            const reportElement = document.createElement('div');
+            reportElement.innerHTML = html;
 
             const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
             html2pdf().from(reportElement).set({

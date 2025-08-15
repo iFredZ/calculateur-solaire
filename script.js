@@ -62,6 +62,61 @@
             pvgis_error: "Erreur communication PVGIS.",
             sensors_activating: "Activation des capteurs...",
         },
+
+const dom = {
+        mainPage: document.getElementById('main-page'),
+        settingsPage: document.getElementById('settings-page'),
+        latitudeInput: document.getElementById('latitude-input'),
+        dateInput: document.getElementById('date-input'),
+        dateDisplay: document.getElementById('date-display'),
+        getLocationButton: document.getElementById('get-location'),
+        locationError: document.getElementById('location-error'),
+        activateSensorsButton: document.getElementById('activate-sensors-button'),
+        manualEntryButton: document.getElementById('manual-entry-button'),
+        resultDisplay: document.getElementById('result'),
+        sensorsReadout: document.getElementById('sensors-readout'),
+        currentAngleDisplay: document.getElementById('current-angle'),
+        currentCompassDisplay: document.getElementById('current-compass'),
+        manualEntryDisplay: document.getElementById('manual-entry-display'),
+        manualTiltInput: document.getElementById('manual-tilt-input'),
+        manualAzimuthInput: document.getElementById('manual-azimuth-input'),
+        memorizeContainer: document.getElementById('memorize-container'),
+        memorizeBtnWrapper: document.getElementById('memorize-btn-wrapper'),
+        memorizeRingBtn: document.getElementById('memorize-ring-btn'),
+        memorizeBtnText: document.getElementById('memorize-btn-text'),
+        memorizeCheckmarkIcon: document.getElementById('memorize-checkmark-icon'),
+        sensorError: document.getElementById('sensor-error'),
+        gotoEstimationButton: document.getElementById('goto-estimation-button'),
+        backButton: document.getElementById('back-button'),
+        settingsButton: document.getElementById('settings-button'),
+        mainHelpButton: document.getElementById('main-help-button'),
+        compassRoseContainer: document.getElementById('compass-rose-container'),
+        inclinometerLineContainer: document.getElementById('inclinometer-line-container'),
+        peakPowerInput: document.getElementById('peak-power'),
+        longitudeInput: document.getElementById('longitude-input'),
+        currentTiltInput: document.getElementById('current-tilt-input'),
+        currentAzimuthInput: document.getElementById('current-azimuth-input'),
+        calculateProductionButton: document.getElementById('calculate-production'),
+        calculateText: document.getElementById('calculate-text'),
+        calculateLoader: document.getElementById('calculate-loader'),
+        productionResults: document.getElementById('production-results'),
+        currentProductionDisplay: document.getElementById('current-production'),
+        optimalProductionDisplay: document.getElementById('optimal-production'),
+        potentialGainMonthlyDisplay: document.getElementById('potential-gain-monthly'),
+        pvgisError: document.getElementById('pvgis-error'),
+        exportContainer: document.getElementById('export-container'),
+        exportPdfBtn: document.getElementById('export-pdf-btn'),
+        trulyOptimalProductionDisplay: document.getElementById('truly-optimal-production'),
+        donationMessage: document.getElementById('donation-message'),
+        bugReportButton: document.getElementById('bug-report-button'),
+        donateButtonFab: document.getElementById('donate-button-fab'),
+        settingsModal: document.getElementById('settings-modal'),
+        mainHelpModal: document.getElementById('main-help-modal'),
+        clippingCheckbox: document.getElementById('clipping-checkbox'),
+        calibrateTiltBtn: document.getElementById('calibrate-tilt-btn'),
+        clippingHelpButton: document.getElementById('clipping-help-button'),
+        settingsHelpButton: document.getElementById('settings-help-button'),
+    };
     ,
 en: {
                     geoloc_error: "Geolocation error.",
@@ -247,10 +302,23 @@ en: {
             dom.settingsPage.classList.toggle('hidden', page !== 'settings');
             dom.mainHelpButton.classList.toggle('hidden', page !== 'main');
             dom.settingsHelpButton.classList.toggle('hidden', page !== 'settings');
+        
+            toggleHelpIcons();
         }
     };
 
-    const calculations = {
+    
+    // Ensure only one help icon is visible (main vs settings)
+    function toggleHelpIcons(){
+        try{
+            const modalOpen = dom.settingsModal && !dom.settingsModal.classList.contains('hidden');
+            const settingsPageVisible = dom.settingsPage && !dom.settingsPage.classList.contains('hidden');
+            const useSettingsHelp = !!(modalOpen || settingsPageVisible);
+            if(dom.mainHelpButton) dom.mainHelpButton.classList.toggle('hidden', useSettingsHelp);
+            if(dom.settingsHelpButton) dom.settingsHelpButton.classList.toggle('hidden', !useSettingsHelp);
+        }catch(e){}
+    }
+const calculations = {
         calculateAndDisplayAll: () => {
             const lat = utils.safeParseFloat(dom.latitudeInput.value);
             const dateValue = dom.dateInput.value;
@@ -575,7 +643,7 @@ en: {
     };
     
     function init() {
-        i18n.setLanguage('fr');
+        ui.showPage('main'); toggleHelpIcons(); i18n.setLanguage('fr');
         dom.latitudeInput.value = CONFIG.defaultLatitude.toFixed(5);
         state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
         
@@ -603,13 +671,13 @@ en: {
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
         dom.bugReportButton.addEventListener('click', handlers.openBugReport);
 
-        if(dom.settingsButton) dom.settingsButton.addEventListener('click', () => dom.settingsModal.classList.remove('hidden'));
+        if(dom.settingsButton) dom.settingsButton.addEventListener('click', () => { dom.settingsModal.classList.remove('hidden'); toggleHelpIcons(); });
         if(dom.mainHelpButton) dom.mainHelpButton.addEventListener('click', () => dom.mainHelpModal.classList.remove('hidden'));
         if(dom.settingsHelpButton && dom.settingsHelpModal){ dom.settingsHelpButton.addEventListener('click', ()=> dom.settingsHelpModal.classList.remove('hidden')); }
         if(dom.clippingHelpButton && dom.clippingHelpModal){ dom.clippingHelpButton.addEventListener('click', ()=> dom.clippingHelpModal.classList.remove('hidden')); }
 
         document.querySelectorAll('.close-modal-btn').forEach(btn => 
-            btn.addEventListener('click', (e) => e.target.closest('.fixed').classList.add('hidden'))
+            btn.addEventListener('click', (e) => { e.target.closest('.fixed').classList.add('hidden'); toggleHelpIcons(); })
         );
         if(dom.calibrateTiltBtn) dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
     }

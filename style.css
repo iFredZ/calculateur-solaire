@@ -398,3 +398,60 @@ input:checked + .slider:before { transform: translateX(24px); }
   animation: sheenMove 4.6s ease-in-out infinite;
 }
 @keyframes sheenMove{0%{transform:translateX(-60%)}50%{transform:translateX(60%)}100%{transform:translateX(160%)}}
+
+
+
+/* === Splash Overlay (covers app) v3 === */
+.splash-overlay{position:fixed; inset:0; z-index:2147483647; background:#000; color:var(--fg, #eaf1ff); --gold:#ffd56a; --titleY:34vh;}
+/* hide any legacy splash underneath */
+#pg-splash, .pg-splash, #pg-zoom, .pg-zoom{display:none !important;}
+.splash-overlay.exit{opacity:0; transition:opacity .38s ease; pointer-events:none;}
+.splash-overlay .topHalo,
+.splash-overlay .sky,
+.splash-overlay .hud,
+.splash-overlay .titleWrap,
+.splash-overlay .cta{position:absolute;}
+.splash-overlay .topHalo{inset:0;}
+.splash-overlay .sky{inset:0;}
+.splash-overlay .hud{left:50%; bottom:3vh; transform:translateX(-50%); width:min(94vmin,980px); text-align:center; pointer-events:none;}
+.splash-overlay .titleWrap{left:0; right:0; top: var(--titleY); transform:translateY(-50%); display:grid; place-items:center;}
+.splash-overlay .titleSvg{width:min(84vw, 1000px); height:auto;}
+.splash-overlay .cta{left:50%; transform:translateX(-50%); bottom:22px; text-align:center; z-index:2;}
+.splash-overlay .splash-btn{border:1px solid rgba(255,255,255,.18);color:var(--fg, #eaf1ff);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.25));padding:10px 14px;border-radius:12px;cursor:pointer;backdrop-filter:blur(6px);transition:transform .15s ease,border-color .2s ease,background .2s ease;font-weight:600;opacity:0;transform:translateY(6px)}
+.splash-overlay .splash-btn.show{opacity:1; transform:none; transition:opacity .4s ease, transform .4s ease;}
+.splash-overlay .splash-btn:hover{transform:translateY(-1px);border-color:rgba(255,213,106,.5)}
+/* HUD visuals */
+.splash-overlay .curve{fill:none;stroke:#23d3ee;stroke-width:2;filter:drop-shadow(0 0 8px rgba(35,211,238,.35))}
+.splash-overlay .curve-p{stroke:#ffd56a;filter:drop-shadow(0 0 8px rgba(255,213,106,.35))}
+.splash-overlay .grid{stroke:rgba(255,255,255,.15);stroke-width:1}
+.splash-overlay .axis{stroke:rgba(255,255,255,.28);stroke-width:1.4}
+.splash-overlay .label{fill:rgba(255,255,255,.6);font: 12px/1.2 system-ui, sans-serif}
+.splash-overlay .stars{opacity:.32;animation:twinkle 6s ease-in-out infinite;
+  background-image:
+    radial-gradient(1px 1px at 12% 28%,rgba(255,255,255,.9) 50%,transparent 51%),
+    radial-gradient(1px 1px at 72% 14%,rgba(255,255,255,.6) 50%,transparent 51%),
+    radial-gradient(1px 1px at 25% 70%,rgba(255,255,255,.7) 50%,transparent 51%),
+    radial-gradient(1px 1px at 88% 80%,rgba(255,255,255,.55) 50%,transparent 51%);
+  background-size: 420px 420px; background-repeat:repeat;
+}
+.splash-overlay .particles{position:absolute;inset:0;overflow:hidden}
+.splash-overlay .spark{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--gold);filter:blur(.3px);opacity:0;will-change:transform,opacity}
+.splash-overlay .topHalo::before{
+  content:""; position:absolute; left:50%; top:-56vmin; transform:translateX(-50%);
+  width:220vmin; height:150vmin; border-radius:50%;
+  background:radial-gradient(ellipse at 50% 88%,rgba(255,213,106,.55) 0%,rgba(255,184,47,.38) 28%,rgba(255,184,47,.18) 52%,rgba(255,184,47,.08) 68%,transparent 78%);
+  filter: blur(18px); opacity:1;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 32%, transparent 56%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 32%, transparent 56%);
+  animation: haloBreath 9s ease-in-out infinite alternate;
+}
+.splash-overlay .topHalo::after{
+  content:""; position:absolute; left:50%; top:-60vmin; transform:translateX(-50%);
+  width:210vmin; height:146vmin; border-radius:50%; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(255,213,106,.22) 0%, rgba(255,184,47,.08) 22%, transparent 46%),radial-gradient(ellipse at 50% 92%, transparent 74%, rgba(255,213,106,.85) 82%, transparent 88%);
+  filter: blur(10px); opacity:.95;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 50%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 50%);
+}
+@keyframes twinkle{0%,100%{opacity:.22}50%{opacity:.46}}
+@keyframes haloBreath{ from{ filter: blur(20px); opacity:.9 } to { filter: blur(26px); opacity:.7 } }

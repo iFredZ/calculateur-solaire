@@ -999,15 +999,16 @@
   if (typeof window === 'undefined') return;
   const splash = document.getElementById('pg-splash');
   if (!splash) return;
+  
   // Option pour désactiver: ?nosplash=1
-  const bypass = /[?&]nosplash=1/.test(location.search);
-  if (sessionStorage.getItem('pg_splash_seen') || bypass){
-    splash.classList.add('pg-hide'); // s'assurer qu'il est masqué si on ne joue pas l'anim
+  const bypass = /[?&]nosplash=1 /.test(location.search);
+  if (bypass){
+    splash.classList.add('pg-hide');
     return;
   }
-  // On va l'afficher : retirer pg-hide et marquer vu
+
+  // On va l'afficher : retirer pg-hide
   splash.classList.remove('pg-hide');
-  sessionStorage.setItem('pg_splash_seen','1');
 
   const needle = document.getElementById('pg-needle');
   function setAngle(a){
@@ -1086,4 +1087,56 @@
   }
   // small zoom effect class
   splash.classList.add('pg-zoom');
+})();
+
+
+// === Splash Overlay controller v3 ===
+(function(){
+  const overlay = document.getElementById('splashOverlay');
+  if(!overlay) return;
+  // Ensure any legacy splash never shows
+  document.getElementById('pg-splash')?.remove();
+  document.querySelector('.pg-splash')?.remove();
+  document.getElementById('pg-zoom')?.remove();
+  document.querySelector('.pg-zoom')?.remove();
+
+  let particleTimer = null;
+  function makeSpark(){
+    const box=overlay.querySelector('#particles'); const W=window.innerWidth, H=window.innerHeight;
+    const s=document.createElement('div'); s.className='spark'; box.appendChild(s);
+    const x=Math.random()*W; const size = 1 + Math.random()*1.5;
+    s.style.width=size+'px'; s.style.height=size+'px';
+    const startY=H + 10 + Math.random()*30;
+    const dx=(Math.random()-.5)*80; const dy= - (H + 120 + Math.random()*160);
+    const dur= 5200 + Math.random()*2400;
+    s.style.left=x+'px'; s.style.top=startY+'px';
+    const anim = s.animate([{opacity:0, transform:'translate(0,0) scale(1)'},{opacity:.8, offset:.15},{opacity:0, transform:`translate(${dx}px, ${dy}px) scale(${1+Math.random()*0.5})`}], {duration:dur, easing:'ease-out', fill:'both'});
+    anim.onfinish=()=> s.remove();
+  }
+  function spawnParticles(){
+    if(particleTimer) clearInterval(particleTimer);
+    for(let i=0;i<24;i++) makeSpark();
+    particleTimer = setInterval(()=>{ for(let i=0;i<6;i++) makeSpark(); }, 260);
+  }
+  function animateCurves(){
+    const iv=overlay.querySelector('#iv'); const pv=overlay.querySelector('#pv');
+    [iv,pv].forEach(p=>{ if(!p) return; const len=p.getTotalLength(); p.style.strokeDasharray=len; p.style.strokeDashoffset=len; p.getBoundingClientRect(); p.style.transition='stroke-dashoffset 1200ms ease-out'; p.style.strokeDashoffset='0'; });
+  }
+  const SPLASH_MS = 3400;
+  let exitTimer = null, exiting = false;
+  function exitSplash(){
+    if(exiting) return; exiting = true;
+    if(particleTimer) clearInterval(particleTimer);
+    if(exitTimer) clearTimeout(exitTimer);
+    overlay.classList.add('exit');
+    setTimeout(()=> overlay.remove(), 420);
+  }
+  function startSequence(){
+    animateCurves();
+    spawnParticles();
+    setTimeout(()=>{ overlay.querySelectorAll('.splash-btn').forEach(b=>b.classList.add('show')); }, 600);
+    exitTimer = setTimeout(exitSplash, SPLASH_MS);
+  }
+  overlay.querySelector('#continueBtn')?.addEventListener('click', exitSplash);
+  window.addEventListener('load', startSequence);
 })();

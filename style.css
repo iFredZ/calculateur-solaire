@@ -30,6 +30,9 @@ body {
     background-color: var(--bg);
     color: var(--fg);
     -webkit-tap-highlight-color: transparent;
+    /* CORRECTION : Empêche le zoom du système de modifier la taille du texte */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 .card {
     background-color: var(--card);
@@ -127,7 +130,8 @@ input::placeholder { color: var(--muted); }
     box-shadow: none;
     animation: none;
 }
-.compass-rose, .inclinometer-line { transition: transform 0.2s ease-out; }
+/* MODIFICATION : transition désactivée pour la boussole pour laisser le JS gérer l'animation en continu */
+.inclinometer-line { transition: transform 0.2s ease-out; }
 .info-box { background-color: var(--info-box-bg); }
 
 main { flex: 1 0 auto; }

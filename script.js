@@ -84,13 +84,14 @@
             onboarding_prev: "Précédent",
             onboarding_next: "Suivant",
             onboarding_finish: "Terminer",
-            compass_north: "N",
+            compass_north: "NORD",
             compass_south: "SUD",
-            compass_east: "E",
-            compass_west: "O",
+            compass_east: "EST",
+            compass_west: "OUEST",
             fill_all_fields_error: "Veuillez remplir tous les champs.",
             settings_already_optimal: "Vos réglages actuels sont déjà optimaux.",
             pvgis_error: "Erreur communication PVGIS.",
+            offline_error: "Pas de connexion internet.",
             export_pdf: "Exporter en PDF",
             exporting_pdf: "Génération...",
             export_error_no_data: "Faites d’abord un calcul de production.",
@@ -178,13 +179,14 @@
             onboarding_prev: "Previous",
             onboarding_next: "Next",
             onboarding_finish: "Finish",
-            compass_north: "N",
+            compass_north: "NORTH",
             compass_south: "SOUTH",
-            compass_east: "E",
-            compass_west: "W",
+            compass_east: "EAST",
+            compass_west: "WEST",
             fill_all_fields_error: "Please fill all fields.",
             settings_already_optimal: "Your current settings are already optimal.",
             pvgis_error: "PVGIS communication error.",
+            offline_error: "No internet connection.",
             export_pdf: "Export to PDF",
             exporting_pdf: "Generating...",
             export_error_no_data: "Please run a production estimate first.",
@@ -211,8 +213,9 @@
         tiltOffset: 0,
         isStable: false,
         lastReadings: [],
-        stabilityThreshold: 2.0,
+        stabilityThreshold: 4.0, /* MODIFICATION : Seuil de stabilité augmenté de 2.0 à 4.0 */
         stabilityBuffer: 5,
+        continuousHeading: null, /* AJOUT : Pour une rotation fluide de la boussole */
         lastCurrentProd: null,
         lastOptimalProd: null,
         lastTrulyOptimalProd: null,
@@ -323,6 +326,13 @@
                 oscillator.stop(audioCtx.currentTime + 0.15);
             } catch (e) {
                 utils.log("Web Audio API failed", e);
+            }
+        },
+        openExternalUrl: async (url) => {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+                await window.Capacitor.Plugins.Browser.open({ url: url });
+            } else {
+                window.open(url, '_blank');
             }
         }
     };
@@ -453,14 +463,17 @@
             const tolerance = 5;
 
             if (azimuth >= (360 - tolerance) || azimuth <= tolerance) return translations[lang].compass_north;
+            if (Math.abs(azimuth - 90) <= tolerance) return translations[lang].compass_east;
             if (Math.abs(azimuth - 180) <= tolerance) return translations[lang].compass_south;
+            if (Math.abs(azimuth - 270) <= tolerance) return translations[lang].compass_west;
             
             let deviation = azimuth - 180;
             if (deviation > 180) deviation -= 360;
             if (deviation < -180) deviation += 360;
             
             const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
-            return `${Math.round(deviation)}°${direction}`;
+            const dirSymbol = direction === translations[lang].compass_east ? translations[lang].compass_east[0] : translations[lang].compass_west[0];
+            return `${Math.abs(Math.round(deviation))}° ${dirSymbol}`;
         },
         handleOrientation: (event) => {
             const now = performance.now();
@@ -478,7 +491,18 @@
             if (heading !== null) {
                 state.panelAzimuthLive = utils.normalizeAngle(heading);
                 dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
-                dom.compassRoseContainer.style.transform = `rotate(${state.panelAzimuthLive}deg)`;
+
+                // --- MODIFICATION : Logique pour la rotation fluide de la boussole ---
+                if (state.continuousHeading === null) {
+                    state.continuousHeading = state.panelAzimuthLive;
+                } else {
+                    let diff = state.panelAzimuthLive - (state.continuousHeading % 360);
+                    if (diff > 180) diff -= 360;
+                    if (diff < -180) diff += 360;
+                    state.continuousHeading += diff;
+                }
+                dom.compassRoseContainer.style.transition = 'transform 0.2s linear'; // Assurer une transition fluide
+                dom.compassRoseContainer.style.transform = `rotate(${state.continuousHeading}deg)`;
             }
 
             if (tilt !== null && heading !== null) {
@@ -505,6 +529,7 @@
             window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
             state.sensorsActive = false;
             state.panelAzimuthLive = null;
+            state.continuousHeading = null; // Réinitialiser la boussole
             sensors.setStable(false);
             state.lastReadings = [];
             dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
@@ -544,6 +569,13 @@
                 dom.sensorError.textContent = translations[i18n.currentLang].invalid_measurements;
                 return;
             }
+
+            state.memorizedTilt = tilt;
+            state.memorizedAzimuthValue = az;
+            
+            // --- AJOUT : Retour haptique ---
+            utils.playSuccessNotification();
+
             dom.memorizeBtnText.classList.add('hidden');
             dom.memorizeCheckmarkIcon.classList.remove('hidden');
             
@@ -555,9 +587,6 @@
                     dom.memorizeBtnText.textContent = translations[i18n.currentLang].memorize_action;
                 }, 1500);
             }, 700);
-
-            state.memorizedTilt = tilt;
-            state.memorizedAzimuthValue = az;
         },
         replayTutorial: () => {
             dom.mainHelpModal.classList.add('hidden');
@@ -716,6 +745,12 @@
             const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
             
             const strategies = [
+                // AJOUT : Tentative directe en premier
+                async () => {
+                    const res = await fetchWithTimeout(pvgisUrl, {}, 5000); // Timeout plus court
+                    if (!res.ok) throw new Error('Direct PVGIS fetch failed');
+                    return await res.json();
+                },
                 async () => {
                      const proxyUrl = `https://api.allorigins.win/json?url=${encodeURIComponent(pvgisUrl)}`;
                      const res = await fetchWithTimeout(proxyUrl, {}, 8000);
@@ -759,6 +794,14 @@
             dom.donationMessage.classList.add('hidden');
             dom.calculateLoader.classList.remove('hidden');
             dom.calculateText.classList.add('hidden');
+
+            // AJOUT : Vérification de la connexion internet
+            if (navigator.onLine === false) {
+                dom.pvgisError.textContent = translations[i18n.currentLang].offline_error;
+                dom.calculateText.classList.remove('hidden'); 
+                dom.calculateLoader.classList.add('hidden'); 
+                return;
+            }
 
             const lat = utils.safeParseFloat(dom.latitudeInput.value); 
             const lon = utils.safeParseFloat(dom.longitudeInput.value); 
@@ -955,8 +998,12 @@
         });
         dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
         dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
+        
+        // MODIFICATION : Utilisation du Browser Plugin
         dom.bugReportButton.addEventListener('click', handlers.openBugReport);
-		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); window.open(CONFIG.donateLink, '_blank'); });
+		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
+        dom.donateButtonFab.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
+
         dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
         dom.closeSettingsBtn.addEventListener('click', () => ui.showPage('main'));
@@ -993,35 +1040,24 @@
         // =================================================================
         // GESTION DU BOUTON "RETOUR" ANDROID
         // =================================================================
-        // On vérifie d'abord que Capacitor est bien là pour éviter les erreurs
         if (window.Capacitor && Capacitor.isPluginAvailable('App')) {
-        
-            // On dit à l'application : "Écoute attentivement si l'utilisateur appuie sur le bouton Retour"
             Capacitor.Plugins.App.addListener('backButton', (event) => {
-
-                // Par défaut, le bouton retour FERME l'application.
-                // La ligne suivante dit au téléphone : "Stop ! Ne fais rien pour l'instant, c'est moi qui gère."
                 event.preventDefault();
 
-                // --- Maintenant, on décide quoi faire, dans l'ordre de priorité ---
-
-                // 1. Est-ce qu'une fenêtre "modale" (aide, réglages, tutoriel) est ouverte ?
-                const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
-                if (openModal) {
-                    // Si oui, on la ferme simplement.
-                    openModal.classList.add('hidden');
-                    return; // Et on s'arrête là.
+                // MODIFICATION : Détection élargie pour inclure les splash screens
+                const openElement = document.querySelector('.fixed.inset-0:not(.hidden), #splashOverlay:not(.exit), #pg-splash:not(.pg-hide)');
+                if (openElement) {
+                    if (openElement.id === 'splashOverlay') openElement.classList.add('exit');
+                    else if (openElement.id === 'pg-splash') openElement.classList.add('pg-hide');
+                    else openElement.classList.add('hidden');
+                    return;
                 }
 
-                // 2. Sinon, est-ce qu'on est sur la page d'estimation/réglages ?
                 if (!dom.settingsPage.classList.contains('hidden')) {
-                    // Si oui, on retourne à la page principale.
                     ui.showPage('main');
-                    return; // Et on s'arrête là.
+                    return;
                 }
                 
-                // 3. Si on n'est dans aucun des cas précédents, ça veut dire qu'on est sur l'écran principal.
-                // On peut donc fermer l'application.
                 Capacitor.Plugins.App.exitApp();
             });
         }

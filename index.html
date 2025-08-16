@@ -14,9 +14,9 @@
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <link rel="stylesheet" href="style.css?v=4.1.7">
-	<link rel="stylesheet" href="style2.css?v=4.1.7">
-    <link rel="stylesheet" href="style-solar.css?v=4.1.7">
+    <link rel="stylesheet" href="style.css?v=4.1.8">
+	<link rel="stylesheet" href="style2.css?v=4.1.8">
+    <link rel="stylesheet" href="style-solar.css?v=4.1.8">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -196,19 +196,19 @@
     </main>
     
     <footer class="flex-shrink-0 w-full max-w-lg mx-auto p-4 flex justify-between items-center">
-        <a id="bug-report-button" href="#" class="icon-btn text-yellow-400">
+        <button type="button" id="bug-report-button" class="icon-btn text-yellow-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-        </a>
-         <p class="text-xs text-gray-600">v4.1.7</p>
-         <a id="donate-button-fab" href="https://paypal.me/iFredZ" target="_blank" class="icon-btn text-red-400">
+        </button>
+         <p class="text-xs text-gray-600">v4.1.8</p>
+         <button type="button" id="donate-button-fab" class="icon-btn text-red-400">
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </a>
+        </button>
     </footer>
     
-    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
         <div class="w-full max-w-sm card rounded-lg shadow-lg">
             <div class="flex justify-between items-center p-4 border-b border-border-color">
-                <h3 class="text-lg font-bold text-accent" data-i18n="settings_title">Réglages</h3>
+                <h3 id="settings-modal-title" class="text-lg font-bold text-accent" data-i18n="settings_title">Réglages</h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -246,10 +246,10 @@
             </div>
         </div>
     </div>
-    <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4">
+    <div id="main-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="main-help-modal-title">
         <div class="card w-full max-w-lg p-5">
             <div class="flex justify-between items-center">
-                <h3 class="text-xl leading-6 font-bold text-accent" data-i18n="main_guide_title"></h3>
+                <h3 id="main-help-modal-title" class="text-xl leading-6 font-bold text-accent" data-i18n="main_guide_title"></h3>
                 <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-btn-secondary-bg">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -278,10 +278,10 @@
             </div>
         </div>
     </div>
-    <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
+    <div id="settings-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="settings-help-modal-title">
         <div class="card w-full max-w-lg p-5">
             <div class="flex justify-between items-center">
-                <h3 class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="estimation_guide_title"></h3>
+                <h3 id="settings-help-modal-title" class="text-xl leading-6 font-bold text-teal-300 page-title" data-i18n="estimation_guide_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -298,10 +298,10 @@
             </div>
         </div>
     </div>
-    <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog">
+    <div id="clipping-help-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="clipping-help-modal-title">
         <div class="card w-full max-w-lg p-5">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="clipping_title"></h3>
+                <h3 id="clipping-help-modal-title" class="text-lg leading-6 font-bold text-teal-300 page-title" data-i18n="clipping_title"></h3>
                  <button type="button" class="close-modal-btn p-1 rounded-full hover:bg-gray-700">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -318,12 +318,12 @@
             </div>
         </div>
     </div>
-    <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
+    <div id="onboarding-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="onboarding-title-1">
         <div class="card w-full max-w-sm rounded-2xl p-6 text-center flex flex-col shadow-2xl">
             <div class="flex-grow">
                 <div class="onboarding-slide">
                     <img src="etape1_calibrage.png" alt="Illustration calibrage" class="mx-auto h-32 mb-4">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step1_title"></h3><p class="text-gray-400" data-i18n="onboarding_step1_desc"></p>
+                    <h3 id="onboarding-title-1" class="text-xl font-bold mb-2 text-teal-300" data-i18n="onboarding_step1_title"></h3><p class="text-gray-400" data-i18n="onboarding_step1_desc"></p>
                 </div>
                 <div class="onboarding-slide hidden">
                     <img src="etape2_activation.png" alt="Illustration activation" class="mx-auto h-32 mb-4">
@@ -349,9 +349,8 @@
         </div>
     </div>
     
-    <script src="script.js?v=4.1.7" defer></script>
+    <script src="script.js?v=4.1.8" defer></script>
 
-    <!-- Splash "Photon Grid" - overlay non intrusif -->
     <div id="pg-splash" class="splash-pg pg-hide" aria-hidden="true" role="presentation">
       <div class="pg-wrap">
         <div class="pg-logo">
@@ -360,13 +359,11 @@
           <span class="pg-title" id="pg-appname">Solar Setup</span>
         </div>
 
-        <!-- Globe stylisé avec position -->
         <div class="pg-globe" aria-hidden="true">
           <div class="pg-grid"></div>
           <div class="pg-location" id="pg-loc"></div>
         </div>
 
-        <!-- Scène panneau solaire + soleil est-ouest -->
         <div class="pg-scene" aria-hidden="true">
           <div class="pg-sky">
             <div class="pg-sun"></div>
@@ -385,8 +382,7 @@
     </div>
     </div>
     
-<!-- Splash Overlay (Opti Solar) -->
-<div id="splashOverlay" class="splash-overlay" role="dialog" aria-label="Splash Opti Solar">
+<div id="splashOverlay" class="splash-overlay" role="dialog" aria-modal="true" aria-label="Splash Opti Solar">
   <div class="topHalo" aria-hidden="true"></div>
   <div class="sky" aria-hidden="true">
     <div class="stars"></div>

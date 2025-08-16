@@ -213,7 +213,7 @@
         tiltOffset: 0,
         isStable: false,
         lastReadings: [],
-        stabilityThreshold: 4.0, /* MODIFICATION : Seuil de stabilité augmenté de 2.0 à 4.0 */
+        stabilityThreshold: 5.5, /* MODIFICATION : Seuil de stabilité augmenté de 4.0 à 5.5 */
         stabilityBuffer: 5,
         continuousHeading: null, /* AJOUT : Pour une rotation fluide de la boussole */
         lastCurrentProd: null,
@@ -329,9 +329,11 @@
             }
         },
         openExternalUrl: async (url) => {
-            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
-                await window.Capacitor.Plugins.Browser.open({ url: url });
-            } else {
+            try {
+                const { Browser } = Capacitor.Plugins;
+                await Browser.open({ url: url });
+            } catch (e) {
+                utils.log("Capacitor Browser plugin not available, falling back to window.open", e);
                 window.open(url, '_blank');
             }
         }
@@ -472,7 +474,7 @@
             if (deviation < -180) deviation += 360;
             
             const direction = deviation < 0 ? translations[lang].compass_east : translations[lang].compass_west;
-            const dirSymbol = direction === translations[lang].compass_east ? translations[lang].compass_east[0] : translations[lang].compass_west[0];
+            const dirSymbol = (direction === translations[lang].compass_east || direction === "EST") ? "E" : "O"; // Utiliser E/O pour les intermédiaires
             return `${Math.abs(Math.round(deviation))}° ${dirSymbol}`;
         },
         handleOrientation: (event) => {
@@ -501,7 +503,7 @@
                     if (diff < -180) diff += 360;
                     state.continuousHeading += diff;
                 }
-                dom.compassRoseContainer.style.transition = 'transform 0.2s linear'; // Assurer une transition fluide
+                dom.compassRoseContainer.style.transition = 'transform 0.1s linear';
                 dom.compassRoseContainer.style.transform = `rotate(${state.continuousHeading}deg)`;
             }
 
@@ -543,7 +545,7 @@
         openBugReport: (event) => {
             event.preventDefault();
             const subject = "Suggestion / Bug pour Opti Solar";
-            window.location.href = `mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`;
+            utils.openExternalUrl(`mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`);
         },
         prepareEstimationPage: () => {
             if (state.entryMode === 'manual') {
@@ -634,7 +636,7 @@
             
             const reportElement = document.createElement('div');
             reportElement.innerHTML = `
-                <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+                <div style="font-family: Arial, sans-serif; padding: 40px; color: #333; width: 210mm;">
                     <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
                     <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                     <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
@@ -669,6 +671,11 @@
                     </div>
                 </div>
             `;
+            
+            // --- MODIFICATION PDF : Attacher l'élément au DOM de manière invisible ---
+            reportElement.style.position = 'absolute';
+            reportElement.style.left = '-9999px';
+            document.body.appendChild(reportElement);
 
             const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
             html2pdf().from(reportElement).set({
@@ -678,6 +685,11 @@
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).save().then(() => {
+                document.body.removeChild(reportElement); // Nettoyer l'élément du DOM
+                btn.disabled = false;
+                btn.querySelector('span').textContent = originalText;
+            }).catch(() => {
+                document.body.removeChild(reportElement); // S'assurer de nettoyer même en cas d'erreur
                 btn.disabled = false;
                 btn.querySelector('span').textContent = originalText;
             });
@@ -1000,7 +1012,7 @@
         dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
         
         // MODIFICATION : Utilisation du Browser Plugin
-        dom.bugReportButton.addEventListener('click', handlers.openBugReport);
+        dom.bugReportButton.addEventListener('click', (e) => { e.preventDefault(); handlers.openBugReport(e); });
 		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
         dom.donateButtonFab.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
 
@@ -1011,7 +1023,7 @@
         dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 
         document.querySelectorAll('.close-modal-btn').forEach(btn => 
-            btn.addEventListener('click', (e) => e.target.closest('.fixed.inset-0').classList.add('hidden'))
+            btn.addEventListener('click', (e) => e.target.closest('.fixed.inset-0, .splash-overlay').classList.add('hidden'))
         );
         [dom.settingsButton, dom.mainHelpButton, dom.settingsHelpButton, dom.clippingHelpButton].forEach(btn => {
             btn.addEventListener('click', () => {

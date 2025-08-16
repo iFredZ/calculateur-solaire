@@ -989,6 +989,42 @@
         dom.dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         
         calculations.calculateAndDisplayAll();
+
+        // =================================================================
+        // GESTION DU BOUTON "RETOUR" ANDROID
+        // =================================================================
+        // On vérifie d'abord que Capacitor est bien là pour éviter les erreurs
+        if (window.Capacitor && Capacitor.isPluginAvailable('App')) {
+        
+            // On dit à l'application : "Écoute attentivement si l'utilisateur appuie sur le bouton Retour"
+            Capacitor.Plugins.App.addListener('backButton', (event) => {
+
+                // Par défaut, le bouton retour FERME l'application.
+                // La ligne suivante dit au téléphone : "Stop ! Ne fais rien pour l'instant, c'est moi qui gère."
+                event.preventDefault();
+
+                // --- Maintenant, on décide quoi faire, dans l'ordre de priorité ---
+
+                // 1. Est-ce qu'une fenêtre "modale" (aide, réglages, tutoriel) est ouverte ?
+                const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+                if (openModal) {
+                    // Si oui, on la ferme simplement.
+                    openModal.classList.add('hidden');
+                    return; // Et on s'arrête là.
+                }
+
+                // 2. Sinon, est-ce qu'on est sur la page d'estimation/réglages ?
+                if (!dom.settingsPage.classList.contains('hidden')) {
+                    // Si oui, on retourne à la page principale.
+                    ui.showPage('main');
+                    return; // Et on s'arrête là.
+                }
+                
+                // 3. Si on n'est dans aucun des cas précédents, ça veut dire qu'on est sur l'écran principal.
+                // On peut donc fermer l'application.
+                Capacitor.Plugins.App.exitApp();
+            });
+        }
     }
     
     window.addEventListener('load', init);

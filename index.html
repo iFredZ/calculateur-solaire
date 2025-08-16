@@ -6,17 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Opti Solar</title>
     
-    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@capacitor/core@5.7.4/dist/capacitor.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <link rel="stylesheet" href="style.css?v=4.2.0">
-	<link rel="stylesheet" href="style2.css?v=4.2.0">
-    <link rel="stylesheet" href="style-solar.css?v=4.2.0">
+    <link rel="stylesheet" href="tailwind.app.css">    
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css?v=4.3.0">
+	<link rel="stylesheet" href="style2.css?v=4.3.0">
+    <link rel="stylesheet" href="style-solar.css?v=4.3.0">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -49,7 +44,7 @@
             <div id="main-page">
                 <div class="space-y-3">
                     <div class="max-w-xs mx-auto">
-                        <label class="block text-sm font-medium text-muted mb-1 text-center" data-i18n="location">Localisation (Latitude)</label>
+                        <label class="block text-sm font-medium text-muted mb-1 text-center" for="latitude-input" data-i18n="location">Localisation (Latitude)</label>
                         <div class="flex items-center gap-2">
                             <input type="number" id="latitude-input" step="any" class="bg-input block w-full p-2 rounded-md shadow-sm text-center" data-i18n-placeholder="latitude_placeholder">
                             <button type="button" id="get-location" title="Utiliser ma position" class="p-2 bg-input rounded-md hover:bg-btn-secondary-bg transition-colors flex-shrink-0">
@@ -73,7 +68,11 @@
                         <button type="button" id="manual-entry-button" class="btn-secondary font-bold py-3 px-4 rounded-lg" data-i18n="manual_entry">Saisie Manuelle</button>
                     </div>
                     
-                    <div id="sensors-readout" class="hidden grid grid-cols-2 gap-4 text-center pt-4">
+                    <div id="sensors-readout" class="relative hidden grid grid-cols-2 gap-4 text-center pt-4">
+					<p id="sensor-warning" class="absolute -bottom-6 left-0 right-0 hidden text-xs text-amber-300 text-center flex items-center justify-center gap-2" role="status">
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    <span data-i18n="sensor_warning_text"></span>
+</p>
                          <div class="info-box p-3 rounded-lg">
                             <p class="text-sm font-medium text-muted" data-i18n="orientation">Orientation</p>
                              <div class="relative w-16 h-16 mx-auto mt-1">
@@ -111,10 +110,12 @@
                             <div>
                                 <label for="manual-tilt-input" class="block text-sm font-medium text-muted mb-1" data-i18n="tilt">Inclinaison</label>
                                 <input type="number" id="manual-tilt-input" class="bg-input w-full p-2 rounded-md text-center" data-i18n-placeholder="tilt_placeholder">
+								<p id="manual-tilt-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                             </div>
                             <div>
                                 <label for="manual-azimuth-input" class="block text-sm font-medium text-muted mb-1" data-i18n="orientation_short">Orientation</label>
                                 <input type="number" id="manual-azimuth-input" class="bg-input w-full p-2 rounded-md text-center" data-i18n-placeholder="orientation_placeholder">
+								<p id="manual-azimuth-error" class="text-xs text-red-400 h-4 mt-1 text-center" role="alert"></p>
                             </div>
                         </div>
                     </div>
@@ -123,7 +124,7 @@
                 <button type="button" id="goto-estimation-button" class="w-full bg-accent-blue text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center text-center mt-4" data-i18n="calculate_gain">Estimer la Production</button>
 
                 <div class="mt-4">
-                     <label for="date-input" class="block text-sm font-medium text-muted mb-2 text-center" data-i18n="target_date">Date de Simulation</label>
+                     <label for="date-input" class="block text-sm font-medium text-muted mb-2 text-center" for="date-input" data-i18n="target_date">Date de Simulation</label>
                      <input type="date" id="date-input" class="w-full p-2 rounded-lg shadow-sm bg-input">
                 </div>
             </div>
@@ -140,19 +141,23 @@
                     <div>
                         <label for="peak-power" class="block text-sm font-medium text-gray-400" data-i18n="peak_power">Puissance crête (kWc)</label>
                         <input type="number" id="peak-power" class="mt-1 block w-full p-2 bg-input rounded-md">
+						<p id="peak-power-error" class="text-xs text-red-400 h-4 mt-1"></p>
                     </div>
                     <div class="border-t border-border-color"></div>
                      <div>
                         <label for="longitude-input" class="block text-sm font-medium text-gray-400" data-i18n="longitude">Longitude</label>
                         <input type="number" id="longitude-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+						<p id="longitude-error" class="text-xs text-red-400 h-4 mt-1"></p>
                     </div>
                     <div>
                         <label for="current-tilt-input" class="block text-sm font-medium text-gray-400" data-i18n="current_tilt">Inclinaison actuelle (°)</label>
                         <input type="number" id="current-tilt-input" class="mt-1 block w-full p-2 bg-input rounded-md">
+						<p id="current-tilt-error" class="text-xs text-red-400 h-4 mt-1"></p>
                     </div>
                      <div>
                         <label for="current-azimuth-input" class="block text-sm font-medium text-gray-400" data-i18n="current_azimuth">Orientation actuelle (Déviation / Sud)</label>
                         <input type="number" id="current-azimuth-input" class="mt-1 block w-full p-2 bg-input rounded-md" data-i18n-placeholder="azimuth_placeholder">
+						<p id="current-azimuth-error" class="text-xs text-red-400 h-4 mt-1"></p>
                     </div>
                 </div>
                 <button type="button" id="calculate-production" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg flex items-center justify-center">
@@ -199,7 +204,7 @@
         <button type="button" id="bug-report-button" class="icon-btn text-yellow-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
         </button>
-         <p class="text-xs text-gray-600">v4.2.0</p>
+         <p class="text-xs text-gray-600">v4.3.0</p>
          <button type="button" id="donate-button-fab" class="icon-btn text-red-400">
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
@@ -348,8 +353,10 @@
             </div>
         </div>
     </div>
-    
-    <script src="script.js?v=4.2.0" defer></script>
+	<script src="logo.js"></script>
+    <script src="jspdf.min.js"></script>
+	<script src="jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js?v=4.3.0" defer></script>
 
     <div id="pg-splash" class="splash-pg pg-hide" aria-hidden="true" role="presentation">
       <div class="pg-wrap">

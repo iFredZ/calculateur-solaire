@@ -106,6 +106,7 @@
             button_style_neon: "Néon",
             button_style_glass: "Verre",
             button_style_radar: "Radar",
+			sensor_warning_text: "Attention aux interférences magnétiques (coques, métal)."
         },
         en: {
             geoloc_error: "Geolocation error.",
@@ -201,6 +202,7 @@
             button_style_neon: "Neon",
             button_style_glass: "Glass",
             button_style_radar: "Radar",
+			sensor_warning_text: "Warning: Magnetic interference (cases, metal)."
         }
     };
 
@@ -213,9 +215,9 @@
         tiltOffset: 0,
         isStable: false,
         lastReadings: [],
-        stabilityThreshold: 5.5, /* MODIFICATION : Seuil de stabilité augmenté de 4.0 à 5.5 */
+        stabilityThreshold: 5.5,
         stabilityBuffer: 5,
-        continuousHeading: null, /* AJOUT : Pour une rotation fluide de la boussole */
+        continuousHeading: null, 
         lastCurrentProd: null,
         lastOptimalProd: null,
         lastTrulyOptimalProd: null,
@@ -494,7 +496,6 @@
                 state.panelAzimuthLive = utils.normalizeAngle(heading);
                 dom.currentCompassDisplay.textContent = sensors.formatAzimuthForDisplay(state.panelAzimuthLive);
 
-                // --- MODIFICATION : Logique pour la rotation fluide de la boussole ---
                 if (state.continuousHeading === null) {
                     state.continuousHeading = state.panelAzimuthLive;
                 } else {
@@ -519,6 +520,7 @@
             try {
                 window.addEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
                 state.sensorsActive = true;
+				document.getElementById('sensor-warning').classList.remove('hidden');
                 dom.activateSensorsButton.textContent = translations[i18n.currentLang].stop_sensors;
                 dom.activateSensorsButton.setAttribute('data-i18n', 'stop_sensors');
                 dom.sensorError.textContent = '';
@@ -530,8 +532,9 @@
             if (!state.sensorsActive) return;
             window.removeEventListener(CONFIG.sensorEventName, sensors.handleOrientation, true);
             state.sensorsActive = false;
+			document.getElementById('sensor-warning').classList.add('hidden');
             state.panelAzimuthLive = null;
-            state.continuousHeading = null; // Réinitialiser la boussole
+            state.continuousHeading = null;
             sensors.setStable(false);
             state.lastReadings = [];
             dom.activateSensorsButton.textContent = translations[i18n.currentLang].activate_sensors;
@@ -543,7 +546,6 @@
     
     const handlers = {
         openBugReport: (event) => {
-            event.preventDefault();
             const subject = "Suggestion / Bug pour Opti Solar";
             utils.openExternalUrl(`mailto:${CONFIG.reportEmail}?subject=${encodeURIComponent(subject)}`);
         },
@@ -575,7 +577,6 @@
             state.memorizedTilt = tilt;
             state.memorizedAzimuthValue = az;
             
-            // --- AJOUT : Retour haptique ---
             utils.playSuccessNotification();
 
             dom.memorizeBtnText.classList.add('hidden');
@@ -610,90 +611,213 @@
         savePeakPower: () => {
             localStorage.setItem('userPeakPower', dom.peakPowerInput.value);
         },
-        exportToPDF: () => {
-            if (!state.lastCurrentProd || !state.lastOptimalProd || !state.lastTrulyOptimalProd) {
-                alert(translations[i18n.currentLang].export_error_no_data);
-                return;
+        
+exportToPDF: async () => {
+    if (!state.lastCurrentProd || !state.lastOptimalProd || !state.lastTrulyOptimalProd) {
+        alert(translations[i18n.currentLang].export_error_no_data);
+        return;
+    }
+    const btn = dom.exportPdfBtn;
+    const span = btn ? btn.querySelector('span') : null;
+    const originalText = span ? span.textContent : '';
+    if (btn) btn.disabled = true;
+    if (span) span.textContent = translations[i18n.currentLang].exporting_pdf;
+
+    // Helper: quick reverse geocode (best-effort, short timeouts)
+    async function quickCityName(lat, lon) {
+        try {
+            lat = Number(lat); lon = Number(lon);
+            if (!isFinite(lat) || !isFinite(lon)) return null;
+            const headers = { 'Accept': 'application/json' };
+            function tmo(ms, p){ return new Promise((res, rej)=>{ const t=setTimeout(()=>rej(new Error('timeout')),ms); p.then(v=>{clearTimeout(t);res(v);},e=>{clearTimeout(t);rej(e);});}); }
+            async function tryOne(url){
+                try {
+                    const r = await tmo(1500, fetch(url, { headers }));
+                    if (!r.ok) return null;
+                    const data = await r.json();
+                    var name = '';
+                    if (data && data.nom) name = data.nom;
+                    else if (data && data.address) {
+                        name = data.address.city || data.address.town || data.address.village || data.address.municipality || '';
+                    } else if (data && data.display_name) {
+                        name = String(data.display_name).split(',')[0];
+                    }
+                    name = (name || '').trim();
+                    return name || null;
+                } catch(_) { return null; }
             }
-            const btn = dom.exportPdfBtn;
-            const originalText = btn.querySelector('span').textContent;
-            btn.disabled = true;
-            btn.querySelector('span').textContent = translations[i18n.currentLang].exporting_pdf;
+            var inFR = (lat >= 41 && lat <= 51.5 && lon >= -5.5 && lon <= 10);
+            var candidates = inFR
+              ? [
+                  'https://geo.api.gouv.fr/reverse?lat=' + lat + '&lon=' + lon,
+                  'https://geocode.maps.co/reverse?lat=' + lat + '&lon=' + lon,
+                  'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&zoom=10&addressdetails=1'
+                ]
+              : [
+                  'https://geocode.maps.co/reverse?lat=' + lat + '&lon=' + lon,
+                  'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&zoom=10&addressdetails=1'
+                ];
+            for (var i=0;i<candidates.length;i++){
+                var n = await tryOne(candidates[i]);
+                if (n) return n;
+            }
+        } catch(_){}
+        return null;
+    }
 
-            const gainDailyNum = state.lastOptimalProd.outputs.totals.fixed.E_d - state.lastCurrentProd.outputs.totals.fixed.E_d;
-            const gainMonthlyNum = gainDailyNum * 30.4;
-            const gainDailyText = gainDailyNum < 1 ? `~ ${Math.round(gainDailyNum * 1000)} Wh` : `~ ${utils.formatNumber(gainDailyNum)} kWh`;
-            const gainMonthlyText = `~ ${utils.formatNumber(gainMonthlyNum)} kWh`;
+    try {
+        var curDailyNum = Number(state.lastCurrentProd && state.lastCurrentProd.outputs && state.lastCurrentProd.outputs.totals && state.lastCurrentProd.outputs.totals.fixed && state.lastCurrentProd.outputs.totals.fixed.E_d) || 0;
+        var optDailyNum = Number(state.lastOptimalProd && state.lastOptimalProd.outputs && state.lastOptimalProd.outputs.totals && state.lastOptimalProd.outputs.totals.fixed && state.lastOptimalProd.outputs.totals.fixed.E_d) || 0;
+        var trulyOptDailyNum = Number(state.lastTrulyOptimalProd && state.lastTrulyOptimalProd.outputs && state.lastTrulyOptimalProd.outputs.totals && state.lastTrulyOptimalProd.outputs.totals.fixed && state.lastTrulyOptimalProd.outputs.totals.fixed.E_d) || 0;
+        if (optDailyNum < curDailyNum) optDailyNum = curDailyNum;
 
-            const formattedDate = new Date(dom.dateInput.value).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
-            const curDailyProd = utils.formatNumber(state.lastCurrentProd.outputs.totals.fixed.E_d);
-            const optDailyProd = utils.formatNumber(state.lastOptimalProd.outputs.totals.fixed.E_d);
-            const trulyOptDailyProd = utils.formatNumber(state.lastTrulyOptimalProd.outputs.totals.fixed.E_d);
-            const currentTilt = dom.currentTiltInput.value || '--';
-            const currentAzimuth = dom.currentAzimuthInput.value || '--';
-            const recommendedTilt = state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--';
-            const idealOptimalTilt = state.lastIdealOptimalTilt ? Math.round(state.lastIdealOptimalTilt) : recommendedTilt;
-            
-            const reportElement = document.createElement('div');
-            reportElement.innerHTML = `
-                <div style="font-family: Arial, sans-serif; padding: 40px; color: #333; width: 210mm;">
-                    <h1 style="color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">Rapport d'Optimisation Solaire</h1>
-                    <p style="text-align: right; font-size: 12px;">Généré par Opti Solar le ${new Date().toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US')}</p>
-                    <h2 style="color: #1d4ed8; margin-top: 30px;">Paramètres de la Simulation</h2>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">Localisation</td><td style="padding: 8px; border: 1px solid #ddd;">Lat ${dom.latitudeInput.value}, Lon ${dom.longitudeInput.value}</td></tr>
-                        <tr><td style="padding: 8px; border: 1px solid #ddd;">Date de référence</td><td style="padding: 8px; border: 1px solid #ddd;">${formattedDate}</td></tr>
-                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Puissance crête</td><td style="padding: 8px; border: 1px solid #ddd;">${dom.peakPowerInput.value} kWc</td></tr>
-                    </table>
-                    <h2 style="color: #1d4ed8; margin-top: 30px;">Comparatif de Production Journalière Estimée</h2>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                        <thead>
-                            <tr style="background-color: #1d4ed8; color: white; text-align: left;"><th style="padding: 8px;">Configuration</th><th style="padding: 8px;">Inclinaison</th><th style="padding: 8px;">Orientation</th><th style="padding: 8px;">Production Journalière</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd;">Actuelle</td><td style="padding: 8px; border: 1px solid #ddd;">${currentTilt}°</td><td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td><td style="padding: 8px; border: 1px solid #ddd;">${curDailyProd} kWh</td></tr>
-                            <tr><td style="padding: 8px; border: 1px solid #ddd;">Optimale (votre orientation)</td><td style="padding: 8px; border: 1px solid #ddd;">${recommendedTilt}°</td><td style="padding: 8px; border: 1px solid #ddd;">${currentAzimuth}° / Sud</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #065f46;">${optDailyProd} kWh</td></tr>
-                            <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">Idéale (plein Sud)</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${idealOptimalTilt}°</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">0° / Sud</td><td style="padding: 8px; border: 1px solid #ddd; font-style: italic;">${trulyOptDailyProd} kWh</td></tr>
-                        </tbody>
-                    </table>
-                     <h2 style="color: #1d4ed8; margin-top: 30px;">Gain Potentiel Estimé</h2>
-                     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                        <tr style="background-color: #f1f5f9;"><td style="padding: 8px; border: 1px solid #ddd; width: 40%;">${translations[i18n.currentLang].daily_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainDailyText}</td></tr>
-                        <tr><td style="padding: 8px; border: 1px solid #ddd;">${translations[i18n.currentLang].monthly_gain}</td><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1.2em; color: #1e40af;">${gainMonthlyText}</td></tr>
-                    </table>
-                    <div style="margin-top: 30px; padding: 15px; background-color: #f1f5f9; border-radius: 8px; font-size: 12px;">
-                        <h3 style="color: #1d4ed8; margin-top: 0;">${translations[i18n.currentLang].pdf_explanation_title}</h3>
-                        <p>${translations[i18n.currentLang].pdf_explanation_text}</p>
-                    </div>
-                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 10px; color: #555;">
-                        <h4 style="color: #333; margin-top: 0; font-size: 12px;">${translations[i18n.currentLang].pdf_disclaimer_title}</h4>
-                        <p>${translations[i18n.currentLang].pdf_disclaimer_text}</p>
-                    </div>
-                </div>
-            `;
-            
-            // --- MODIFICATION PDF : Attacher l'élément au DOM de manière invisible ---
-            reportElement.style.position = 'absolute';
-            reportElement.style.left = '-9999px';
-            document.body.appendChild(reportElement);
+        var gainDailyNum = optDailyNum - curDailyNum;
+        var gainMonthlyNum = gainDailyNum * 30.4;
 
-            const filename = `OptiSolar_Rapport_${new Date().toISOString().split('T')[0]}.pdf`;
-            html2pdf().from(reportElement).set({
-                margin: 10,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save().then(() => {
-                document.body.removeChild(reportElement); // Nettoyer l'élément du DOM
-                btn.disabled = false;
-                btn.querySelector('span').textContent = originalText;
-            }).catch(() => {
-                document.body.removeChild(reportElement); // S'assurer de nettoyer même en cas d'erreur
-                btn.disabled = false;
-                btn.querySelector('span').textContent = originalText;
-            });
+        function fmt(n){
+            try { return utils.formatNumber(n); } catch(_){ return String(Math.round(n*100)/100); }
         }
+        var gainDailyText = gainDailyNum < 1 ? '~ ' + fmt(gainDailyNum * 1000) + ' Wh' : '~ ' + fmt(gainDailyNum) + ' kWh';
+        var gainMonthlyText = '~ ' + fmt(gainMonthlyNum) + ' kWh';
+
+        var now = new Date();
+        var formattedDate = new Date(dom.dateInput && dom.dateInput.value || now).toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US');
+
+        var curDailyProd = fmt(curDailyNum);
+        var optDailyProd = fmt(optDailyNum);
+        var trulyOptDailyProd = fmt(trulyOptDailyNum);
+
+        var currentTilt = dom.currentTiltInput && dom.currentTiltInput.value || '--';
+        var currentAzimuth = dom.currentAzimuthInput && dom.currentAzimuthInput.value || '--';
+        var recommendedTilt = state.lastRecommendedTilt ? Math.round(state.lastRecommendedTilt) : '--';
+        var idealOptimalTilt = state.lastIdealOptimalTilt ? Math.round(state.lastIdealOptimalTilt) : (recommendedTilt || '--');
+
+        var lat = dom.latitudeInput && dom.latitudeInput.value || '--';
+        var lon = dom.longitudeInput && dom.longitudeInput.value || '--';
+
+        // City: cached or quick lookup
+        var cityName = (localStorage.getItem('lastCityName') || '').trim();
+        if (!cityName && isFinite(Number(lat)) && isFinite(Number(lon))) {
+            try {
+                var n = await quickCityName(lat, lon);
+                if (n) { cityName = n; try { localStorage.setItem('lastCityName', n); } catch(e) {} }
+            } catch(_){}
+        }
+        var locationLabel = cityName ? (cityName + ' – Lat ' + lat + ', Lon ' + lon) : ('Lat ' + lat + ', Lon ' + lon);
+
+        // jsPDF init
+        var jspdfNS = window.jspdf || {};
+        var JsPDFClass = jspdfNS.jsPDF || window.jsPDF;
+        if (!JsPDFClass) throw new Error('jsPDF non chargé');
+        var doc = new JsPDFClass({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        if (typeof doc.autoTable !== 'function') throw new Error('AutoTable non chargé');
+
+        var pageWidth = doc.internal.pageSize.getWidth();
+        var margin = 10;
+
+        // Header with logo (natural ratio)
+        var y = 14;
+        if (window.LOGO_DATA_URI) {
+            try {
+                // Quick draw with fixed height but clamp width to avoid overflow
+                var img = new Image();
+                var done = new Promise(function(res){ img.onload = function(){res(true)}; img.onerror = function(){res(false)}; });
+                img.src = window.LOGO_DATA_URI;
+                await done;
+                var ratio = (img.naturalWidth && img.naturalHeight) ? (img.naturalWidth / img.naturalHeight) : 1;
+                var targetH = 12, maxW = 42;
+                var w = targetH * ratio;
+                if (w > maxW) w = maxW;
+                var h = w / ratio;
+                doc.addImage(window.LOGO_DATA_URI, 'PNG', margin, y - (h - 4), w, h);
+            } catch(e) {}
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        var title = i18n.currentLang === 'fr' ? "Rapport d'Optimisation Solaire" : "Solar Optimization Report";
+        doc.text(title, margin + 46, y);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(formattedDate, pageWidth - margin, y, { align: 'right' });
+
+        // Params table
+        doc.setFontSize(12);
+        doc.text(i18n.currentLang === 'fr' ? "Paramètres de la Simulation" : "Simulation Parameters", margin, y + 12);
+        doc.autoTable({
+            startY: y + 16,
+            styles: { fontSize: 10, cellPadding: 2 },
+            headStyles: { fillColor: [29, 78, 216], textColor: 255 },
+            head: [[i18n.currentLang === 'fr' ? 'Paramètre' : 'Parameter', i18n.currentLang === 'fr' ? 'Valeur' : 'Value']],
+            body: [
+                [i18n.currentLang === 'fr' ? 'Localisation' : 'Location', locationLabel],
+                [i18n.currentLang === 'fr' ? 'Date' : 'Date', formattedDate],
+                [i18n.currentLang === 'fr' ? 'Puissance installée' : 'Installed capacity', (dom.peakPowerInput && dom.peakPowerInput.value ? dom.peakPowerInput.value : '--') + ' kWc'],
+                [i18n.currentLang === 'fr' ? 'Inclinaison mesurée' : 'Measured tilt', (currentTilt || '--') + '°'],
+                [i18n.currentLang === 'fr' ? 'Azimut mesuré' : 'Measured azimuth', (currentAzimuth || '--') + '°'],
+                [i18n.currentLang === 'fr' ? 'Inclinaison recommandée' : 'Recommended tilt', (recommendedTilt || '--') + '°'],
+                [i18n.currentLang === 'fr' ? 'Inclinaison optimale (théorique)' : 'Ideal optimal tilt', (idealOptimalTilt || '--') + '°']
+            ],
+            theme: 'grid',
+            margin: { left: margin, right: margin }
+        });
+
+        // Comparison table
+        var afterFirst = doc.lastAutoTable.finalY + 8;
+        doc.setFontSize(12);
+        doc.text(i18n.currentLang === 'fr' ? "Comparatif de Production Journalière Estimée" : "Estimated Daily Production Comparison", margin, afterFirst);
+        doc.autoTable({
+            startY: afterFirst + 4,
+            styles: { fontSize: 10, cellPadding: 2 },
+            headStyles: { fillColor: [29, 78, 216], textColor: 255 },
+            head: [[i18n.currentLang === 'fr' ? 'Configuration' : 'Configuration', i18n.currentLang === 'fr' ? 'Production (kWh/j)' : 'Production (kWh/day)']],
+            body: [
+                [i18n.currentLang === 'fr' ? 'Actuelle' : 'Current', curDailyProd],
+                [i18n.currentLang === 'fr' ? 'Optimale (recommandée)' : 'Optimal (recommended)', optDailyProd],
+                [i18n.currentLang === 'fr' ? 'Optimale théorique' : 'Theoretical optimal', trulyOptDailyProd],
+                [i18n.currentLang === 'fr' ? 'Gain journalier' : 'Daily gain', gainDailyText],
+                [i18n.currentLang === 'fr' ? 'Gain mensuel (approx.)' : 'Monthly gain (approx.)', gainMonthlyText]
+            ],
+            theme: 'grid',
+            margin: { left: margin, right: margin }
+        });
+
+        // Disclaimers
+        var yAfter = doc.lastAutoTable.finalY + 8;
+        var disclaimerTitle = translations[i18n.currentLang].pdf_disclaimer_title;
+        var disclaimerText = translations[i18n.currentLang].pdf_disclaimer_text;
+        var explanationTitle = translations[i18n.currentLang].pdf_explanation_title;
+        var explanationText = translations[i18n.currentLang].pdf_explanation_text;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(disclaimerTitle, margin, yAfter);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        var wrapW = pageWidth - margin*2;
+        doc.text(doc.splitTextToSize(disclaimerText, wrapW), margin, yAfter + 5);
+
+        var blockH = doc.getTextDimensions(doc.splitTextToSize(disclaimerText, wrapW)).h;
+        var yAfter2 = yAfter + 5 + blockH + 4;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(explanationTitle, margin, yAfter2);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(doc.splitTextToSize(explanationText, wrapW), margin, yAfter2 + 5);
+
+        var filename = 'OptiSolar_Rapport_' + new Date().toISOString().split('T')[0] + '.pdf';
+        doc.save(filename);
+
+    } catch (err) {
+        try { utils.log('PDF generation failed:', err); } catch(_) {}
+        alert(translations[i18n.currentLang].generic_error || 'Erreur');
+    } finally {
+        if (btn) btn.disabled = false;
+        if (span) span.textContent = originalText;
+    }
+},
+
     };
 
     const onboarding = {
@@ -757,9 +881,8 @@
             const pvgisUrl = `https://re.jrc.ec.europa.eu/api/PVcalc?lat=${lat}&lon=${lon}&peakpower=${peakpower}&loss=14&angle=${angle}&aspect=${aspect}&outputformat=json`;
             
             const strategies = [
-                // AJOUT : Tentative directe en premier
                 async () => {
-                    const res = await fetchWithTimeout(pvgisUrl, {}, 5000); // Timeout plus court
+                    const res = await fetchWithTimeout(pvgisUrl, {}, 5000); 
                     if (!res.ok) throw new Error('Direct PVGIS fetch failed');
                     return await res.json();
                 },
@@ -807,7 +930,6 @@
             dom.calculateLoader.classList.remove('hidden');
             dom.calculateText.classList.add('hidden');
 
-            // AJOUT : Vérification de la connexion internet
             if (navigator.onLine === false) {
                 dom.pvgisError.textContent = translations[i18n.currentLang].offline_error;
                 dom.calculateText.classList.remove('hidden'); 
@@ -866,7 +988,7 @@
 
                 const gainDaily = optDaily - curDaily;
                 dom.potentialGainDailyDisplay.textContent = gainDaily < 1 ? `~ ${Math.round(gainDaily * 1000)} Wh` : `~ ${utils.formatNumber(gainDaily)} kWh`; 
-                const gainMonthly = gainDaily * 30.4; // Average days in month
+                const gainMonthly = gainDaily * 30.4;
                 dom.potentialGainMonthlyDisplay.textContent = `~ ${utils.formatNumber(gainMonthly)} kWh`; 
                 
                 dom.productionResults.classList.remove('hidden');
@@ -882,7 +1004,60 @@
             } 
         }
     };
+function validateManualInputs() {
+    const tiltInput = dom.manualTiltInput;
+    const azimuthInput = dom.manualAzimuthInput;
+    const tiltError = document.getElementById('manual-tilt-error');
+    const azimuthError = document.getElementById('manual-azimuth-error');
 
+    let isValid = true;
+
+    const tiltValue = utils.safeParseFloat(tiltInput.value);
+    if (isNaN(tiltValue) || tiltValue < 0 || tiltValue > 90) {
+        tiltInput.classList.add('error');
+        tiltError.textContent = "Entre 0° et 90°";
+        isValid = false;
+    } else {
+        tiltInput.classList.remove('error');
+        tiltError.textContent = "";
+    }
+
+    const azimuthValue = utils.safeParseFloat(azimuthInput.value);
+    if (isNaN(azimuthValue) || azimuthValue < -180 || azimuthValue > 180) {
+        azimuthInput.classList.add('error');
+        azimuthError.textContent = "Entre -180° et 180°";
+        isValid = false;
+    } else {
+        azimuthInput.classList.remove('error');
+        azimuthError.textContent = "";
+    }
+
+    return isValid;
+}
+function validateEstimationInputs() {
+    const inputs = [
+        { el: dom.peakPowerInput, errorEl: document.getElementById('peak-power-error'), min: 0.01, max: 1000, msg: "> 0" },
+        { el: dom.longitudeInput, errorEl: document.getElementById('longitude-error'), min: -180, max: 180, msg: "Entre -180 et 180" },
+        { el: dom.currentTiltInput, errorEl: document.getElementById('current-tilt-error'), min: 0, max: 90, msg: "Entre 0° et 90°" },
+        { el: dom.currentAzimuthInput, errorEl: document.getElementById('current-azimuth-error'), min: -180, max: 180, msg: "Entre -180° et 180°" }
+    ];
+
+    let allValid = true;
+
+    inputs.forEach(item => {
+        const value = utils.safeParseFloat(item.el.value);
+        if (isNaN(value) || value < item.min || value > item.max) {
+            item.el.classList.add('error');
+            item.errorEl.textContent = item.msg;
+            allValid = false;
+        } else {
+            item.el.classList.remove('error');
+            item.errorEl.textContent = "";
+        }
+    });
+
+    return allValid;
+}
     function init() {
         const savedLang = localStorage.getItem('userLang') || 'fr';
         i18n.setLanguage(savedLang);
@@ -901,11 +1076,6 @@
         state.tiltOffset = Number(localStorage.getItem('tiltOffset')) || 0;
         dom.peakPowerInput.value = localStorage.getItem('userPeakPower') || '3.72';
 
-        // =================================================================
-        // CODE POUR LES BOUTONS ROTATIFS
-        // =================================================================
-
-        // --- 1. Gestion du style du bouton "Mémoriser" ---
         const styleKnob = document.getElementById('style-knob');
         const styleKnobLabel = document.getElementById('style-knob-label');
         const memorizeRingBtn = dom.memorizeRingBtn;
@@ -943,7 +1113,6 @@
         if (currentStyleIndex === -1) currentStyleIndex = 0;
         updateStyleKnob();
 
-        // --- 2. Gestion du Thème de l'application ---
         const themeKnob = document.getElementById('theme-knob');
         const themeKnobLabel = document.getElementById('theme-knob-label');
 
@@ -956,7 +1125,6 @@
         let currentThemeIndex = 0;
 
         const applyTheme = (theme) => {
-            // Préserve les classes existantes du <body>
             document.body.classList.remove('light-mode','style2-mode','solar-mode');
             if (theme.className) {
                 document.body.classList.add(theme.className);
@@ -981,11 +1149,7 @@
         currentThemeIndex = themeOptions.findIndex(opt => opt.id === savedThemeId);
         if (currentThemeIndex === -1) currentThemeIndex = 0;
         updateThemeKnob();
-
-        // =================================================================
-        // FIN DU CODE POUR LES BOUTONS ROTATIFS
-        // =================================================================
-
+        
         if (!localStorage.getItem('onboardingComplete')) {
             onboarding.start();
         }
@@ -1011,15 +1175,23 @@
         dom.memorizeRingBtn.addEventListener('click', handlers.memorizeSensorValues);
         dom.calibrateTiltBtn.addEventListener('click', handlers.calibrateTilt);
         
-        // MODIFICATION : Utilisation du Browser Plugin
         dom.bugReportButton.addEventListener('click', (e) => { e.preventDefault(); handlers.openBugReport(e); });
 		dom.donationMessage.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
         dom.donateButtonFab.addEventListener('click', (e) => { e.preventDefault(); utils.openExternalUrl(CONFIG.donateLink); });
 
-        dom.gotoEstimationButton.addEventListener('click', handlers.prepareEstimationPage);
+        dom.gotoEstimationButton.addEventListener('click', () => {
+    if (state.entryMode === 'manual' && !validateManualInputs()) {
+        return; // Bloque si la validation échoue en mode manuel
+    }
+    handlers.prepareEstimationPage();
+});
         dom.backButton.addEventListener('click', () => ui.showPage('main'));
         dom.closeSettingsBtn.addEventListener('click', () => ui.showPage('main'));
-        dom.calculateProductionButton.addEventListener('click', api.getProductionEstimate);
+        dom.calculateProductionButton.addEventListener('click', () => {
+    if (validateEstimationInputs()) { // On vérifie d'abord
+        api.getProductionEstimate();   // Si c'est bon, on lance le calcul
+    }
+});
         dom.exportPdfBtn.addEventListener('click', handlers.exportToPDF);
 
         document.querySelectorAll('.close-modal-btn').forEach(btn => 
@@ -1037,6 +1209,12 @@
         dom.onboardingPrevBtn.addEventListener('click', () => onboarding.prev());
         dom.onboardingFinishBtn.addEventListener('click', () => onboarding.finish());
         dom.replayTutorialBtn.addEventListener('click', handlers.replayTutorial);
+		dom.manualTiltInput.addEventListener('input', validateManualInputs);
+		dom.manualAzimuthInput.addEventListener('input', validateManualInputs);
+		dom.peakPowerInput.addEventListener('input', validateEstimationInputs);
+		dom.longitudeInput.addEventListener('input', validateEstimationInputs);
+		dom.currentTiltInput.addEventListener('input', validateEstimationInputs);
+		dom.currentAzimuthInput.addEventListener('input', validateEstimationInputs);
         
         document.getElementById('lang-switcher').addEventListener('click', (e) => {
             if (e.target.matches('.lang-btn')) {
@@ -1049,14 +1227,9 @@
         
         calculations.calculateAndDisplayAll();
 
-        // =================================================================
-        // GESTION DU BOUTON "RETOUR" ANDROID
-        // =================================================================
         if (window.Capacitor && Capacitor.isPluginAvailable('App')) {
             Capacitor.Plugins.App.addListener('backButton', (event) => {
                 event.preventDefault();
-
-                // MODIFICATION : Détection élargie pour inclure les splash screens
                 const openElement = document.querySelector('.fixed.inset-0:not(.hidden), #splashOverlay:not(.exit), #pg-splash:not(.pg-hide)');
                 if (openElement) {
                     if (openElement.id === 'splashOverlay') openElement.classList.add('exit');
@@ -1064,12 +1237,10 @@
                     else openElement.classList.add('hidden');
                     return;
                 }
-
                 if (!dom.settingsPage.classList.contains('hidden')) {
                     ui.showPage('main');
                     return;
                 }
-                
                 Capacitor.Plugins.App.exitApp();
             });
         }
@@ -1078,77 +1249,7 @@
     window.addEventListener('load', init);
 })();
 
-// === Photon Grid Splash (non intrusif) ===
-(function(){
-  if (typeof window === 'undefined') return;
-  const splash = document.getElementById('pg-splash');
-  if (!splash) return;
-  
-  // Option pour désactiver: ?nosplash=1
-  const bypass = /[?&]nosplash=1 /.test(location.search);
-  if (bypass){
-    splash.classList.add('pg-hide');
-    return;
-  }
 
-  // On va l'afficher : retirer pg-hide
-  splash.classList.remove('pg-hide');
-
-  const needle = document.getElementById('pg-needle');
-  function setAngle(a){
-    const clamped = Math.max(0, Math.min(90, a || 0));
-    needle.style.transform = `translate(-50%,-100%) rotate(${clamped-90}deg)`;
-  }
-
-  const lastLat = parseFloat(localStorage.getItem('lastLat') || localStorage.getItem('latitude') || '44.13');
-  const approx = Math.max(0, Math.min(90, Math.round(Math.abs(lastLat)*0.8)));
-  setTimeout(()=> setAngle(approx), 1200);
-
-  const pulseMemorize = () => {
-    const candidates = Array.from(document.querySelectorAll('button, [role="button"]'));
-    const target = candidates.find(el => /m[ée]moriser/i.test(el.textContent||''));
-    if (target){ target.classList.add('pg-pulse'); setTimeout(()=>target.classList.remove('pg-pulse'), 3000); }
-  };
-
-  function closeSplash(){
-    if (!splash || splash.classList.contains('pg-hide')) return;
-    splash.classList.add('pg-hide');
-    setTimeout(()=>{ try{splash.remove();}catch(e){} pulseMemorize(); }, 620);
-  }
-
-  // Fermer si on tape hors bouton également (fail‑safe UX)
-  splash.addEventListener('click', (e)=>{
-    if (!(e.target && (e.target.id === 'pg-calibrate'))) { closeSplash(); }
-  });
-
-  document.getElementById('pg-calibrate')?.addEventListener('click', async (ev)=>{
-    ev.stopPropagation();
-    try{
-      if (window.Capacitor?.Plugins?.Haptics) { await window.Capacitor.Plugins.Haptics.vibrate(); }
-      else if (navigator.vibrate) { navigator.vibrate(10); }
-    }catch(_){}
-    let ended = false;
-    if (navigator.geolocation){
-      navigator.geolocation.getCurrentPosition((pos)=>{
-        const lat = pos.coords.latitude, lon = pos.coords.longitude;
-        localStorage.setItem('lastLat', String(lat));
-        localStorage.setItem('lastLon', String(lon));
-        window.dispatchEvent(new CustomEvent('photon:geo', {detail:{lat,lon}}));
-        ['onGeoUpdate','updateLocation','applyGeo','handleGPS','calibrateWithPosition'].forEach(fn=>{
-          if (typeof window[fn] === 'function'){ try{ window[fn](lat,lon); ended=true; }catch(e){} }
-        });
-        setAngle(Math.max(0, Math.min(90, Math.round(Math.abs(lat)*0.9))));
-        setTimeout(closeSplash, 800);
-      }, ()=>{ closeSplash(); }, {timeout:2500, maximumAge:60000});
-    }
-    if (!ended){ setTimeout(closeSplash, 1200); }
-  });
-
-  // Fail‑safe ultime : ferme quoi qu’il arrive après 6,5s
-  setTimeout(closeSplash, 6500);
-})();
-
-// Enhance splash visuals: set app name, place location, play zoom
 (function(){
   const splash = document.getElementById('pg-splash');
   if (!splash) return;
@@ -1157,33 +1258,25 @@
   const titleApp = document.title;
   const appName = (metaApp && metaApp.trim()) || (titleApp && titleApp.trim()) || 'Solar Setup';
   if (appnameEl) appnameEl.textContent = appName;
-
   const loc = document.getElementById('pg-loc');
-  // lat/lon last known (fallback Alès approx)
   const lat = parseFloat(localStorage.getItem('lastLat') || localStorage.getItem('latitude') || '44.12');
   const lon = parseFloat(localStorage.getItem('lastLon') || localStorage.getItem('longitude') || '4.08');
   if (!isNaN(lat) && !isNaN(lon) && loc){
-    // simple equirectangular projection onto the globe box: 0..100%
     const x = ((lon + 180) / 360) * 100;
     const y = ((90 - lat) / 180) * 100;
     loc.style.setProperty('--x', x+'%');
     loc.style.setProperty('--y', y+'%');
   }
-  // small zoom effect class
   splash.classList.add('pg-zoom');
 })();
-
-
-// === Splash Overlay controller v3 ===
 (function(){
   const overlay = document.getElementById('splashOverlay');
   if(!overlay) return;
-  // Ensure any legacy splash never shows
+  if (/[?&]nosplash=1(?:&|$)/.test(location.search)) { overlay.remove(); return; }
   document.getElementById('pg-splash')?.remove();
   document.querySelector('.pg-splash')?.remove();
   document.getElementById('pg-zoom')?.remove();
   document.querySelector('.pg-zoom')?.remove();
-
   let particleTimer = null;
   function makeSpark(){
     const box=overlay.querySelector('#particles'); const W=window.innerWidth, H=window.innerHeight;
@@ -1222,5 +1315,14 @@
     exitTimer = setTimeout(exitSplash, SPLASH_MS);
   }
   overlay.querySelector('#continueBtn')?.addEventListener('click', exitSplash);
-  window.addEventListener('load', startSequence);
+  
+  const kickoff = () => { try{ startSequence(); }catch(e){ console && console.warn && console.warn('splash start err', e);} };
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(kickoff, 0);
+  } else {
+    window.addEventListener('DOMContentLoaded', kickoff, { once:true });
+  }
+  // ultimate failsafe: never block the app
+  setTimeout(() => { try{ exitSplash(); } catch(_){} }, 8000);
+ 
 })();

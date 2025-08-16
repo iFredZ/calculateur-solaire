@@ -13,6 +13,9 @@
     --border-color-input: rgba(255,255,255,.1);
     --info-box-bg: rgba(123, 138, 165, 0.1);
 }
+/* FIX: ensure hidden wins over .icon-btn */
+.hidden{display:none!important}
+
 .light-mode {
     --bg: #f1f5f9;
     --card: #ffffff;
@@ -459,3 +462,8 @@ input:checked + .slider:before { transform: translateX(24px); }
 }
 @keyframes twinkle{0%,100%{opacity:.22}50%{opacity:.46}}
 @keyframes haloBreath{ from{ filter: blur(20px); opacity:.9 } to { filter: blur(26px); opacity:.7 } }
+/* Style pour les champs de saisie en erreur */
+input.error {
+    border-color: var(--bad) !important; /* Utilise la variable de couleur "mauvaise" */
+    box-shadow: 0 0 5px rgba(255, 107, 107, 0.5); /* Ajoute une légère lueur */
+}
